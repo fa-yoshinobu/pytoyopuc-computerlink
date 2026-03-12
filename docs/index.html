@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>toyopuc-computerlink Docs</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        max-width: 760px;
+        margin: 40px auto;
+        padding: 0 16px;
+        line-height: 1.6;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        margin: 20px 0 28px;
+      }
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 14px 16px;
+        background: #fafafa;
+      }
+      .card h2 {
+        font-size: 1rem;
+        margin: 0 0 0.4rem;
+      }
+      .card p {
+        margin: 0 0 0.6rem;
+        color: #444;
+      }
+      h1 {
+        margin-bottom: 0.25em;
+      }
+      h2 {
+        margin-top: 1.6em;
+      }
+      ul {
+        padding-left: 1.2em;
+      }
+      code {
+        background: #f4f4f4;
+        padding: 0.1em 0.3em;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>toyopuc-computerlink Docs</h1>
+    <p>Entry points for the library reference, protocol notes, testing guides, and runnable examples.</p>
+    <p><strong>Quick Start:</strong> Start with the README for installation and normal usage, then move to Examples or API Reference depending on whether you want runnable code or generated API docs.</p>
+    <div class="grid">
+      <div class="card">
+        <h2>Start Here</h2>
+        <p>Main library overview, installation, and normal usage.</p>
+        <a href="../README.md">Open README</a>
+      </div>
+      <div class="card">
+        <h2>API Reference</h2>
+        <p>Generated API documentation for the public Python package.</p>
+        <a href="api/toyopuc.html"><code>toyopuc</code> API</a>
+      </div>
+      <div class="card">
+        <h2>Examples</h2>
+        <p>Copy-paste runnable scripts for TCP, UDP, clock, status, and GUI monitor.</p>
+        <a href="../examples/README.md">Open Examples</a>
+      </div>
+      <div class="card">
+        <h2>Testing</h2>
+        <p>Real hardware validation steps, simulator smoke tests, and batch runners.</p>
+        <a href="TESTING.md">Open Testing Guide</a>
+      </div>
+    </div>
+
+    <h2>All Documents</h2>
+    <ul>
+      <li><a href="../README.md">Project README</a></li>
+      <li><a href="../examples/README.md">Examples</a></li>
+      <li><a href="TESTING.md">Testing Guide</a></li>
+      <li><a href="COMPUTER_LINK_SPEC.md">Computer Link Spec</a></li>
+      <li><a href="MODEL_RANGES.md">Model Ranges</a></li>
+      <li><a href="RELEASE.md">Release Checklist</a></li>
+      <li><a href="RELEASE_NOTES.md">Release Notes</a></li>
+      <li><a href="PENDING.md">Pending</a></li>
+      <li><a href="api/index.html">API Docs</a></li>
+      <li><a href="api/toyopuc.html"><code>toyopuc</code> module API</a></li>
+    </ul>
+
+    <h2>Regenerate API Docs</h2>
+    <pre><code>pip install .[docs]
+tools\build_api_docs.bat</code></pre>
+  </body>
+</html>
