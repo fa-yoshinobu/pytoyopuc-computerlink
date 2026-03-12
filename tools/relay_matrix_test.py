@@ -4,12 +4,13 @@ import argparse
 from datetime import datetime, timedelta
 from pathlib import Path
 import sys
-from typing import Iterable, TextIO
+from typing import Iterable, Mapping, Optional, TextIO, TypeVar, cast
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from toyopuc import ToyopucHighLevelClient, resolve_device  # noqa: E402
+from toyopuc.high_level import ResolvedDevice  # noqa: E402
 from toyopuc.protocol import (  # noqa: E402
     build_ext_word_read,
     build_ext_word_write,
@@ -19,6 +20,22 @@ from toyopuc.protocol import (  # noqa: E402
     build_word_write,
     unpack_u16_le,
 )
+
+T = TypeVar("T")
+
+
+def _require(value: Optional[T], label: str) -> T:
+    if value is None:
+        raise ValueError(f"resolved device missing {label}")
+    return value
+
+
+def _as_int(value: object) -> int:
+    if isinstance(value, bool):
+        return 1 if value else 0
+    if isinstance(value, int):
+        return value
+    raise TypeError(f"unsupported readback type: {type(value)!r}")
 
 
 def parse_int_auto(text: str) -> int:
@@ -62,17 +79,20 @@ def _relay_block_read(plc: ToyopucHighLevelClient, hops: str, device: str, count
     if resolved.unit != "word":
         raise ValueError(f"{device} is not a word device")
     if resolved.scheme == "basic-word":
-        resp = plc.send_via_relay(hops, build_word_read(resolved.basic_addr, count))
+        resp = plc.send_via_relay(hops, build_word_read(_require(resolved.basic_addr, "basic_addr"), count))
         if resp.cmd != 0x1C:
             raise ValueError(f"Unexpected CMD in relay basic word-read response: 0x{resp.cmd:02X}")
         return unpack_u16_le(resp.data)
     if resolved.scheme in ("program-word", "ext-word"):
-        resp = plc.send_via_relay(hops, build_ext_word_read(resolved.no, resolved.addr, count))
+        resp = plc.send_via_relay(
+            hops,
+            build_ext_word_read(_require(resolved.no, "no"), _require(resolved.addr, "addr"), count),
+        )
         if resp.cmd != 0x94:
             raise ValueError(f"Unexpected CMD in relay ext word-read response: 0x{resp.cmd:02X}")
         return unpack_u16_le(resp.data)
     if resolved.scheme == "pc10-word":
-        resp = plc.send_via_relay(hops, build_pc10_block_read(resolved.addr32, count * 2))
+        resp = plc.send_via_relay(hops, build_pc10_block_read(_require(resolved.addr32, "addr32"), count * 2))
         if resp.cmd != 0xC2:
             raise ValueError(f"Unexpected CMD in relay PC10 word-read response: 0x{resp.cmd:02X}")
         return unpack_u16_le(resp.data)
@@ -85,18 +105,21 @@ def _relay_block_write(plc: ToyopucHighLevelClient, hops: str, device: str, valu
         raise ValueError(f"{device} is not a word device")
     masked = [int(value) & 0xFFFF for value in values]
     if resolved.scheme == "basic-word":
-        resp = plc.send_via_relay(hops, build_word_write(resolved.basic_addr, masked))
+        resp = plc.send_via_relay(hops, build_word_write(_require(resolved.basic_addr, "basic_addr"), masked))
         if resp.cmd != 0x1D:
             raise ValueError(f"Unexpected CMD in relay basic word-write response: 0x{resp.cmd:02X}")
         return
     if resolved.scheme in ("program-word", "ext-word"):
-        resp = plc.send_via_relay(hops, build_ext_word_write(resolved.no, resolved.addr, masked))
+        resp = plc.send_via_relay(
+            hops,
+            build_ext_word_write(_require(resolved.no, "no"), _require(resolved.addr, "addr"), masked),
+        )
         if resp.cmd != 0x95:
             raise ValueError(f"Unexpected CMD in relay ext word-write response: 0x{resp.cmd:02X}")
         return
     if resolved.scheme == "pc10-word":
         payload = b"".join(value.to_bytes(2, "little") for value in masked)
-        resp = plc.send_via_relay(hops, build_pc10_block_write(resolved.addr32, payload))
+        resp = plc.send_via_relay(hops, build_pc10_block_write(_require(resolved.addr32, "addr32"), payload))
         if resp.cmd != 0xC3:
             raise ValueError(f"Unexpected CMD in relay PC10 word-write response: 0x{resp.cmd:02X}")
         return
@@ -122,7 +145,7 @@ def main() -> int:
     parser.add_argument("--timeout", type=float, default=5.0)
     parser.add_argument("--retries", type=int, default=0)
     parser.add_argument("--hops", required=True)
-    parser.add_argument("--targets", default="D0000,R0000,S0000,U08000")
+    parser.add_argument("--targets", default="P1-D0000,P1-R0000,P1-S0000,U08000")
     parser.add_argument("--counts", default="8,16,32")
     parser.add_argument("--loops", type=int, default=3)
     parser.add_argument("--value", type=parse_int_auto, default=0x1000)
@@ -195,13 +218,13 @@ def main() -> int:
 
             if not args.skip_write_many:
                 def _write_many_case() -> str:
-                    items = {}
+                    items: dict[str, object] = {}
                     for i, target in enumerate(targets):
                         items[target] = (args.value + 0x2000 + i) & 0xFFFF
-                    plc.relay_write_many(args.hops, items)
+                    plc.relay_write_many(args.hops, cast(Mapping[str | ResolvedDevice, object], items))
                     actual = plc.relay_read_many(args.hops, list(items.keys()))
-                    normalized = [int(value) if not isinstance(value, bool) else int(value) for value in actual]
-                    expected = [items[target] for target in items]
+                    normalized = [_as_int(value) for value in actual]
+                    expected = [_as_int(items[target]) for target in items]
                     if normalized != expected:
                         raise ValueError(f"expected={_format_words(expected)} got={_format_words(normalized)}")
                     return f"targets={','.join(items.keys())} values={_format_words(expected)}"
@@ -212,25 +235,20 @@ def main() -> int:
 
             if not args.skip_mixed:
                 def _mixed_case() -> str:
-                    items = {
-                        "M0000": 1,
-                        "D0000L": 0x79,
+                    items: dict[str, object] = {
+                        "P1-M0000": 1,
+                        "P1-D0000L": 0x79,
                         "P1-D0000": 0x2468,
                         "ES0000": 0x9ABC,
                         "U08000": 0xDEF0,
                     }
-                    plc.relay_write_many(args.hops, items)
+                    plc.relay_write_many(args.hops, cast(Mapping[str | ResolvedDevice, object], items))
                     actual = plc.relay_read_many(args.hops, list(items.keys()))
-                    normalized: list[int] = []
-                    for value in actual:
-                        if isinstance(value, bool):
-                            normalized.append(1 if value else 0)
-                        else:
-                            normalized.append(int(value))
-                    expected = [int(items[key]) for key in items]
+                    normalized = [_as_int(value) for value in actual]
+                    expected = [_as_int(items[key]) for key in items]
                     if normalized != expected:
                         raise ValueError(f"expected={expected} got={normalized}")
-                    return "items=" + ", ".join(f"{key}=0x{int(items[key]):X}" for key in items)
+                    return "items=" + ", ".join(f"{key}=0x{_as_int(items[key]):X}" for key in items)
 
                 total += 1
                 if _run_case(log_f, "mixed write_many", _mixed_case):

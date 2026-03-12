@@ -39,7 +39,7 @@ def main() -> int:
     p.add_argument("--timeout", type=float, default=5.0)
     p.add_argument("--retries", type=int, default=0)
     p.add_argument("--hops", required=True, help='relay hops, for example "P1-L2:N2,P1-L2:N4"')
-    p.add_argument("--device", default="D0000", help="starting word device")
+    p.add_argument("--device", default="P1-D0000", help="starting word device")
     p.add_argument("--count", type=int, default=8, help="number of contiguous words per transfer")
     p.add_argument("--loops", type=int, default=3, help="number of write/read cycles")
     p.add_argument("--value", type=parse_int_auto, default=0x1000, help="starting word value for loop 1")

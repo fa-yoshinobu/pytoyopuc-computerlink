@@ -65,7 +65,7 @@ if defined LOG (
     --timeout %TIMEOUT% ^
     --retries %RETRIES% ^
     --hops "%HOPS%" ^
-    --targets D0000,R0000,S0000,U08000 ^
+    --targets P1-D0000,P1-R0000,P1-S0000,U08000 ^
     --counts 8,16,32 ^
     --loops 3 ^
     --value 0x1000 ^
@@ -81,7 +81,7 @@ if defined LOG (
     --timeout %TIMEOUT% ^
     --retries %RETRIES% ^
     --hops "%HOPS%" ^
-    --targets D0000,R0000,S0000,U08000 ^
+    --targets P1-D0000,P1-R0000,P1-S0000,U08000 ^
     --counts 8,16,32 ^
     --loops 3 ^
     --value 0x1000 ^
