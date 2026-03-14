@@ -12,9 +12,9 @@ This document is a practical checklist for releasing the library as a package.
 
 Naming used by this project:
 
-- GitHub repository: `pytoyopuc-computerlink`
-- GitHub URL: `https://github.com/fa-yoshinobu/pytoyopuc-computerlink`
-- GitHub Pages: `https://fa-yoshinobu.github.io/pytoyopuc-computerlink/`
+- GitHub repository: `toyopuc-computer-link-python`
+- GitHub URL: `https://github.com/fa-yoshinobu/toyopuc-computer-link-python`
+- GitHub Pages: `https://fa-yoshinobu.github.io/toyopuc-computer-link-python/`
 - package name: `toyopuc-computerlink`
 - import name: `toyopuc`
 
@@ -216,7 +216,7 @@ Current release note file:
 
 - [RELEASE_NOTES.md](RELEASE_NOTES.md)
 - GitHub Releases body:
-  - [GITHUB_RELEASE_v1.0.0.md](GITHUB_RELEASE_v1.0.0.md)
+  - [GITHUB_RELEASE_v1.0.3.md](GITHUB_RELEASE_v1.0.3.md)
   - includes title, tag, target, body, and upload checklist
 
 ## 12. Post-Release

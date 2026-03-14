@@ -19,11 +19,15 @@ Verified on real hardware:
 
 Names:
 
-- GitHub repository: `pytoyopuc-computerlink`
-- GitHub URL: `https://github.com/fa-yoshinobu/pytoyopuc-computerlink`
-- GitHub Pages: `https://fa-yoshinobu.github.io/pytoyopuc-computerlink/`
+- GitHub repository: `toyopuc-computer-link-python`
+- GitHub URL: `https://github.com/fa-yoshinobu/toyopuc-computer-link-python`
+- GitHub Pages: `https://fa-yoshinobu.github.io/toyopuc-computer-link-python/`
 - package name: `toyopuc-computerlink`
 - import name: `toyopuc`
+
+Related repositories:
+
+- .NET version: `https://github.com/fa-yoshinobu/toyopuc-computer-link-dotnet`
 
 Main documents:
 
@@ -47,7 +51,7 @@ For relay usage, start with `examples/relay_basic.py`.
 Install from GitHub:
 
 ```bash
-pip install git+https://github.com/fa-yoshinobu/pytoyopuc-computerlink.git
+pip install git+https://github.com/fa-yoshinobu/toyopuc-computer-link-python.git
 ```
 
 Read and write one device with the high-level client:
@@ -129,7 +133,7 @@ pip install -e .
 From GitHub:
 
 ```bash
-pip install git+https://github.com/fa-yoshinobu/pytoyopuc-computerlink.git
+pip install git+https://github.com/fa-yoshinobu/toyopuc-computer-link-python.git
 ```
 
 For API documentation generation:
@@ -147,7 +151,7 @@ Generated files:
 
 GitHub Pages entry:
 
-- `https://fa-yoshinobu.github.io/pytoyopuc-computerlink/`
+- `https://fa-yoshinobu.github.io/toyopuc-computer-link-python/`
 
 The generated API pages are docstring-based. If you want richer API reference
 output, expand docstrings on public classes and methods under `toyopuc/`.

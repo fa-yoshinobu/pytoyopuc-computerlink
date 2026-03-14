@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "toyopuc-computerlink"
-version = "1.0.2"
+version = "1.0.3"
 description = "Python client library for TOYOPUC computer-link communication over TCP and UDP"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -33,9 +33,9 @@ classifiers = [
 docs = ["pdoc"]
 
 [project.urls]
-Homepage = "https://github.com/fa-yoshinobu/pytoyopuc-computerlink"
-Repository = "https://github.com/fa-yoshinobu/pytoyopuc-computerlink"
-Documentation = "https://fa-yoshinobu.github.io/pytoyopuc-computerlink/"
+Homepage = "https://github.com/fa-yoshinobu/toyopuc-computer-link-python"
+Repository = "https://github.com/fa-yoshinobu/toyopuc-computer-link-python"
+Documentation = "https://fa-yoshinobu.github.io/toyopuc-computer-link-python/"
 
 [tool.setuptools.packages.find]
 include = ["toyopuc"]

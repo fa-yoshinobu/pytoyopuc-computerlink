@@ -8,6 +8,32 @@ Related documents:
 - [COMPUTER_LINK_SPEC.md](COMPUTER_LINK_SPEC.md)
 - [RELEASE.md](RELEASE.md)
 
+## v1.0.3
+
+Documentation and repository-link refresh release.
+
+Release date:
+
+- 2026-03-15
+
+### Included
+
+- updated GitHub repository links to:
+  - `https://github.com/fa-yoshinobu/toyopuc-computer-link-python`
+- updated GitHub Pages links to:
+  - `https://fa-yoshinobu.github.io/toyopuc-computer-link-python/`
+- added related repository note for the `.NET` implementation:
+  - `https://github.com/fa-yoshinobu/toyopuc-computer-link-dotnet`
+- refreshed generated API docs under `docs/api`
+
+### Verification
+
+- API docs:
+  - `tools\build_api_docs.bat` passed
+- package checks:
+  - `python -m build` passed
+  - `python -m twine check dist/*` passed
+
 ## v1.0.2
 
 Regression-guard release for sparse `pc10-word` `read_many` behavior.
