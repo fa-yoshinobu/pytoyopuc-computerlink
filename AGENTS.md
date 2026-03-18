@@ -4,7 +4,7 @@ This repository is part of the PLC Communication Workspace and follows the globa
 
 ## 1. Project-Specific Context
 - **Protocol**: TOYOPUC Computer Link (JTEKT)
-- **Authoritative Source**: JTEKT/Toyoda specs (e.g. SN-I, SN-II, etc.)
+- **Authoritative Source**: JTEKT/Toyoda specs 
 - **Language**: Python (3.11+)
 - **Role**: Core Communication Library for TOYOPUC-Plus, Nano 10GX, etc.
 

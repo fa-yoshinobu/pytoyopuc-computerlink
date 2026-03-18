@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Static Analysis: Ruff](https://img.shields.io/badge/Lint-Ruff-black.svg)](https://github.com/astral-sh/ruff)
 
-A professional Python client library for JTEKT (Toyoda) TOYOPUC computer-link communication. Supporting TOYOPUC-Plus, Nano 10GX, and other SN-I/SN-II compatible models.
+A professional Python client library for JTEKT (Toyoda) TOYOPUC computer-link communication. Supporting TOYOPUC-Plus, Nano 10GX, and other compatible models.
 
 ## Key Features
 
