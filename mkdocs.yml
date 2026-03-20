@@ -17,7 +17,8 @@ nav:
   - API Reference:
       - Client: api/client.md
   - QA Reports: validation/reports/
-  - Change Log: ../CHANGELOG.md
+  - Change Log: CHANGELOG.md
+
 
 
 
