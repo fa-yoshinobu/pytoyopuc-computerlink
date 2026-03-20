@@ -1,4 +1,5 @@
-# Examples
+
+[![Documentation](https://img.shields.io/badge/docs-GitHub_Pages-blue.svg)](https://fa-yoshinobu.github.io/samples/)
 
 These examples show practical usage of `toyopuc`.
 
@@ -158,4 +159,6 @@ FR commit through relay:
 ```powershell
 python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode fr-commit --device FR000000 --wait
 ```
+
+
 

@@ -1,4 +1,5 @@
-# Tools
+
+[![Documentation](https://img.shields.io/badge/docs-GitHub_Pages-blue.svg)](https://fa-yoshinobu.github.io/scripts/)
 
 Use this file as a short index for the `tools/` directory.
 
@@ -132,4 +133,6 @@ python tools\final_whl_edge_test.py --host 192.168.250.101 --port 1027 --protoco
 tools\run_final_whl_edge_matrix.bat 192.168.250.101 1025 1027 12000 5 1 final_whl_edge_matrix_logs
 tools\run_sim_tests.bat 192.168.250.101 1027 udp 12000 5 2
 ```
+
+
 
