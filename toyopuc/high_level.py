@@ -808,7 +808,7 @@ class ToyopucDeviceClient(ToyopucClient):
     def relay_read_dword(
         self,
         hops: str | Iterable[tuple[int, int]],
-        device: Union[int, str, ResolvedDevice],
+        device: Union[str, ResolvedDevice],
     ) -> int:
         """Read one 32-bit value through relay hops."""
         return self.relay_read_dwords(hops, device, 1)[0]
@@ -816,7 +816,7 @@ class ToyopucDeviceClient(ToyopucClient):
     def relay_write_dword(
         self,
         hops: str | Iterable[tuple[int, int]],
-        device: Union[int, str, ResolvedDevice],
+        device: Union[str, ResolvedDevice],
         value: int,
     ) -> None:
         """Write one 32-bit value through relay hops."""
@@ -825,7 +825,7 @@ class ToyopucDeviceClient(ToyopucClient):
     def relay_read_dwords(
         self,
         hops: str | Iterable[tuple[int, int]],
-        device: Union[int, str, ResolvedDevice],
+        device: Union[str, ResolvedDevice],
         count: int,
     ) -> List[int]:
         """Read one or more 32-bit values through relay hops."""
@@ -839,7 +839,7 @@ class ToyopucDeviceClient(ToyopucClient):
     def relay_write_dwords(
         self,
         hops: str | Iterable[tuple[int, int]],
-        device: Union[int, str, ResolvedDevice],
+        device: Union[str, ResolvedDevice],
         values: Iterable[int],
     ) -> None:
         """Write one or more 32-bit values through relay hops."""
@@ -852,7 +852,7 @@ class ToyopucDeviceClient(ToyopucClient):
     def relay_read_float32(
         self,
         hops: str | Iterable[tuple[int, int]],
-        device: Union[int, str, ResolvedDevice],
+        device: Union[str, ResolvedDevice],
     ) -> float:
         """Read one IEEE-754 float32 through relay hops."""
         return self.relay_read_float32s(hops, device, 1)[0]
@@ -860,7 +860,7 @@ class ToyopucDeviceClient(ToyopucClient):
     def relay_write_float32(
         self,
         hops: str | Iterable[tuple[int, int]],
-        device: Union[int, str, ResolvedDevice],
+        device: Union[str, ResolvedDevice],
         value: float,
     ) -> None:
         """Write one IEEE-754 float32 through relay hops."""
@@ -869,7 +869,7 @@ class ToyopucDeviceClient(ToyopucClient):
     def relay_read_float32s(
         self,
         hops: str | Iterable[tuple[int, int]],
-        device: Union[int, str, ResolvedDevice],
+        device: Union[str, ResolvedDevice],
         count: int,
     ) -> List[float]:
         """Read one or more IEEE-754 float32 values through relay hops."""
@@ -883,7 +883,7 @@ class ToyopucDeviceClient(ToyopucClient):
     def relay_write_float32s(
         self,
         hops: str | Iterable[tuple[int, int]],
-        device: Union[int, str, ResolvedDevice],
+        device: Union[str, ResolvedDevice],
         values: Iterable[float],
     ) -> None:
         """Write one or more IEEE-754 float32 values through relay hops."""
