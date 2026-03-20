@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "toyopuc-computerlink"
-version = "0.1.1"
+version = "0.1.2"
 description = "Python client library for TOYOPUC computer-link communication over TCP and UDP"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -44,6 +44,7 @@ exclude = ["tests*", "scripts*", "docsrc/maintainer*", "docsrc/validation*"]
 [tool.setuptools]
 include-package-data = true
 exclude-package-data = { "*" = ["TODO.md"] }
+
 
 
 

@@ -10,14 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with: { python-version: "3.11" }
       - name: Build
         run: |
           pip install build
           python -m build
       - name: Upload
-        env: { GH_TOKEN: ${{ github.token }} }
+        env:
+          GH_TOKEN: "${{ github.token }}"
         run: |
-          tag="${{ github.ref_name }}"; if [[ -z "$tag" || "$tag" == "main" ]]; then tag="v0.1.0"; fi
+          tag="${{ github.ref_name }}"; if [[ -z "$tag" || "$tag" == "main" ]]; then tag="v0.1.2"; fi
           gh release upload "$tag" dist/* --clobber || gh release create "$tag" dist/* --title "Release $tag" --generate-notes
