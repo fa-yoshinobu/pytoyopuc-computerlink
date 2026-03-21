@@ -3,25 +3,28 @@ from __future__ import annotations
 import socket
 import struct
 import time
-from datetime import datetime
-from typing import Iterable, List, Optional, Tuple, Self
+from collections.abc import Callable, Iterable, Iterator
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from enum import Enum
+from typing import Self
 
 from .address import encode_fr_word_addr32, fr_block_ex_no
-from .exceptions import ToyopucError, ToyopucProtocolError, ToyopucTimeoutError
+from .errors import ToyopucError, ToyopucProtocolError, ToyopucTimeoutError
 from .protocol import (
-    CpuStatusData,
     FT_RESPONSE,
     ClockData,
+    CpuStatusData,
     ResponseFrame,
     build_bit_read,
     build_bit_write,
     build_byte_read,
     build_byte_write,
+    build_clock_read,
+    build_clock_write,
     build_command,
     build_cpu_status_read,
     build_cpu_status_read_a0,
-    build_clock_read,
-    build_clock_write,
     build_ext_byte_read,
     build_ext_byte_write,
     build_ext_multi_read,
@@ -53,6 +56,18 @@ from .relay import (
     parse_relay_inner_response,
     unwrap_relay_response_chain,
 )
+
+
+class ToyopucTraceDirection(Enum):
+    SEND = "send"
+    RECEIVE = "receive"
+
+
+@dataclass(frozen=True)
+class ToyopucTraceFrame:
+    direction: ToyopucTraceDirection
+    data: bytes
+    timestamp: datetime
 
 
 ERROR_CODE_DESCRIPTIONS = {
@@ -98,7 +113,7 @@ def _validate_fr_index(index: int) -> int:
     return idx
 
 
-def _iter_fr_segments(start_index: int, word_count: int):
+def _iter_fr_segments(start_index: int, word_count: int) -> Iterator[tuple[int, int]]:
     index = _validate_fr_index(start_index)
     remaining = int(word_count)
     if remaining < 1:
@@ -113,7 +128,7 @@ def _iter_fr_segments(start_index: int, word_count: int):
 
 def _iter_fr_io_segments(
     start_index: int, word_count: int, max_chunk_words: int = _FR_IO_CHUNK_WORDS
-):
+) -> Iterator[tuple[int, int]]:
     if int(max_chunk_words) < 1:
         raise ValueError("max_chunk_words must be >= 1")
     for block_index, block_words in _iter_fr_segments(start_index, word_count):
@@ -124,24 +139,24 @@ def _iter_fr_io_segments(
             offset += chunk
 
 
-def _fr_commit_blocks(start_index: int, word_count: int) -> List[int]:
+def _fr_commit_blocks(start_index: int, word_count: int) -> list[int]:
     return [
         segment_start for segment_start, _ in _iter_fr_segments(start_index, word_count)
     ]
 
 
-def _unpack_uint32_low_word_first_words(words: Iterable[int]) -> List[int]:
+def _unpack_uint32_low_word_first_words(words: Iterable[int]) -> list[int]:
     items = [int(word) & 0xFFFF for word in words]
     if len(items) % 2 != 0:
         raise ValueError("word count must be even")
-    values: List[int] = []
+    values: list[int] = []
     for i in range(0, len(items), 2):
         values.append(items[i] | (items[i + 1] << 16))
     return values
 
 
-def _pack_uint32_low_word_first_words(values: Iterable[int]) -> List[int]:
-    words: List[int] = []
+def _pack_uint32_low_word_first_words(values: Iterable[int]) -> list[int]:
+    words: list[int] = []
     for value in values:
         bits = int(value) & 0xFFFFFFFF
         words.append(bits & 0xFFFF)
@@ -149,15 +164,15 @@ def _pack_uint32_low_word_first_words(values: Iterable[int]) -> List[int]:
     return words
 
 
-def _unpack_float32_low_word_first_words(words: Iterable[int]) -> List[float]:
-    values: List[float] = []
+def _unpack_float32_low_word_first_words(words: Iterable[int]) -> list[float]:
+    values: list[float] = []
     for bits in _unpack_uint32_low_word_first_words(words):
         values.append(struct.unpack("<f", struct.pack("<I", bits))[0])
     return values
 
 
-def _pack_float32_low_word_first_words(values: Iterable[float]) -> List[int]:
-    words: List[int] = []
+def _pack_float32_low_word_first_words(values: Iterable[float]) -> list[int]:
+    words: list[int] = []
     for value in values:
         bits = struct.unpack("<I", struct.pack("<f", float(value)))[0]
         words.append(bits & 0xFFFF)
@@ -176,7 +191,7 @@ def format_response_error(resp: ResponseFrame) -> str:
     return f"{msg}, data={resp.data.hex()}"
 
 
-def _extract_response_error_code(frame: bytes | None) -> Optional[int]:
+def _extract_response_error_code(frame: bytes | None) -> int | None:
     if not frame:
         return None
     try:
@@ -188,7 +203,7 @@ def _extract_response_error_code(frame: bytes | None) -> Optional[int]:
     return resp.data[-1] if resp.data else resp.cmd
 
 
-def _extract_relay_nak_error_code(frame: bytes | None) -> Optional[int]:
+def _extract_relay_nak_error_code(frame: bytes | None) -> int | None:
     if not frame:
         return None
     try:
@@ -231,45 +246,47 @@ class ToyopucClient:
         port: int,
         *,
         local_port: int = 0,
-        protocol: str = "tcp",
+        transport: str = "tcp",
         timeout: float = 3.0,
         retries: int = 0,
         retry_delay: float = 0.2,
         recv_bufsize: int = 8192,
+        trace_hook: Callable[[ToyopucTraceFrame], None] | None = None,
     ) -> None:
         self.host = host
         self.port = port
         self.local_port = int(local_port)
-        self.protocol = protocol.lower()
+        self.transport = transport.lower()
         self.timeout = timeout
         self.retries = max(0, int(retries))
         self.retry_delay = float(retry_delay)
         self.recv_bufsize = recv_bufsize
-        self._sock: Optional[socket.socket] = None
-        self._last_tx: Optional[bytes] = None
-        self._last_rx: Optional[bytes] = None
-        self._fr_wait_prefers_a0: Optional[bool] = None
-        self._relay_fr_wait_prefers_a0: Optional[bool] = None
+        self._sock: socket.socket | None = None
+        self._last_tx: bytes | None = None
+        self._last_rx: bytes | None = None
+        self._fr_wait_prefers_a0: bool | None = None
+        self._relay_fr_wait_prefers_a0: bool | None = None
+        self.trace_hook = trace_hook
 
     def __enter__(self) -> Self:
         self.connect()
         return self
 
-    def __exit__(self, exc_type, exc, tb) -> None:
+    def __exit__(self, exc_type: object, exc: object, tb: object) -> None:
         self.close()
 
     def connect(self) -> None:
         if self._sock:
             return
-        if self.protocol == "tcp":
+        if self.transport == "tcp":
             sock = socket.create_connection((self.host, self.port), self.timeout)
-        elif self.protocol == "udp":
+        elif self.transport == "udp":
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             if self.local_port:
                 sock.bind(("", self.local_port))
             sock.settimeout(self.timeout)
         else:
-            raise ValueError("protocol must be 'tcp' or 'udp'")
+            raise ValueError("transport must be 'tcp' or 'udp'")
         self._sock = sock
 
     def close(self) -> None:
@@ -281,12 +298,16 @@ class ToyopucClient:
         self._last_tx = None
         self._last_rx = None
 
+    def _fire_trace(self, direction: ToyopucTraceDirection, data: bytes) -> None:
+        if self.trace_hook is not None:
+            self.trace_hook(ToyopucTraceFrame(direction, bytes(data), datetime.now(timezone.utc)))
+
     @property
-    def last_tx(self) -> Optional[bytes]:
+    def last_tx(self) -> bytes | None:
         return self._last_tx
 
     @property
-    def last_rx(self) -> Optional[bytes]:
+    def last_rx(self) -> bytes | None:
         return self._last_rx
 
     def _recv_exact(self, n: int) -> bytes:
@@ -296,7 +317,7 @@ class ToyopucClient:
         while remaining > 0:
             try:
                 chunk = self._sock.recv(remaining)
-            except socket.timeout as e:
+            except TimeoutError as e:
                 raise ToyopucTimeoutError("Receive timeout") from e
             if not chunk:
                 raise ToyopucProtocolError("Connection closed while receiving")
@@ -306,7 +327,7 @@ class ToyopucClient:
 
     def _send_and_recv(self, payload: bytes) -> ResponseFrame:
         attempt = 0
-        last_err: Optional[Exception] = None
+        last_err: Exception | None = None
         while attempt <= self.retries:
             attempt += 1
             if not self._sock:
@@ -314,9 +335,10 @@ class ToyopucClient:
             assert self._sock is not None
             self._last_tx = payload
             self._last_rx = None
+            self._fire_trace(ToyopucTraceDirection.SEND, payload)
 
             try:
-                if self.protocol == "tcp":
+                if self.transport == "tcp":
                     self._sock.sendall(payload)
                     header = self._recv_exact(4)
                     ll, lh = header[2], header[3]
@@ -326,7 +348,7 @@ class ToyopucClient:
                 else:
                     self._sock.sendto(payload, (self.host, self.port))
                     frame, _ = self._sock.recvfrom(self.recv_bufsize)
-            except socket.timeout as e:
+            except TimeoutError as e:
                 last_err = ToyopucTimeoutError("Send/receive timeout")
                 if attempt <= self.retries:
                     try:
@@ -351,6 +373,7 @@ class ToyopucClient:
                     continue
                 raise last_err from e
 
+            self._fire_trace(ToyopucTraceDirection.RECEIVE, frame)
             self._last_rx = frame
             resp = parse_response(frame)
             if resp.ft != FT_RESPONSE:
@@ -371,7 +394,7 @@ class ToyopucClient:
         """Send a fully-built command payload and return the parsed response."""
         return self._send_and_recv(payload)
 
-    def read_words(self, addr: int, count: int) -> List[int]:
+    def read_words(self, addr: int, count: int) -> list[int]:
         """Read one or more basic-area words with `CMD=1C`."""
         resp = self._send_and_recv(build_word_read(addr, count))
         if resp.cmd != 0x1C:
@@ -420,7 +443,7 @@ class ToyopucClient:
         """Write one 32-bit value to two consecutive words."""
         self.write_dwords(addr, [value])
 
-    def read_dwords(self, addr: int, count: int) -> List[int]:
+    def read_dwords(self, addr: int, count: int) -> list[int]:
         """Read one or more 32-bit values from consecutive words."""
         points = int(count)
         if points < 1:
@@ -439,7 +462,7 @@ class ToyopucClient:
         """Write one IEEE-754 float32 to two consecutive words."""
         self.write_float32s(addr, [value])
 
-    def read_float32s(self, addr: int, count: int) -> List[float]:
+    def read_float32s(self, addr: int, count: int) -> list[float]:
         """Read one or more IEEE-754 float32 values from consecutive words."""
         points = int(count)
         if points < 1:
@@ -450,14 +473,14 @@ class ToyopucClient:
         """Write one or more IEEE-754 float32 values to consecutive words."""
         self.write_words(addr, _pack_float32_low_word_first_words(values))
 
-    def read_words_multi(self, addrs: Iterable[int]) -> List[int]:
+    def read_words_multi(self, addrs: Iterable[int]) -> list[int]:
         """Read multiple non-contiguous basic-area words with `CMD=22`."""
         resp = self._send_and_recv(build_multi_word_read(addrs))
         if resp.cmd != 0x22:
             raise ToyopucProtocolError("Unexpected CMD in response")
         return unpack_u16_le(resp.data)
 
-    def write_words_multi(self, pairs: Iterable[Tuple[int, int]]) -> None:
+    def write_words_multi(self, pairs: Iterable[tuple[int, int]]) -> None:
         """Write multiple non-contiguous basic-area words with `CMD=23`."""
         resp = self._send_and_recv(build_multi_word_write(pairs))
         if resp.cmd != 0x23:
@@ -470,13 +493,13 @@ class ToyopucClient:
             raise ToyopucProtocolError("Unexpected CMD in response")
         return resp.data
 
-    def write_bytes_multi(self, pairs: Iterable[Tuple[int, int]]) -> None:
+    def write_bytes_multi(self, pairs: Iterable[tuple[int, int]]) -> None:
         """Write multiple non-contiguous basic-area bytes with `CMD=25`."""
         resp = self._send_and_recv(build_multi_byte_write(pairs))
         if resp.cmd != 0x25:
             raise ToyopucProtocolError("Unexpected CMD in response")
 
-    def read_ext_words(self, no: int, addr: int, count: int) -> List[int]:
+    def read_ext_words(self, no: int, addr: int, count: int) -> list[int]:
         """Read extended-area words with `CMD=94` using `(No., addr)`."""
         resp = self._send_and_recv(build_ext_word_read(no, addr, count))
         if resp.cmd != 0x94:
@@ -504,9 +527,9 @@ class ToyopucClient:
 
     def read_ext_multi(
         self,
-        bit_points: Iterable[Tuple[int, int, int]],
-        byte_points: Iterable[Tuple[int, int]],
-        word_points: Iterable[Tuple[int, int]],
+        bit_points: Iterable[tuple[int, int, int]],
+        byte_points: Iterable[tuple[int, int]],
+        word_points: Iterable[tuple[int, int]],
     ) -> bytes:
         """Read mixed extended points with `CMD=98`.
 
@@ -523,9 +546,9 @@ class ToyopucClient:
 
     def write_ext_multi(
         self,
-        bit_points: Iterable[Tuple[int, int, int, int]],
-        byte_points: Iterable[Tuple[int, int, int]],
-        word_points: Iterable[Tuple[int, int, int]],
+        bit_points: Iterable[tuple[int, int, int, int]],
+        byte_points: Iterable[tuple[int, int, int]],
+        word_points: Iterable[tuple[int, int, int]],
     ) -> None:
         """Write mixed extended points with `CMD=99`."""
         resp = self._send_and_recv(
@@ -562,13 +585,13 @@ class ToyopucClient:
         if resp.cmd != 0xC5:
             raise ToyopucProtocolError("Unexpected CMD in response")
 
-    def read_fr_words(self, index: int, count: int) -> List[int]:
+    def read_fr_words(self, index: int, count: int) -> list[int]:
         """Read FR words via PC10 block read (`CMD=C2`).
 
         `FR` real-hardware access uses 32-bit PC10 addressing with
         `Ex No.=0x40-0x7F`, not `CMD=94`.
         """
-        values: List[int] = []
+        values: list[int] = []
         for chunk_index, chunk_words in _iter_fr_io_segments(index, count):
             data = self.pc10_block_read(
                 encode_fr_word_addr32(chunk_index), chunk_words * 2
@@ -633,7 +656,7 @@ class ToyopucClient:
         wait: bool = False,
         timeout: float = 30.0,
         poll_interval: float = 0.2,
-    ) -> Optional[CpuStatusData]:
+    ) -> CpuStatusData | None:
         """Commit the FR block containing `index` via `CMD=CA`.
 
         By default this waits until `Data7.bit4` (`under_writing_flash_register`)
@@ -654,9 +677,9 @@ class ToyopucClient:
         wait: bool = False,
         timeout: float = 30.0,
         poll_interval: float = 0.2,
-    ) -> Optional[CpuStatusData]:
+    ) -> CpuStatusData | None:
         """Commit every FR block touched by a contiguous word range."""
-        last_status: Optional[CpuStatusData] = None
+        last_status: CpuStatusData | None = None
         for block_index in _fr_commit_blocks(index, count):
             last_status = self.commit_fr_block(
                 block_index,
@@ -685,13 +708,13 @@ class ToyopucClient:
         )
 
     def relay_nested(
-        self, hops: Iterable[Tuple[int, int]], inner_payload: bytes
+        self, hops: Iterable[tuple[int, int]], inner_payload: bytes
     ) -> ResponseFrame:
         """Wrap a command in multiple relay hops using nested `CMD=60` frames."""
         return self._send_and_recv(build_relay_nested(list(hops), inner_payload))
 
     def send_via_relay(
-        self, hops: str | Iterable[Tuple[int, int]], inner_payload: bytes
+        self, hops: str | Iterable[tuple[int, int]], inner_payload: bytes
     ) -> ResponseFrame:
         """Send a command through relay hops and return the final inner response."""
         outer = self.relay_nested(normalize_relay_hops(hops), inner_payload)
@@ -704,8 +727,8 @@ class ToyopucClient:
         return final
 
     def relay_read_words(
-        self, hops: str | Iterable[Tuple[int, int]], addr: int, count: int
-    ) -> List[int]:
+        self, hops: str | Iterable[tuple[int, int]], addr: int, count: int
+    ) -> list[int]:
         """Read one or more basic-area words through relay hops."""
         resp = self.send_via_relay(hops, build_word_read(addr, count))
         if resp.cmd != 0x1C:
@@ -713,14 +736,14 @@ class ToyopucClient:
         return unpack_u16_le(resp.data)
 
     def relay_write_words(
-        self, hops: str | Iterable[Tuple[int, int]], addr: int, values: Iterable[int]
+        self, hops: str | Iterable[tuple[int, int]], addr: int, values: Iterable[int]
     ) -> None:
         """Write one or more basic-area words through relay hops."""
         resp = self.send_via_relay(hops, build_word_write(addr, values))
         if resp.cmd != 0x1D:
             raise ToyopucProtocolError("Unexpected CMD in relay word-write response")
 
-    def relay_read_clock(self, hops: str | Iterable[Tuple[int, int]]) -> ClockData:
+    def relay_read_clock(self, hops: str | Iterable[tuple[int, int]]) -> ClockData:
         """Read the CPU clock through relay hops."""
         resp = self.send_via_relay(hops, build_clock_read())
         if resp.cmd != 0x32:
@@ -733,7 +756,7 @@ class ToyopucClient:
             ) from e
 
     def relay_write_clock(
-        self, hops: str | Iterable[Tuple[int, int]], value: datetime
+        self, hops: str | Iterable[tuple[int, int]], value: datetime
     ) -> None:
         """Set the CPU clock through relay hops via `CMD=32 / 71 00`."""
         weekday = (value.weekday() + 1) % 7
@@ -755,7 +778,7 @@ class ToyopucClient:
             raise ToyopucProtocolError("Unexpected relay clock-write response body")
 
     def relay_read_cpu_status(
-        self, hops: str | Iterable[Tuple[int, int]]
+        self, hops: str | Iterable[tuple[int, int]]
     ) -> CpuStatusData:
         """Read the 8-byte CPU status block through relay hops."""
         resp = self.send_via_relay(hops, build_cpu_status_read())
@@ -769,7 +792,7 @@ class ToyopucClient:
             ) from e
 
     def relay_read_cpu_status_a0_raw(
-        self, hops: str | Iterable[Tuple[int, int]]
+        self, hops: str | Iterable[tuple[int, int]]
     ) -> bytes:
         """Read raw 8-byte CPU status through relay hops via `CMD=A0 / 01 10`."""
         resp = self.send_via_relay(hops, build_cpu_status_read_a0())
@@ -783,7 +806,7 @@ class ToyopucClient:
             ) from e
 
     def relay_read_cpu_status_a0(
-        self, hops: str | Iterable[Tuple[int, int]]
+        self, hops: str | Iterable[tuple[int, int]]
     ) -> CpuStatusData:
         """Read decoded CPU status through relay hops via `CMD=A0 / 01 10`."""
         resp = self.send_via_relay(hops, build_cpu_status_read_a0())
@@ -798,7 +821,7 @@ class ToyopucClient:
 
     def relay_write_fr_words(
         self,
-        hops: str | Iterable[Tuple[int, int]],
+        hops: str | Iterable[tuple[int, int]],
         index: int,
         values: Iterable[int],
         *,
@@ -809,7 +832,7 @@ class ToyopucClient:
 
     def relay_write_fr_words_ex(
         self,
-        hops: str | Iterable[Tuple[int, int]],
+        hops: str | Iterable[tuple[int, int]],
         index: int,
         values: Iterable[int],
         *,
@@ -851,7 +874,7 @@ class ToyopucClient:
                 )
 
     def relay_fr_register(
-        self, hops: str | Iterable[Tuple[int, int]], ex_no: int
+        self, hops: str | Iterable[tuple[int, int]], ex_no: int
     ) -> None:
         """Issue the FR-register command `CMD=CA` through relay hops."""
         resp = self.send_via_relay(hops, build_fr_register(ex_no))
@@ -860,13 +883,13 @@ class ToyopucClient:
 
     def relay_commit_fr_block(
         self,
-        hops: str | Iterable[Tuple[int, int]],
+        hops: str | Iterable[tuple[int, int]],
         index: int,
         *,
         wait: bool = False,
         timeout: float = 30.0,
         poll_interval: float = 0.2,
-    ) -> Optional[CpuStatusData]:
+    ) -> CpuStatusData | None:
         """Commit the remote FR block containing `index` via relay `CMD=CA`."""
         self.relay_fr_register(hops, fr_block_ex_no(index))
         if wait:
@@ -877,16 +900,16 @@ class ToyopucClient:
 
     def relay_commit_fr_range(
         self,
-        hops: str | Iterable[Tuple[int, int]],
+        hops: str | Iterable[tuple[int, int]],
         index: int,
         count: int = 1,
         *,
         wait: bool = False,
         timeout: float = 30.0,
         poll_interval: float = 0.2,
-    ) -> Optional[CpuStatusData]:
+    ) -> CpuStatusData | None:
         """Commit every FR block touched by a contiguous relay FR range."""
-        last_status: Optional[CpuStatusData] = None
+        last_status: CpuStatusData | None = None
         for block_index in _fr_commit_blocks(index, count):
             last_status = self.relay_commit_fr_block(
                 hops,
@@ -899,7 +922,7 @@ class ToyopucClient:
 
     def relay_wait_fr_write_complete(
         self,
-        hops: str | Iterable[Tuple[int, int]],
+        hops: str | Iterable[tuple[int, int]],
         *,
         timeout: float = 30.0,
         poll_interval: float = 0.2,

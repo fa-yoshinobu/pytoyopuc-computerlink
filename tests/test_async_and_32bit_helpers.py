@@ -74,10 +74,12 @@ def test_high_level_32bit_helpers_use_word_sequences() -> None:
     client.word_map = {addr0: 0x5678, addr1: 0x1234}
 
     assert client.read_dword("B0000") == 0x12345678
-    assert client.word_reads == [(addr0, 1), (addr1, 1)]
+    # Batch optimization: consecutive words are fetched in one read_words(addr, 2) call
+    assert client.word_reads == [(addr0, 2)]
 
     client.write_float32("B0000", 1.5)
-    assert client.word_writes == [(addr0, [0x0000]), (addr1, [0x3FC0])]
+    # Batch optimization: consecutive word write in one write_words(addr, [lo, hi]) call
+    assert client.word_writes == [(addr0, [0x0000, 0x3FC0])]
 
 
 def test_async_high_level_helpers_wrap_sync_implementation() -> None:
@@ -92,5 +94,5 @@ def test_async_high_level_helpers_wrap_sync_implementation() -> None:
 
     asyncio.run(run_checks())
 
-    assert client.word_reads == [(addr0, 1), (addr1, 1)]
-    assert client.word_writes == [(addr0, [0x0000]), (addr1, [0x3FC0])]
+    assert client.word_reads == [(addr0, 2)]
+    assert client.word_writes == [(addr0, [0x0000, 0x3FC0])]

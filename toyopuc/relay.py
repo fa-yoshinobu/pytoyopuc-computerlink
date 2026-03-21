@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, List, Tuple
 
-from .exceptions import ToyopucProtocolError
+from .errors import ToyopucProtocolError
 from .protocol import ResponseFrame, parse_response
 
 
@@ -19,9 +19,9 @@ class RelayLayer:
     padding: bytes = b""
 
 
-def parse_relay_hops(text: str) -> List[Tuple[int, int]]:
+def parse_relay_hops(text: str) -> list[tuple[int, int]]:
     """Parse relay hops from `P1-L2:N2` or `0x12:0x0002` style text."""
-    hops: List[Tuple[int, int]] = []
+    hops: list[tuple[int, int]] = []
     for part in text.split(","):
         item = part.strip()
         if not item:
@@ -54,8 +54,8 @@ def parse_relay_hops(text: str) -> List[Tuple[int, int]]:
 
 
 def normalize_relay_hops(
-    hops: str | Iterable[Tuple[int, int]],
-) -> List[Tuple[int, int]]:
+    hops: str | Iterable[tuple[int, int]],
+) -> list[tuple[int, int]]:
     """Normalize relay hops from text or `(link, station)` pairs."""
     if isinstance(hops, str):
         return parse_relay_hops(hops)
@@ -87,14 +87,14 @@ def parse_relay_inner_response(inner_raw: bytes) -> tuple[ResponseFrame, bytes]:
 
 def unwrap_relay_response_chain(
     resp: ResponseFrame,
-) -> tuple[List[RelayLayer], ResponseFrame | None]:
+) -> tuple[list[RelayLayer], ResponseFrame | None]:
     """Unwrap nested relay responses until a non-relay inner response is reached.
 
     Returns `(layers, final_response)`. When a relay layer returns NAK
     (`ack != 0x06`), `final_response` is `None` and the last layer contains the
     raw relay NAK payload.
     """
-    layers: List[RelayLayer] = []
+    layers: list[RelayLayer] = []
     current = resp
     while current.cmd == 0x60:
         if len(current.data) < 4:

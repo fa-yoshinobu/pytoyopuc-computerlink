@@ -1,6 +1,5 @@
 import re
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 
 @dataclass(frozen=True)
@@ -133,6 +132,13 @@ _EXT_BIT_SEGMENTS = {
 
 
 _ADDR_RE = re.compile(r"^(?P<area>[A-Z]{1,2})(?P<num>[0-9A-Fa-f]+)(?P<suffix>[LHW])?$")
+
+_ALL_KNOWN_AREAS = (
+    set(_WORD_BASE)
+    | {"ES", "EN", "H", "U", "EB", "FR"}
+    | {"EP", "EK", "EV", "ET", "EC", "EL", "EX", "EY", "EM", "GX", "GY", "GM"}
+)
+_VALID_AREAS_STR = ", ".join(sorted(_ALL_KNOWN_AREAS))
 _PREF_RE = re.compile(
     r"^(?P<prefix>P[123])-(?P<area>[A-Z]{1,2})(?P<num>[0-9A-Fa-f]+)(?P<suffix>[LHW])?$"
 )
@@ -288,6 +294,11 @@ def parse_address(text: str, unit: str, *, radix: int = 16) -> ParsedAddress:
         raise ValueError(f"Invalid address format: {text!r}")
 
     area = m.group("area")
+    if area not in _ALL_KNOWN_AREAS:
+        raise ValueError(
+            f"Unknown device area {area!r} in {text!r}. "
+            f"Valid areas: {_VALID_AREAS_STR}"
+        )
     num_text = m.group("num")
     num = int(num_text, radix)
     suffix = m.group("suffix")
@@ -327,7 +338,7 @@ def parse_address(text: str, unit: str, *, radix: int = 16) -> ParsedAddress:
 
 def parse_prefixed_address(
     text: str, unit: str, *, radix: int = 16
-) -> Tuple[int, ParsedAddress]:
+) -> tuple[int, ParsedAddress]:
     """Parse a prefixed address and return `(program_ex_no, parsed_address)`.
 
     Examples:
@@ -487,7 +498,7 @@ def encode_program_byte_address(addr: ParsedAddress) -> int:
     )
 
 
-def encode_program_bit_address(addr: ParsedAddress) -> Tuple[int, int]:
+def encode_program_bit_address(addr: ParsedAddress) -> tuple[int, int]:
     """Encode a prefixed (`P1/P2/P3`) bit address for `CMD=98/99`.
 
     Returns `(bit_no, addr)` where `bit_no` is the bit position inside the
@@ -515,7 +526,7 @@ def encode_exno_byte_u32(ex_no: int, byte_addr: int) -> int:
     return ((ex_no & 0xFF) << 16) | (byte_addr & 0xFFFF)
 
 
-def split_u32_words(value: int) -> Tuple[int, int]:
+def split_u32_words(value: int) -> tuple[int, int]:
     """Split a 32-bit value into `(low_word, high_word)`."""
     low = value & 0xFFFF
     high = (value >> 16) & 0xFFFF
@@ -558,7 +569,7 @@ def encode_ext_no_address(area: str, index: int, unit: str) -> ExtNoAddress:
       `CMD=C2/C3`, not `CMD=94-99`
     """
     area_u = area.upper()
-    no: Optional[int] = None
+    no: int | None = None
     addr = index
 
     if area_u in _EXT_AREA_MAP:

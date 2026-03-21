@@ -6,5 +6,5 @@ class ToyopucProtocolError(ToyopucError):
     """Raised when the response frame is invalid or unexpected."""
 
 
-class ToyopucTimeoutError(ToyopucError):
+class ToyopucTimeoutError(ToyopucProtocolError):
     """Raised on socket timeouts."""

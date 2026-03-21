@@ -11,13 +11,14 @@ plugins:
   - search
   - mkdocstrings:
       default_handler: python
+exclude_docs: |
+  maintainer/
+  user/MODEL_RANGES.md
 nav:
   - Overview: index.md
   - User Guide: user/USER_GUIDE.md
   - API Reference:
       - Client: api/client.md
-  - QA Reports: validation/reports/
-  - Change Log: CHANGELOG.md
 
 
 

@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import asyncio
 import functools
+from collections.abc import Callable
+from typing import Any, Self
 
 from .client import ToyopucClient
 from .high_level import ToyopucDeviceClient
 
 
-async def _run_sync_in_worker(func, /, *args, **kwargs):
+async def _run_sync_in_worker(func: Callable[..., Any], /, *args: Any, **kwargs: Any) -> Any:
     try:
         to_thread = asyncio.to_thread
     except AttributeError:
@@ -18,7 +20,7 @@ async def _run_sync_in_worker(func, /, *args, **kwargs):
 
 
 def _install_async_wrapper(async_cls: type, method_name: str) -> None:
-    async def _async_method(self, *args, **kwargs):
+    async def _async_method(self: Any, *args: Any, **kwargs: Any) -> Any:
         bound = getattr(self._client, method_name)
         return await _run_sync_in_worker(bound, *args, **kwargs)
 
@@ -30,23 +32,23 @@ def _install_async_wrapper(async_cls: type, method_name: str) -> None:
 class _AsyncToyopucClientBase:
     _sync_client_cls = ToyopucClient
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         object.__setattr__(self, "_client", self._sync_client_cls(*args, **kwargs))
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         return getattr(self._client, name)
 
-    def __setattr__(self, name, value) -> None:
+    def __setattr__(self, name: str, value: Any) -> None:
         if name == "_client" or hasattr(type(self), name):
             object.__setattr__(self, name, value)
             return
         setattr(self._client, name, value)
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> Self:
         await self.connect()
         return self
 
-    async def __aexit__(self, exc_type, exc, tb) -> None:
+    async def __aexit__(self, exc_type: object, exc: object, tb: object) -> None:
         await self.close()
 
 

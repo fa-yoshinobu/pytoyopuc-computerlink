@@ -8,7 +8,7 @@ name = "toyopuc-computerlink"
 version = "0.1.2"
 description = "Python client library for TOYOPUC computer-link communication over TCP and UDP"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "fa-yoshinobu"}]
 maintainers = [{name = "fa-yoshinobu"}]
@@ -20,8 +20,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -44,6 +42,35 @@ exclude = ["tests*", "scripts*", "docsrc/maintainer*", "docsrc/validation*"]
 [tool.setuptools]
 include-package-data = true
 exclude-package-data = { "*" = ["TODO.md"] }
+
+[tool.setuptools.package-data]
+toyopuc = ["py.typed"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+files = ["toyopuc"]
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+strict_equality = true
+
+[tool.coverage.run]
+source = ["toyopuc"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
 
 
 

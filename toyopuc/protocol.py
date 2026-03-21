@@ -1,11 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable, List, Optional, Sequence, Tuple
 
-from .exceptions import ToyopucProtocolError
-
+from .errors import ToyopucProtocolError
 
 FT_COMMAND = 0x00
 FT_RESPONSE = 0x80
@@ -277,7 +276,7 @@ def pack_u16_le(value: int) -> bytes:
     return bytes([value & 0xFF, (value >> 8) & 0xFF])
 
 
-def unpack_u16_le(data: bytes) -> List[int]:
+def unpack_u16_le(data: bytes) -> list[int]:
     if len(data) % 2 != 0:
         raise ToyopucProtocolError("Word data length must be even")
     return [data[i] | (data[i + 1] << 8) for i in range(0, len(data), 2)]
@@ -485,9 +484,9 @@ def build_ext_byte_write(no: int, addr: int, values: Iterable[int]) -> bytes:
 
 
 def build_ext_multi_read(
-    bit_points: Sequence[Tuple[int, int, int]],
-    byte_points: Sequence[Tuple[int, int]],
-    word_points: Sequence[Tuple[int, int]],
+    bit_points: Sequence[tuple[int, int, int]],
+    byte_points: Sequence[tuple[int, int]],
+    word_points: Sequence[tuple[int, int]],
 ) -> bytes:
     data = bytearray()
     data.extend(
@@ -506,9 +505,9 @@ def build_ext_multi_read(
 
 
 def build_ext_multi_write(
-    bit_points: Sequence[Tuple[int, int, int, int]],
-    byte_points: Sequence[Tuple[int, int, int]],
-    word_points: Sequence[Tuple[int, int, int]],
+    bit_points: Sequence[tuple[int, int, int, int]],
+    byte_points: Sequence[tuple[int, int, int]],
+    word_points: Sequence[tuple[int, int, int]],
 ) -> bytes:
     data = bytearray()
     data.extend(
@@ -613,12 +612,12 @@ def build_relay_command(
     return build_command(0x60, data)
 
 
-def build_relay_nested(hops: Sequence[Tuple[int, int]], inner_payload: bytes) -> bytes:
+def build_relay_nested(hops: Sequence[tuple[int, int]], inner_payload: bytes) -> bytes:
     hops = list(hops)
     if not hops:
         raise ValueError("at least one relay hop is required")
     inner = _normalize_inner_payload(inner_payload)
-    frame: Optional[bytes] = None
+    frame: bytes | None = None
     for link_no, station_no in reversed(hops):
         frame = build_relay_command(link_no, station_no, inner)
         inner = _frame_to_inner_payload(frame)
