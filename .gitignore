@@ -21,4 +21,7 @@ venv/
 
 # Local files
 local_folder/
-build_check.log
+*.log
+.vscode/
+.idea/
+uv.lock
