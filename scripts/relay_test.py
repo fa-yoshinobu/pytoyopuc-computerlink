@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import argparse
+from collections.abc import Callable
 from datetime import datetime
-from typing import Callable
 
 from toyopuc import (
     ToyopucClient,
@@ -10,21 +10,25 @@ from toyopuc import (
     parse_address,
 )
 from toyopuc.protocol import (
-    build_clock_write,
     build_clock_read,
-    build_cpu_status_read_a0,
+    build_clock_write,
     build_cpu_status_read,
+    build_cpu_status_read_a0,
     build_relay_nested,
     build_word_read,
     build_word_write,
     parse_clock_data,
-    parse_cpu_status_data_a0,
     parse_cpu_status_data,
+    parse_cpu_status_data_a0,
     unpack_u16_le,
 )
 from toyopuc.relay import (
     format_relay_hop as format_hop,
+)
+from toyopuc.relay import (
     parse_relay_hops as parse_hops,
+)
+from toyopuc.relay import (
     unwrap_relay_response_chain,
 )
 
@@ -261,7 +265,7 @@ def main() -> int:
         if inner_resp is None:
             if layers:
                 log(
-                    f"{'OUTER' if len(layers) == 1 else f'RELAY[{len(layers)}]'} INNER_PARSE = skipped because relay ACK is not 0x06"
+                    f"{'OUTER' if len(layers) == 1 else f'RELAY[{len(layers)}]'} INNER_PARSE = skipped because relay ACK is not 0x06"  # noqa: E501
                 )
             return 1
 

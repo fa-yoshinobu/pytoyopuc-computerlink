@@ -2,11 +2,11 @@
 import argparse
 import socket
 import threading
+from collections.abc import Mapping, MutableMapping
 from datetime import datetime
-from typing import Dict, Mapping, MutableMapping, Tuple, TypeVar
+from typing import TypeVar
 
 from toyopuc.protocol import FT_COMMAND, FT_RESPONSE
-
 
 _BASIC_PACKED = {
     "P": {
@@ -170,7 +170,7 @@ def _write_u16_to_map(
     store[high_key] = (value >> 8) & 0xFF
 
 
-def parse_command(frame: bytes) -> Tuple[int, bytes]:
+def parse_command(frame: bytes) -> tuple[int, bytes]:
     if len(frame) < 5:
         raise ValueError("frame too short")
     ft, rc, ll, lh, cmd = frame[:5]
@@ -192,16 +192,16 @@ def build_response(cmd: int, data: bytes, rc: int = 0x00) -> bytes:
 
 class Memory:
     def __init__(self) -> None:
-        self.word: Dict[int, int] = {}
-        self.byte: Dict[int, int] = {}
-        self.bit: Dict[int, int] = {}
-        self.ext_word: Dict[Tuple[int, int], int] = {}
-        self.ext_byte: Dict[Tuple[int, int], int] = {}
-        self.ext_bit: Dict[Tuple[int, int, int], int] = {}
-        self.pc10: Dict[int, int] = {}
-        self.basic_packed_byte: Dict[int, int] = {}
-        self.program_packed_byte: Dict[Tuple[int, int], int] = {}
-        self.ext_packed_byte: Dict[Tuple[int, int], int] = {}
+        self.word: dict[int, int] = {}
+        self.byte: dict[int, int] = {}
+        self.bit: dict[int, int] = {}
+        self.ext_word: dict[tuple[int, int], int] = {}
+        self.ext_byte: dict[tuple[int, int], int] = {}
+        self.ext_bit: dict[tuple[int, int, int], int] = {}
+        self.pc10: dict[int, int] = {}
+        self.basic_packed_byte: dict[int, int] = {}
+        self.program_packed_byte: dict[tuple[int, int], int] = {}
+        self.ext_packed_byte: dict[tuple[int, int], int] = {}
         self.clock = datetime(2026, 3, 8, 12, 34, 56)
         # Example: RUN + PC10 mode, programs 1/2/3 running.
         self.cpu_status = bytes([0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0E])

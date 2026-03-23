@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import argparse
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 from toyopuc import (
     ToyopucClient,
@@ -9,13 +9,13 @@ from toyopuc import (
     encode_exno_byte_u32,
     encode_ext_no_address,
     encode_fr_word_addr32,
-    encode_word_address,
     encode_program_word_address,
+    encode_word_address,
     parse_address,
 )
 from toyopuc.address import ParsedAddress
 
-Range = Tuple[int, int]
+Range = tuple[int, int]
 
 
 @dataclass
@@ -25,11 +25,11 @@ class ReadTarget:
     mode: str  # basic, ext, pc10, fr, bitword, pref_word, pref_bitword
     width: int  # hex width for display
     suffix: str = ""
-    area: Optional[str] = None
-    prefix: Optional[str] = None
+    area: str | None = None
+    prefix: str | None = None
 
 
-TARGETS: Dict[str, ReadTarget] = {}
+TARGETS: dict[str, ReadTarget] = {}
 
 
 def _add_target(target: ReadTarget) -> None:
@@ -120,7 +120,7 @@ for prefix in _PREFIX_EX_NO:
         )
 
 
-def _chunk_iter(start: int, end: int, chunk: int) -> Iterable[Tuple[int, int]]:
+def _chunk_iter(start: int, end: int, chunk: int) -> Iterable[tuple[int, int]]:
     current = start
     while current <= end:
         size = min(chunk, end - current + 1)
@@ -142,7 +142,7 @@ def _pc10_eb_addr32(index: int) -> int:
     return encode_exno_byte_u32(ex_no, byte_addr)
 
 
-def _pc10_block_read_words(plc: ToyopucClient, addr32: int, count: int) -> List[int]:
+def _pc10_block_read_words(plc: ToyopucClient, addr32: int, count: int) -> list[int]:
     data = plc.pc10_block_read(addr32, count * 2)
     return [int.from_bytes(data[i * 2 : (i + 1) * 2], "little") for i in range(count)]
 
@@ -180,7 +180,7 @@ def scan_pref_word(
 
 def _split_pc10_range(
     start: int, count: int, block_size: int
-) -> Iterable[Tuple[int, int]]:
+) -> Iterable[tuple[int, int]]:
     remaining = count
     current = start
     while remaining > 0:
@@ -223,7 +223,7 @@ def scan_fr(plc: ToyopucClient, start: int, count: int) -> None:
 
 def scan_target(
     plc: ToyopucClient, target: ReadTarget, chunk_size: int
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     total = 0
     errors = 0
 
@@ -287,7 +287,7 @@ def main() -> int:
     args = p.parse_args()
 
     targets = [name.strip().upper() for name in args.targets.split(",") if name.strip()]
-    specs: List[ReadTarget] = []
+    specs: list[ReadTarget] = []
     for name in targets:
         spec = TARGETS.get(name)
         if spec is None:

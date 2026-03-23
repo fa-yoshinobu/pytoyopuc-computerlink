@@ -1,8 +1,8 @@
 import argparse
 import random
-from typing import Callable, Sequence
+from collections.abc import Callable, Sequence
 
-from toyopuc import ToyopucError, ToyopucDeviceClient, resolve_device
+from toyopuc import ToyopucDeviceClient, ToyopucError, resolve_device
 
 
 def _write_log(log_f, line: str) -> None:
@@ -143,7 +143,7 @@ def _mixed_many_case(
     read_back = _read_many(plc, hops, list(items.keys()))
     ok = 0
     total = len(items)
-    for (addr, expected), value in zip(items.items(), read_back):
+    for (addr, expected), value in zip(items.items(), read_back, strict=False):
         if isinstance(value, bool):
             actual = 1 if value else 0
         else:

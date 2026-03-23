@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import sys
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
-import sys
-from typing import Callable, TextIO
+from typing import TextIO
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -189,13 +190,13 @@ def main() -> int:
                 )
                 target = [original[0] ^ 0xAAAA, original[1] ^ 0x5555]
                 plc.send_via_relay(
-                    args.hops, build_multi_word_write(list(zip(addrs, target)))
+                    args.hops, build_multi_word_write(list(zip(addrs, target, strict=False)))
                 )
                 readback = unpack_u16_le(
                     plc.send_via_relay(args.hops, build_multi_word_read(addrs)).data
                 )
                 plc.send_via_relay(
-                    args.hops, build_multi_word_write(list(zip(addrs, original)))
+                    args.hops, build_multi_word_write(list(zip(addrs, original, strict=False)))
                 )
                 if readback != target:
                     raise ValueError(
@@ -213,13 +214,13 @@ def main() -> int:
                 )
                 target = [original[0] ^ 0xFF, original[1] ^ 0xFF]
                 plc.send_via_relay(
-                    args.hops, build_multi_byte_write(list(zip(addrs, target)))
+                    args.hops, build_multi_byte_write(list(zip(addrs, target, strict=False)))
                 )
                 readback = list(
                     plc.send_via_relay(args.hops, build_multi_byte_read(addrs)).data
                 )
                 plc.send_via_relay(
-                    args.hops, build_multi_byte_write(list(zip(addrs, original)))
+                    args.hops, build_multi_byte_write(list(zip(addrs, original, strict=False)))
                 )
                 if readback != target:
                     raise ValueError(f"expected={target} got={readback}")

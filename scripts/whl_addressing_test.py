@@ -1,8 +1,8 @@
 import argparse
 import random
-from typing import Callable
+from collections.abc import Callable
 
-from toyopuc import ToyopucError, ToyopucDeviceClient, resolve_device
+from toyopuc import ToyopucDeviceClient, ToyopucError, resolve_device
 
 
 def _write_log(log_f, line: str) -> None:

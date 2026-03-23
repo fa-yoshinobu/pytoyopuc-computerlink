@@ -3,16 +3,14 @@ import argparse
 import time
 import zlib
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
 
 from toyopuc import ToyopucClient, ToyopucError, encode_fr_word_addr32
-
 
 FR_MAX_INDEX = 0x1FFFFF
 FR_BLOCK_WORDS = 0x8000
 
 
-Range = Tuple[int, int]
+Range = tuple[int, int]
 
 
 @dataclass
@@ -20,7 +18,7 @@ class VerifySummary:
     ok_chunks: int = 0
     error_chunks: int = 0
     mismatch_words: int = 0
-    first_mismatch_index: Optional[int] = None
+    first_mismatch_index: int | None = None
     crc32_expected: int = 0
     crc32_actual: int = 0
 
@@ -52,8 +50,8 @@ def iter_fr_chunks(start: int, end: int, chunk_words: int):
         index += count
 
 
-def affected_blocks(start: int, end: int) -> List[int]:
-    blocks: List[int] = []
+def affected_blocks(start: int, end: int) -> list[int]:
+    blocks: list[int] = []
     current = start - (start % FR_BLOCK_WORDS)
     while current <= end:
         blocks.append(current)
@@ -61,7 +59,7 @@ def affected_blocks(start: int, end: int) -> List[int]:
     return blocks
 
 
-def build_pattern_words(start_index: int, count: int, seed: int) -> List[int]:
+def build_pattern_words(start_index: int, count: int, seed: int) -> list[int]:
     return [((seed + start_index + offset) & 0xFFFF) for offset in range(count)]
 
 
@@ -74,9 +72,9 @@ def build_pattern_bytes(start_index: int, count: int, seed: int) -> bytes:
 
 def count_chunk_mismatches(
     actual: bytes, expected: bytes, start_index: int
-) -> Tuple[int, Optional[int]]:
+) -> tuple[int, int | None]:
     mismatch_words = 0
-    first_mismatch_index: Optional[int] = None
+    first_mismatch_index: int | None = None
     for offset in range(0, min(len(actual), len(expected)), 2):
         actual_word = actual[offset] | (actual[offset + 1] << 8)
         expected_word = expected[offset] | (expected[offset + 1] << 8)
@@ -158,8 +156,8 @@ def main() -> int:
     commit_blocks = affected_blocks(args.start, args.end)
     log_f = open(args.log, "w", encoding="utf-8") if args.log else None
     verify = VerifySummary()
-    write_errors: List[Range] = []
-    read_errors: List[Range] = []
+    write_errors: list[Range] = []
+    read_errors: list[Range] = []
     start_time = time.monotonic()
 
     header = (
@@ -170,7 +168,7 @@ def main() -> int:
     print(header)
     write_log(log_f, header)
 
-    plc: Optional[ToyopucClient] = None
+    plc: ToyopucClient | None = None
     try:
         with ToyopucClient(
             args.host,

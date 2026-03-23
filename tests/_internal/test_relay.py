@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from toyopuc import (
     ToyopucClient,
     ToyopucDeviceClient,
@@ -21,7 +23,6 @@ from toyopuc.protocol import (
     build_word_write,
     parse_response,
 )
-from datetime import datetime
 from toyopuc.relay import (
     format_relay_hop,
     parse_relay_hops,

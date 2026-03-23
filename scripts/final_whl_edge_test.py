@@ -4,12 +4,11 @@ import argparse
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from toyopuc import ToyopucError, ToyopucDeviceClient
+from toyopuc import ToyopucDeviceClient, ToyopucError
 
 
 @dataclass(frozen=True)
@@ -19,7 +18,7 @@ class FamilyCase:
     prefixed: bool
 
 
-FAMILY_CASES: List[FamilyCase] = [
+FAMILY_CASES: list[FamilyCase] = [
     # basic bit families (prefix required)
     FamilyCase("P", 0x17FF, True),
     FamilyCase("K", 0x02FF, True),
@@ -66,18 +65,18 @@ def _packed_width(max_bit_index: int) -> int:
     return max(1, _bit_width(max_bit_index) - 1)
 
 
-def _word_to_bits(value: int) -> List[int]:
+def _word_to_bits(value: int) -> list[int]:
     return [1 if (value >> i) & 0x01 else 0 for i in range(16)]
 
 
-def _read_device(plc: ToyopucDeviceClient, hops: Optional[str], device: str):
+def _read_device(plc: ToyopucDeviceClient, hops: str | None, device: str):
     if hops:
         return plc.relay_read(hops, device)
     return plc.read(device)
 
 
 def _write_device(
-    plc: ToyopucDeviceClient, hops: Optional[str], device: str, value: int
+    plc: ToyopucDeviceClient, hops: str | None, device: str, value: int
 ) -> None:
     if hops:
         plc.relay_write(hops, device, value)
@@ -87,17 +86,17 @@ def _write_device(
 
 def _write_by_bits(
     plc: ToyopucDeviceClient,
-    hops: Optional[str],
-    bit_devices: List[str],
-    expected_bits: List[int],
+    hops: str | None,
+    bit_devices: list[str],
+    expected_bits: list[int],
 ) -> None:
-    for bit_dev, bit_value in zip(bit_devices, expected_bits):
+    for bit_dev, bit_value in zip(bit_devices, expected_bits, strict=False):
         _write_device(plc, hops, bit_dev, bit_value)
 
 
 def _write_by_hl(
     plc: ToyopucDeviceClient,
-    hops: Optional[str],
+    hops: str | None,
     low_device: str,
     high_device: str,
     value: int,
@@ -108,7 +107,7 @@ def _write_by_hl(
 
 def _build_addresses(
     case: FamilyCase, program_prefix: str
-) -> tuple[List[str], str, str, str]:
+) -> tuple[list[str], str, str, str]:
     base = _format_case_name(case, program_prefix)
     bit_start = (case.max_bit_index >> 4) << 4
     word_index = case.max_bit_index >> 4
@@ -121,13 +120,13 @@ def _build_addresses(
     return bits, word, low, high
 
 
-def _parse_areas(text: str) -> Optional[set[str]]:
+def _parse_areas(text: str) -> set[str] | None:
     if not text.strip():
         return None
     return {part.strip().upper() for part in text.split(",") if part.strip()}
 
 
-def _select_cases(areas: Optional[set[str]]) -> List[FamilyCase]:
+def _select_cases(areas: set[str] | None) -> list[FamilyCase]:
     if areas is None:
         return FAMILY_CASES
     selected = [case for case in FAMILY_CASES if case.area in areas]
@@ -207,7 +206,7 @@ def main() -> int:
             _write_log(log_f, f"=== {case_name} ===")
             _write_log(log_f, f"target bits: {bits[0]}..{bits[-1]}")
             _write_log(log_f, f"word/low/high: {word}, {low}, {high}")
-            original_bits: Optional[List[int]] = None
+            original_bits: list[int] | None = None
 
             try:
                 original_bits = [
@@ -268,7 +267,7 @@ def main() -> int:
             finally:
                 if restore and original_bits is not None:
                     try:
-                        for bit_dev, bit_value in zip(bits, original_bits):
+                        for bit_dev, bit_value in zip(bits, original_bits, strict=False):
                             _write_device(plc, hops, bit_dev, bit_value)
                         restore_line = f"{case_name}: restore=OK"
                     except (ToyopucError, ValueError, RuntimeError) as restore_exc:

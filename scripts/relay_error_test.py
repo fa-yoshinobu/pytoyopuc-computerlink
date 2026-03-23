@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 import sys
-from typing import Iterable, TextIO
+from collections.abc import Iterable
+from pathlib import Path
+from typing import TextIO
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -163,7 +164,7 @@ def main() -> int:
                     )
                     ok += 1
                     return
-                if hasattr(result, "rc") and getattr(result, "rc") == 0x10:
+                if hasattr(result, "rc") and result.rc == 0x10:
                     code = result.data[-1] if result.data else result.cmd
                     _emit(
                         f"{name}: expected error observed via inner response rc=0x10 "

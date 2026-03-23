@@ -2,17 +2,16 @@
 import argparse
 import time
 import zlib
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple
 
 from toyopuc import ToyopucClient, ToyopucError, encode_fr_word_addr32
-
 
 FR_MAX_INDEX = 0x1FFFFF
 FR_BLOCK_WORDS = 0x8000
 
 
-Range = Tuple[int, int]
+Range = tuple[int, int]
 
 
 @dataclass
@@ -25,8 +24,8 @@ class ScanSummary:
     ffff_words: int = 0
     other_words: int = 0
     crc32: int = 0
-    first_ok: Optional[int] = None
-    last_ok: Optional[int] = None
+    first_ok: int | None = None
+    last_ok: int | None = None
 
 
 def parse_int_auto(value: str) -> int:
@@ -56,10 +55,10 @@ def iter_fr_chunks(start: int, end: int, chunk_words: int):
         index += count
 
 
-def compress_ranges(ranges: Sequence[Range]) -> List[Range]:
+def compress_ranges(ranges: Sequence[Range]) -> list[Range]:
     if not ranges:
         return []
-    merged: List[Range] = []
+    merged: list[Range] = []
     cur_start, cur_end = ranges[0]
     for start, end in ranges[1:]:
         if start <= cur_end + 1:
@@ -71,7 +70,7 @@ def compress_ranges(ranges: Sequence[Range]) -> List[Range]:
     return merged
 
 
-def count_words(data: bytes) -> Tuple[int, int, int]:
+def count_words(data: bytes) -> tuple[int, int, int]:
     zero_words = 0
     ffff_words = 0
     other_words = 0
@@ -148,7 +147,7 @@ def main() -> int:
     )
     log_f = open(args.log, "w", encoding="utf-8") if args.log else None
     summary = ScanSummary()
-    error_ranges: List[Range] = []
+    error_ranges: list[Range] = []
     start_time = time.monotonic()
     scanned_chunks = 0
     consecutive_ng = 0
@@ -160,7 +159,7 @@ def main() -> int:
     print(header)
     write_log(log_f, header)
 
-    plc: Optional[ToyopucClient] = None
+    plc: ToyopucClient | None = None
     try:
         with ToyopucClient(
             args.host,

@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 import argparse
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Callable, List, Tuple, cast
+from typing import cast
 
 from toyopuc import (
     ToyopucClient,
     ToyopucError,
     encode_bit_address,
     encode_exno_byte_u32,
-    encode_fr_word_addr32,
     encode_ext_no_address,
+    encode_fr_word_addr32,
     encode_program_bit_address,
     encode_program_word_address,
     encode_word_address,
@@ -44,19 +45,19 @@ _EXT_BIT_AREA_SPECS = {
 _PREFIX_TO_NO = {"P1": 0x01, "P2": 0x02, "P3": 0x03}
 
 
-def _ext_bit_point(area: str, index: int) -> Tuple[int, int, int]:
+def _ext_bit_point(area: str, index: int) -> tuple[int, int, int]:
     no, byte_base = _EXT_BIT_AREA_SPECS[area]
     return no, index & 0x07, byte_base + (index >> 3)
 
 
-def _prefixed_bit_ext_addr(prefix: str, area: str, index: int) -> Tuple[int, int, int]:
+def _prefixed_bit_ext_addr(prefix: str, area: str, index: int) -> tuple[int, int, int]:
     program_no = _PREFIX_TO_NO[prefix]
     parsed = parse_address(f"{area}{index:04X}", "bit")
     bit_no, addr = encode_program_bit_address(parsed)
     return program_no, bit_no, addr
 
 
-def _prefixed_word_ext_addr(prefix: str, area: str, index: int) -> Tuple[int, int]:
+def _prefixed_word_ext_addr(prefix: str, area: str, index: int) -> tuple[int, int]:
     program_no = _PREFIX_TO_NO[prefix]
     parsed = parse_address(f"{area}{index:04X}", "word")
     addr = encode_program_word_address(parsed)
@@ -85,7 +86,7 @@ def _pc10_eb_word_addr32(index: int) -> int:
     return encode_exno_byte_u32(ex_no, byte_addr)
 
 
-def _base_targets() -> List[Target]:
+def _base_targets() -> list[Target]:
     bit_ranges = {
         "P": [(0x000, 0x1FF), (0x1000, 0x17FF)],
         "K": [(0x000, 0x2FF)],
@@ -104,7 +105,7 @@ def _base_targets() -> List[Target]:
         "D": [(0x0000, 0x2FFF)],
     }
 
-    targets: List[Target] = []
+    targets: list[Target] = []
     for area, ranges in bit_ranges.items():
         for start, end in ranges:
             for idx in (start, end):
@@ -142,7 +143,7 @@ def _base_targets() -> List[Target]:
     return targets
 
 
-def _prefixed_targets() -> List[Target]:
+def _prefixed_targets() -> list[Target]:
     bit_ranges = [
         ("P", [(0x000, 0x1FF), (0x1000, 0x17FF)]),
         ("K", [(0x000, 0x2FF)]),
@@ -161,7 +162,7 @@ def _prefixed_targets() -> List[Target]:
         ("D", [(0x0000, 0x2FFF)]),
     ]
 
-    targets: List[Target] = []
+    targets: list[Target] = []
     for prefix in ("P1", "P2", "P3"):
         for area, ranges in bit_ranges:
             for start, end in ranges:
@@ -202,7 +203,7 @@ def _prefixed_targets() -> List[Target]:
     return targets
 
 
-def _ext_targets(include_fr: bool) -> List[Target]:
+def _ext_targets(include_fr: bool) -> list[Target]:
     bit_ranges = {
         "EP": [(0x0000, 0x0FFF)],
         "EK": [(0x0000, 0x0FFF)],
@@ -227,7 +228,7 @@ def _ext_targets(include_fr: bool) -> List[Target]:
     if include_fr:
         word_ranges["FR"] = [(0x000000, 0x1FFFFF)]
 
-    targets: List[Target] = []
+    targets: list[Target] = []
     for area, ranges in bit_ranges.items():
         for start, end in ranges:
             for idx in (start, end):
@@ -314,7 +315,7 @@ def _ext_targets(include_fr: bool) -> List[Target]:
     return targets
 
 
-def build_targets(include_fr: bool) -> List[Target]:
+def build_targets(include_fr: bool) -> list[Target]:
     return _base_targets() + _prefixed_targets() + _ext_targets(include_fr)
 
 
@@ -377,7 +378,7 @@ def main() -> int:
                 action = _prompt_step(i, len(targets), target)
                 _write_log(
                     log_f,
-                    f"[{i}/{len(targets)}] target=[{target.kind}] {target.label} value={target.value_text} action={action or 'write'}",
+                    f"[{i}/{len(targets)}] target=[{target.kind}] {target.label} value={target.value_text} action={action or 'write'}",  # noqa: E501
                 )
                 if action == "q":
                     _write_log(log_f, "operator requested quit before write")
@@ -419,7 +420,7 @@ def main() -> int:
         if log_f:
             _write_log(
                 log_f,
-                f"summary targets={len(targets)} written={written} confirmed={confirmed} failed={failed} skipped={skipped}",
+                f"summary targets={len(targets)} written={written} confirmed={confirmed} failed={failed} skipped={skipped}",  # noqa: E501
             )
             _write_log(
                 log_f, f"finished: {datetime.now().isoformat(timespec='seconds')}"

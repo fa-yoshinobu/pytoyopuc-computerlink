@@ -2,15 +2,14 @@
 import argparse
 import shlex
 import sys
-from typing import List
 
 from toyopuc import (
     ToyopucClient,
     encode_bit_address,
     encode_byte_address,
     encode_exno_byte_u32,
-    encode_fr_word_addr32,
     encode_ext_no_address,
+    encode_fr_word_addr32,
     encode_program_bit_address,
     encode_program_word_address,
     encode_word_address,
@@ -44,7 +43,7 @@ def _hex(data: bytes) -> str:
     return " ".join(f"{b:02X}" for b in data)
 
 
-def _parse_ints(tokens: List[str]) -> List[int]:
+def _parse_ints(tokens: list[str]) -> list[int]:
     out = []
     for t in tokens:
         t = t.strip()
@@ -105,7 +104,7 @@ def _pc10_bit_payload(addr32: int, value=None) -> bytes:
     return build_pc10_multi_write(bytes(header))
 
 
-def _parse_ext_multi_read_specs(tokens: List[str]):
+def _parse_ext_multi_read_specs(tokens: list[str]):
     bit_points = []
     byte_points = []
     word_points = []
@@ -136,7 +135,7 @@ def _parse_ext_multi_read_specs(tokens: List[str]):
     return bit_points, byte_points, word_points, labels
 
 
-def _parse_ext_multi_write_specs(tokens: List[str]):
+def _parse_ext_multi_write_specs(tokens: list[str]):
     bit_points = []
     byte_points = []
     word_points = []

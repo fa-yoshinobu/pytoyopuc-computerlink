@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Optional
 
 from toyopuc import (
-    ToyopucError,
     ToyopucDeviceClient,
+    ToyopucError,
     encode_bit_address,
     encode_exno_byte_u32,
     parse_address,
@@ -127,7 +127,7 @@ def _run_bit_case(plc: ToyopucDeviceClient, case: BitCase, log_f) -> bool:
     original = 1 if bool(plc.read(case.device)) else 0
     phase1 = 1 - original
     restored = False
-    alias_same_point: Optional[bool] = None
+    alias_same_point: bool | None = None
 
     try:
         plc.write(case.device, phase1)
@@ -226,7 +226,7 @@ def _run_word_case(plc: ToyopucDeviceClient, case: WordCase, log_f) -> bool:
             current2 = int(plc.read(case.device)) & 0xFFFF
             alias_ok = current2 == phase2
             _print_line(
-                f"phase2 alt C5 write={_fmt_value(phase2, 'word')} current read={_fmt_value(current2, 'word')} alias_ok={alias_ok}",
+                f"phase2 alt C5 write={_fmt_value(phase2, 'word')} current read={_fmt_value(current2, 'word')} alias_ok={alias_ok}",  # noqa: E501
                 log_f,
             )
             if not alias_ok:
@@ -240,7 +240,7 @@ def _run_word_case(plc: ToyopucDeviceClient, case: WordCase, log_f) -> bool:
             restored_read = int(plc.read(case.device)) & 0xFFFF
             restored = restored_read == original
             _print_line(
-                f"restore expected={_fmt_value(original, 'word')} read={_fmt_value(restored_read, 'word')} ok={restored}",
+                f"restore expected={_fmt_value(original, 'word')} read={_fmt_value(restored_read, 'word')} ok={restored}",  # noqa: E501
                 log_f,
             )
         except ToyopucError as exc:

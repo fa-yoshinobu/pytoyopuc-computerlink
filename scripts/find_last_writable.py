@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 import argparse
 import re
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import Callable, Optional, Sequence, Tuple, cast
+from typing import cast
 
 from toyopuc import (
     ToyopucClient,
     ToyopucError,
     encode_bit_address,
     encode_exno_byte_u32,
-    encode_fr_word_addr32,
     encode_ext_no_address,
+    encode_fr_word_addr32,
     encode_program_bit_address,
     encode_program_word_address,
     encode_word_address,
     parse_address,
 )
-
 
 BASE_BIT_AREAS = {"P", "K", "V", "T", "C", "L", "X", "Y", "M"}
 BASE_WORD_AREAS = {"S", "N", "R", "D", "B"}
@@ -52,7 +52,7 @@ class ProbeRange:
     stop_text: str
 
 
-def _split_target(text: str) -> Tuple[Optional[str], str, int]:
+def _split_target(text: str) -> tuple[str | None, str, int]:
     upper = text.upper()
     prefix = None
     if "-" in upper:
@@ -83,7 +83,7 @@ def _pc10_eb_word_addr32(index: int) -> int:
     return encode_exno_byte_u32(ex_no, byte_addr)
 
 
-def build_probe(target_text: str) -> Tuple[Probe, int]:
+def build_probe(target_text: str) -> tuple[Probe, int]:
     prefix, area, index = _split_target(target_text)
 
     if prefix is None:

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import sys
+from collections.abc import Iterable, Mapping
 from datetime import datetime, timedelta
 from pathlib import Path
-import sys
-from typing import Iterable, Mapping, Optional, TextIO, TypeVar, cast
+from typing import TextIO, TypeVar, cast
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -24,7 +25,7 @@ from toyopuc.protocol import (  # noqa: E402
 T = TypeVar("T")
 
 
-def _require(value: Optional[T], label: str) -> T:
+def _require(value: T | None, label: str) -> T:
     if value is None:
         raise ValueError(f"resolved device missing {label}")
     return value
@@ -324,7 +325,7 @@ def main() -> int:
                     restored_ok = abs((restored - original).total_seconds()) <= 2
                     if not restored_ok:
                         raise ValueError(
-                            f"restore mismatch: original={original.isoformat(sep=' ')} restored={restored.isoformat(sep=' ')}"
+                            f"restore mismatch: original={original.isoformat(sep=' ')} restored={restored.isoformat(sep=' ')}"  # noqa: E501
                         )
                     if passed != args.clock_loops:
                         raise ValueError(

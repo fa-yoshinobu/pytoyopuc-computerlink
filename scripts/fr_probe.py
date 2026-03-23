@@ -1,6 +1,6 @@
 import argparse
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, Optional
 
 from toyopuc import (
     ToyopucClient,
@@ -22,7 +22,7 @@ def fmt_words(values: Iterable[int]) -> str:
     return "[" + ", ".join(f"0x{value:04X}" for value in values) + "]"
 
 
-def hex_or_none(data: Optional[bytes]) -> str:
+def hex_or_none(data: bytes | None) -> str:
     if data is None:
         return "-"
     return data.hex(" ").upper()
@@ -33,10 +33,10 @@ class ProbeResult:
     label: str
     ok: bool
     detail: str
-    tx_register: Optional[bytes] = None
-    rx_register: Optional[bytes] = None
-    tx_read: Optional[bytes] = None
-    rx_read: Optional[bytes] = None
+    tx_register: bytes | None = None
+    rx_register: bytes | None = None
+    tx_read: bytes | None = None
+    rx_read: bytes | None = None
 
 
 def build_parser() -> argparse.ArgumentParser:

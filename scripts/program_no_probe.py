@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Optional, Sequence
 
 from toyopuc import ResolvedDevice, ToyopucClient, ToyopucError, resolve_device
 
@@ -52,15 +52,15 @@ def _print_line(line: str, log_f) -> None:
     _write_log(log_f, line)
 
 
-def _fmt_optional_u8(value: Optional[int]) -> str:
+def _fmt_optional_u8(value: int | None) -> str:
     return "-" if value is None else f"0x{value:02X}"
 
 
-def _fmt_optional_u16(value: Optional[int]) -> str:
+def _fmt_optional_u16(value: int | None) -> str:
     return "-" if value is None else f"0x{value:04X}"
 
 
-def _fmt_snapshot(snapshot: "ProbeSnapshot") -> str:
+def _fmt_snapshot(snapshot: ProbeSnapshot) -> str:
     parts = []
     if snapshot.bit is not None:
         parts.append(f"bit={snapshot.bit}")
@@ -71,7 +71,7 @@ def _fmt_snapshot(snapshot: "ProbeSnapshot") -> str:
     return " ".join(parts) if parts else "(empty)"
 
 
-def _next_distinct_8(value: int, salt: int, *avoid: Optional[int]) -> int:
+def _next_distinct_8(value: int, salt: int, *avoid: int | None) -> int:
     candidate = (value ^ salt) & 0xFF
     if any(a is not None and candidate == a for a in avoid) or candidate == value:
         candidate = (value + 1) & 0xFF
@@ -80,7 +80,7 @@ def _next_distinct_8(value: int, salt: int, *avoid: Optional[int]) -> int:
     return candidate
 
 
-def _next_distinct_16(value: int, salt: int, *avoid: Optional[int]) -> int:
+def _next_distinct_16(value: int, salt: int, *avoid: int | None) -> int:
     candidate = (value ^ salt) & 0xFFFF
     if any(a is not None and candidate == a for a in avoid) or candidate == value:
         candidate = (value + 1) & 0xFFFF
@@ -89,7 +89,7 @@ def _next_distinct_16(value: int, salt: int, *avoid: Optional[int]) -> int:
     return candidate
 
 
-def _require_field(value: Optional[int], context: str) -> int:
+def _require_field(value: int | None, context: str) -> int:
     if value is None:
         raise ValueError(context)
     return value
@@ -97,9 +97,9 @@ def _require_field(value: Optional[int], context: str) -> int:
 
 @dataclass(frozen=True)
 class ProbeSnapshot:
-    bit: Optional[int] = None
-    byte: Optional[int] = None
-    word: Optional[int] = None
+    bit: int | None = None
+    byte: int | None = None
+    word: int | None = None
 
 
 @dataclass(frozen=True)
@@ -107,9 +107,9 @@ class ProbeCase:
     key: str
     label: str
     expected_no: int
-    bit: Optional[ResolvedDevice] = None
-    byte: Optional[ResolvedDevice] = None
-    word: Optional[ResolvedDevice] = None
+    bit: ResolvedDevice | None = None
+    byte: ResolvedDevice | None = None
+    word: ResolvedDevice | None = None
 
     def counts(self) -> tuple[int, int, int]:
         return (1 if self.bit else 0, 1 if self.byte else 0, 1 if self.word else 0)
@@ -241,7 +241,7 @@ def _build_phase_snapshot(
     *,
     salt8: int,
     salt16: int,
-    avoid: Optional[ProbeSnapshot] = None,
+    avoid: ProbeSnapshot | None = None,
 ) -> ProbeSnapshot:
     return ProbeSnapshot(
         bit=None if base.bit is None else (1 - (base.bit & 0x01)),
@@ -327,7 +327,7 @@ def _run_case(
                     continue
                 match = candidate_read == expected
                 _print_line(
-                    f"{phase_name} candidate no=0x{candidate:02X} read={_fmt_snapshot(candidate_read)} match_expected={match}",
+                    f"{phase_name} candidate no=0x{candidate:02X} read={_fmt_snapshot(candidate_read)} match_expected={match}",  # noqa: E501
                     log_f,
                 )
                 if match and candidate not in suspicious:
@@ -361,7 +361,7 @@ def main() -> int:
     cases = _build_cases()
 
     p = argparse.ArgumentParser(
-        description="Probe CMD=98/99 program-number interpretation by comparing current mapping against candidate no values"
+        description="Probe CMD=98/99 program-number interpretation by comparing current mapping against candidate no values"  # noqa: E501
     )
     p.add_argument("--host", required=True)
     p.add_argument("--port", type=int, required=True)

@@ -1,23 +1,22 @@
 #!/usr/bin/env python
 import argparse
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
-from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from toyopuc import (
     ToyopucClient,
     ToyopucError,
     encode_bit_address,
     encode_exno_byte_u32,
-    encode_fr_word_addr32,
     encode_ext_no_address,
+    encode_fr_word_addr32,
     encode_program_bit_address,
     encode_program_word_address,
     encode_word_address,
     parse_address,
 )
 
-
-Range = Tuple[int, int]
+Range = tuple[int, int]
 
 
 @dataclass(frozen=True)
@@ -29,7 +28,7 @@ class TargetSpec:
     writer: Callable[[ToyopucClient, int], None]
 
 
-BASE_BIT_RANGES: Dict[str, Sequence[Range]] = {
+BASE_BIT_RANGES: dict[str, Sequence[Range]] = {
     "P": [(0x0000, 0x01FF), (0x1000, 0x17FF)],
     "K": [(0x0000, 0x02FF)],
     "V": [(0x0000, 0x00FF), (0x1000, 0x17FF)],
@@ -41,7 +40,7 @@ BASE_BIT_RANGES: Dict[str, Sequence[Range]] = {
     "M": [(0x0000, 0x07FF), (0x1000, 0x17FF)],
 }
 
-BASE_WORD_RANGES: Dict[str, Sequence[Range]] = {
+BASE_WORD_RANGES: dict[str, Sequence[Range]] = {
     "S": [(0x0000, 0x03FF), (0x1000, 0x13FF)],
     "N": [(0x0000, 0x01FF), (0x1000, 0x17FF)],
     "R": [(0x0000, 0x07FF)],
@@ -49,7 +48,7 @@ BASE_WORD_RANGES: Dict[str, Sequence[Range]] = {
     "B": [(0x0000, 0x1FFF)],
 }
 
-EXT_BIT_RANGES: Dict[str, Sequence[Range]] = {
+EXT_BIT_RANGES: dict[str, Sequence[Range]] = {
     "EP": [(0x0000, 0x0FFF)],
     "EK": [(0x0000, 0x0FFF)],
     "EV": [(0x0000, 0x0FFF)],
@@ -64,7 +63,7 @@ EXT_BIT_RANGES: Dict[str, Sequence[Range]] = {
     "GM": [(0x0000, 0xFFFF)],
 }
 
-EXT_WORD_RANGES: Dict[str, Sequence[Range]] = {
+EXT_WORD_RANGES: dict[str, Sequence[Range]] = {
     "ES": [(0x0000, 0x07FF)],
     "EN": [(0x0000, 0x07FF)],
     "H": [(0x0000, 0x07FF)],
@@ -186,8 +185,8 @@ def _ext_word_writer(area: str) -> Callable[[ToyopucClient, int], None]:
     return writer
 
 
-def build_specs(include_fr: bool) -> Dict[str, TargetSpec]:
-    specs: Dict[str, TargetSpec] = {}
+def build_specs(include_fr: bool) -> dict[str, TargetSpec]:
+    specs: dict[str, TargetSpec] = {}
 
     for area, ranges in BASE_BIT_RANGES.items():
         specs[area] = TargetSpec(area, "bit", ranges, 1, _base_bit_writer(area))
@@ -215,10 +214,10 @@ def build_specs(include_fr: bool) -> Dict[str, TargetSpec]:
     return specs
 
 
-def _compress_failures(values: Sequence[int]) -> List[Range]:
+def _compress_failures(values: Sequence[int]) -> list[Range]:
     if not values:
         return []
-    out: List[Range] = []
+    out: list[Range] = []
     start = prev = values[0]
     for value in values[1:]:
         if value == prev + 1:
@@ -238,7 +237,7 @@ def _iter_indices(start: int, end: int, step: int, reverse: bool) -> Iterable[in
 
 def _boundary_candidates(
     ok_values: Sequence[int], error_values: Sequence[int]
-) -> List[int]:
+) -> list[int]:
     ok_set = set(ok_values)
     candidates = set()
     for value in error_values:
@@ -250,11 +249,11 @@ def _boundary_candidates(
 
 
 def _iter_targets(
-    specs: Dict[str, TargetSpec], requested: Sequence[str]
-) -> List[TargetSpec]:
+    specs: dict[str, TargetSpec], requested: Sequence[str]
+) -> list[TargetSpec]:
     if len(requested) == 1 and requested[0].lower() == "all":
         return list(specs.values())
-    out: List[TargetSpec] = []
+    out: list[TargetSpec] = []
     for name in requested:
         key = name.upper()
         if key not in specs:
@@ -322,14 +321,14 @@ def main() -> int:
             header = f"=== {spec.name} ({spec.kind}) ==="
             print(header)
             _write_log(log_f, header)
-            all_ok: List[int] = []
-            all_error: List[int] = []
-            last_ok: Optional[int] = None
+            all_ok: list[int] = []
+            all_error: list[int] = []
+            last_ok: int | None = None
 
             for start, end in spec.ranges:
                 consecutive_ng = 0
-                range_ok: List[int] = []
-                range_error: List[int] = []
+                range_ok: list[int] = []
+                range_error: list[int] = []
                 stopped_early = False
                 for index in _iter_indices(start, end, args.step, args.reverse):
                     try:
@@ -346,7 +345,7 @@ def main() -> int:
                             args.stop_after_ng > 0
                             and consecutive_ng >= args.stop_after_ng
                         ):
-                            line = f"stopped early after {consecutive_ng} consecutive errors in {_range_label(spec.name, start, end)}"
+                            line = f"stopped early after {consecutive_ng} consecutive errors in {_range_label(spec.name, start, end)}"  # noqa: E501
                             print(line)
                             _write_log(log_f, line)
                             stopped_early = True

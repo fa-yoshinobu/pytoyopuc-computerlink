@@ -2,23 +2,22 @@
 import argparse
 import re
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Callable, Tuple
 
 from toyopuc import (
     ToyopucClient,
     ToyopucError,
     encode_bit_address,
     encode_exno_byte_u32,
-    encode_fr_word_addr32,
     encode_ext_no_address,
+    encode_fr_word_addr32,
     encode_program_bit_address,
     encode_program_word_address,
     encode_word_address,
     parse_address,
 )
-
 
 BASE_BIT_AREAS = {"P", "K", "V", "T", "C", "L", "X", "Y", "M"}
 BASE_WORD_AREAS = {"S", "N", "R", "D", "B"}
@@ -70,25 +69,25 @@ def _write_log(log_f, line: str) -> None:
         log_f.flush()
 
 
-def _split_area_index(text: str) -> Tuple[str, int]:
+def _split_area_index(text: str) -> tuple[str, int]:
     m = re.fullmatch(r"([A-Z]+)([0-9A-F]+)", text.upper())
     if not m:
         raise ValueError(f"Invalid target format: {text}")
     return m.group(1), int(m.group(2), 16)
 
 
-def _prefixed_bit_addr(prefix: str, area: str, index: int) -> Tuple[int, int, int]:
+def _prefixed_bit_addr(prefix: str, area: str, index: int) -> tuple[int, int, int]:
     parsed = parse_address(f"{area}{index:04X}", "bit")
     bit_no, addr = encode_program_bit_address(parsed)
     return PREFIX_TO_NO[prefix], bit_no, addr
 
 
-def _prefixed_word_addr(prefix: str, area: str, index: int) -> Tuple[int, int]:
+def _prefixed_word_addr(prefix: str, area: str, index: int) -> tuple[int, int]:
     parsed = parse_address(f"{area}{index:04X}", "word")
     return PREFIX_TO_NO[prefix], encode_program_word_address(parsed)
 
 
-def _ext_bit_addr(area: str, index: int) -> Tuple[int, int, int]:
+def _ext_bit_addr(area: str, index: int) -> tuple[int, int, int]:
     no, byte_base = EXT_BIT_SPECS[area]
     return no, index & 0x07, byte_base + (index >> 3)
 
@@ -111,7 +110,7 @@ def _pc10_eb_word_addr32(index: int) -> int:
     return encode_exno_byte_u32(ex_no, byte_addr)
 
 
-def _basic_bit_rw(addr: int) -> Tuple[WriteFn, ReadFn]:
+def _basic_bit_rw(addr: int) -> tuple[WriteFn, ReadFn]:
     def write(plc: ToyopucClient, value: int) -> None:
         plc.write_bit(addr, bool(value))
 
@@ -121,7 +120,7 @@ def _basic_bit_rw(addr: int) -> Tuple[WriteFn, ReadFn]:
     return write, read
 
 
-def _basic_word_rw(addr: int) -> Tuple[WriteFn, ReadFn]:
+def _basic_word_rw(addr: int) -> tuple[WriteFn, ReadFn]:
     def write(plc: ToyopucClient, value: int) -> None:
         plc.write_words(addr, [value & 0xFFFF])
 
@@ -131,7 +130,7 @@ def _basic_word_rw(addr: int) -> Tuple[WriteFn, ReadFn]:
     return write, read
 
 
-def _ext_bit_rw(no: int, bit_no: int, addr: int) -> Tuple[WriteFn, ReadFn]:
+def _ext_bit_rw(no: int, bit_no: int, addr: int) -> tuple[WriteFn, ReadFn]:
     def write(plc: ToyopucClient, value: int) -> None:
         plc.write_ext_multi([(no, bit_no, addr, value & 0x01)], [], [])
 
@@ -141,7 +140,7 @@ def _ext_bit_rw(no: int, bit_no: int, addr: int) -> Tuple[WriteFn, ReadFn]:
     return write, read
 
 
-def _ext_word_rw(no: int, addr: int) -> Tuple[WriteFn, ReadFn]:
+def _ext_word_rw(no: int, addr: int) -> tuple[WriteFn, ReadFn]:
     def write(plc: ToyopucClient, value: int) -> None:
         plc.write_ext_words(no, addr, [value & 0xFFFF])
 
@@ -151,7 +150,7 @@ def _ext_word_rw(no: int, addr: int) -> Tuple[WriteFn, ReadFn]:
     return write, read
 
 
-def _pc10_word_rw(addr32: int) -> Tuple[WriteFn, ReadFn]:
+def _pc10_word_rw(addr32: int) -> tuple[WriteFn, ReadFn]:
     def write(plc: ToyopucClient, value: int) -> None:
         plc.pc10_block_write(addr32, _pack_u16_le(value & 0xFFFF))
 

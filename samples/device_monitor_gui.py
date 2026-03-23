@@ -6,7 +6,6 @@ import tkinter as tk
 from datetime import datetime
 from pathlib import Path
 from tkinter import messagebox, scrolledtext, ttk
-from typing import Dict, Optional
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -38,10 +37,10 @@ class MonitorApp:
         self.root.geometry("1320x860")
         self.root.minsize(1100, 720)
 
-        self.client: Optional[ToyopucDeviceClient] = None
-        self.poll_job: Optional[str] = None
-        self.last_values: Dict[str, object] = {}
-        self.units: Dict[str, str] = {}
+        self.client: ToyopucDeviceClient | None = None
+        self.poll_job: str | None = None
+        self.last_values: dict[str, object] = {}
+        self.units: dict[str, str] = {}
         self.interval_ms = int(args.interval * 1000)
 
         self.device_var = tk.StringVar(value="P1-D0000")
@@ -489,7 +488,7 @@ class MonitorApp:
         suffix = "device" if count == 1 else "devices"
         self.watch_count_var.set(f"{count} {suffix}")
 
-    def _relay_hops(self) -> Optional[str]:
+    def _relay_hops(self) -> str | None:
         hops = self.hops_var.get().strip()
         return hops or None
 
@@ -609,7 +608,7 @@ class MonitorApp:
         ivalue = self._as_int(value)
         return f"0x{ivalue & 0xFFFF:04X}"
 
-    def _selected_device(self) -> Optional[str]:
+    def _selected_device(self) -> str | None:
         selection = self.tree.selection()
         if selection:
             return str(selection[0])

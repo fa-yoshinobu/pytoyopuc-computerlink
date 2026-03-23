@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import argparse
 import random
-from typing import Dict, List, Optional, Tuple
 
 from toyopuc import (
     ToyopucClient,
@@ -10,8 +9,8 @@ from toyopuc import (
     encode_byte_address,
     encode_exno_bit_u32,
     encode_exno_byte_u32,
-    encode_fr_word_addr32,
     encode_ext_no_address,
+    encode_fr_word_addr32,
     encode_program_bit_address,
     encode_program_byte_address,
     encode_program_word_address,
@@ -20,7 +19,7 @@ from toyopuc import (
     parse_prefixed_address,
 )
 
-TOLERATED_MISMATCH_COUNTS: Dict[str, int] = {}
+TOLERATED_MISMATCH_COUNTS: dict[str, int] = {}
 
 
 def _hex(data: bytes) -> str:
@@ -42,7 +41,7 @@ def _range_label(area: str, start: int, end: int, width: int) -> str:
     return f"{area}{start:0{width}X}-{area}{end:0{width}X}"
 
 
-def _ranges_label(area: str, ranges: List[Tuple[int, int]]) -> str:
+def _ranges_label(area: str, ranges: list[tuple[int, int]]) -> str:
     max_end = max(end for _, end in ranges)
     width = max(4, len(f"{max_end:X}"))
     return ", ".join(_range_label(area, start, end, width) for start, end in ranges)
@@ -75,7 +74,7 @@ def _is_tolerated_area(kind: str, area: str) -> bool:
     return (kind == "bit" and area == "V") or (kind == "word" and area == "S")
 
 
-def pick_indices(rng: random.Random, start: int, end: int, count: int) -> List[int]:
+def pick_indices(rng: random.Random, start: int, end: int, count: int) -> list[int]:
     span = end - start + 1
     if count >= span:
         return list(range(start, end + 1))
@@ -84,7 +83,7 @@ def pick_indices(rng: random.Random, start: int, end: int, count: int) -> List[i
 
 def pick_indices_min_max(
     rng: random.Random, start: int, end: int, count: int
-) -> List[int]:
+) -> list[int]:
     span = end - start + 1
     if span <= 0:
         return []
@@ -100,7 +99,7 @@ def pick_indices_min_max(
     return sorted(indices)
 
 
-def _pc10_multi_read_bits(plc: ToyopucClient, addrs32: List[int]) -> List[int]:
+def _pc10_multi_read_bits(plc: ToyopucClient, addrs32: list[int]) -> list[int]:
     bit_cnt = len(addrs32)
     payload = bytearray([bit_cnt & 0xFF, 0x00, 0x00, 0x00])
     for addr in addrs32:
@@ -109,7 +108,7 @@ def _pc10_multi_read_bits(plc: ToyopucClient, addrs32: List[int]) -> List[int]:
     if len(data) < 4:
         raise ValueError("PC10 multi read response too short")
     data = data[4:]
-    out: List[int] = []
+    out: list[int] = []
     if bit_cnt == 0:
         return out
     for i in range(bit_cnt):
@@ -121,7 +120,7 @@ def _pc10_multi_read_bits(plc: ToyopucClient, addrs32: List[int]) -> List[int]:
 
 
 def _pc10_multi_write_bits(
-    plc: ToyopucClient, addrs32: List[int], values: List[int]
+    plc: ToyopucClient, addrs32: list[int], values: list[int]
 ) -> None:
     bit_cnt = len(addrs32)
     payload = bytearray([bit_cnt & 0xFF, 0x00, 0x00, 0x00])
@@ -137,7 +136,7 @@ def _pc10_multi_write_bits(
     plc.pc10_multi_write(bytes(payload))
 
 
-def _pc10_multi_read_words(plc: ToyopucClient, addrs32: List[int]) -> List[int]:
+def _pc10_multi_read_words(plc: ToyopucClient, addrs32: list[int]) -> list[int]:
     word_cnt = len(addrs32)
     payload = bytearray([0x00, 0x00, word_cnt & 0xFF, 0x00])
     for addr in addrs32:
@@ -154,7 +153,7 @@ def _pc10_multi_read_words(plc: ToyopucClient, addrs32: List[int]) -> List[int]:
 
 
 def _pc10_multi_write_words(
-    plc: ToyopucClient, addrs32: List[int], values: List[int]
+    plc: ToyopucClient, addrs32: list[int], values: list[int]
 ) -> None:
     word_cnt = len(addrs32)
     payload = bytearray([0x00, 0x00, word_cnt & 0xFF, 0x00])
@@ -172,7 +171,7 @@ def _verify_bit_sequence(
     mismatch_prefix: str,
     log_f,
     tolerated_label: str | None = None,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for value in (0, 1):
@@ -203,7 +202,7 @@ def _verify_word_sequence(
     rng: random.Random,
     log_f,
     tolerated_label: str | None = None,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     first_value = rng.randint(0, 0xFFFF)
@@ -235,7 +234,7 @@ def _verify_word_block_sequence(
     count: int,
     rng: random.Random,
     log_f,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     values1 = [rng.randint(0, 0xFFFF) for _ in range(count)]
     write_fn(values1)
     log_fn("write1")
@@ -266,7 +265,7 @@ def _verify_byte_block_sequence(
     count: int,
     rng: random.Random,
     log_f,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     values1 = bytes(rng.getrandbits(8) for _ in range(count))
     write_fn(values1)
     log_fn("write1")
@@ -321,7 +320,7 @@ def _unpack_u16_le(data: bytes) -> int:
     return data[0] | (data[1] << 8)
 
 
-def _unpack_words_block(data: bytes) -> List[int]:
+def _unpack_words_block(data: bytes) -> list[int]:
     if len(data) % 2 != 0:
         raise ValueError("word block data must be even length")
     return [data[i] | (data[i + 1] << 8) for i in range(0, len(data), 2)]
@@ -330,21 +329,21 @@ def _unpack_words_block(data: bytes) -> List[int]:
 def _test_bit_indices(
     plc: ToyopucClient,
     area: str,
-    indices: List[int],
+    indices: list[int],
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for idx in indices:
         try:
             addr = encode_bit_address(parse_address(f"{area}{idx:04X}", "bit"))
             o, t = _verify_bit_sequence(
-                lambda value: plc.write_bit(addr, bool(value)),
-                lambda: plc.read_bit(addr),
+                lambda value: plc.write_bit(addr, bool(value)),  # noqa: B023
+                lambda: plc.read_bit(addr),  # noqa: B023
                 lambda suffix: _log_frames(
-                    log_f, plc, f"[BIT] {area}{idx:04X} {suffix}"
+                    log_f, plc, f"[BIT] {area}{idx:04X} {suffix}"  # noqa: B023
                 ),
                 f"[BIT] MISMATCH {area}{idx:04X}",
                 log_f,
@@ -365,21 +364,21 @@ def _test_bit_indices(
 def _test_word_indices(
     plc: ToyopucClient,
     area: str,
-    indices: List[int],
+    indices: list[int],
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for idx in indices:
         try:
             addr = encode_word_address(parse_address(f"{area}{idx:04X}", "word"))
             o, t = _verify_word_sequence(
-                lambda value: plc.write_words(addr, [value]),
-                lambda: plc.read_words(addr, 1)[0],
+                lambda value: plc.write_words(addr, [value]),  # noqa: B023
+                lambda: plc.read_words(addr, 1)[0],  # noqa: B023
                 lambda suffix: _log_frames(
-                    log_f, plc, f"[WORD] {area}{idx:04X} {suffix}"
+                    log_f, plc, f"[WORD] {area}{idx:04X} {suffix}"  # noqa: B023
                 ),
                 f"[WORD] MISMATCH {area}{idx:04X}",
                 rng,
@@ -401,17 +400,17 @@ def _test_word_indices(
 def _test_ext_word_indices(
     plc: ToyopucClient,
     area: str,
-    indices: List[int],
+    indices: list[int],
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
     encoder=None,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     if encoder is None:
 
-        def encoder(a: str, i: int) -> Tuple[int, int]:
+        def encoder(a: str, i: int) -> tuple[int, int]:
             ext = encode_ext_no_address(a, i, "word")
             return ext.no, ext.addr
 
@@ -419,10 +418,10 @@ def _test_ext_word_indices(
         try:
             no, addr = encoder(area, idx)
             o, t = _verify_word_sequence(
-                lambda value: plc.write_ext_words(no, addr, [value]),
-                lambda: plc.read_ext_words(no, addr, 1)[0],
+                lambda value: plc.write_ext_words(no, addr, [value]),  # noqa: B023
+                lambda: plc.read_ext_words(no, addr, 1)[0],  # noqa: B023
                 lambda suffix: _log_frames(
-                    log_f, plc, f"[EXT WORD] {area} {idx:06X} {suffix}"
+                    log_f, plc, f"[EXT WORD] {area} {idx:06X} {suffix}"  # noqa: B023
                 ),
                 f"[EXT WORD] MISMATCH {area} {idx:06X}",
                 rng,
@@ -444,12 +443,12 @@ def _test_ext_word_indices(
 def run_bit_area_ranges(
     plc: ToyopucClient,
     area: str,
-    ranges: List[Tuple[int, int]],
+    ranges: list[tuple[int, int]],
     count: int,
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for start, end in ranges:
@@ -465,12 +464,12 @@ def run_bit_area_ranges(
 def run_word_area_ranges(
     plc: ToyopucClient,
     area: str,
-    ranges: List[Tuple[int, int]],
+    ranges: list[tuple[int, int]],
     count: int,
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for start, end in ranges:
@@ -486,13 +485,13 @@ def run_word_area_ranges(
 def run_ext_word_area_ranges(
     plc: ToyopucClient,
     area: str,
-    ranges: List[Tuple[int, int]],
+    ranges: list[tuple[int, int]],
     count: int,
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
     encoder=None,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for start, end in ranges:
@@ -514,7 +513,7 @@ def run_word_area(
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     return _test_word_indices(
         plc,
         area,
@@ -534,7 +533,7 @@ def run_byte_area(
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for idx in pick_indices(rng, start, end, count):
@@ -569,7 +568,7 @@ def run_bit_area(
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     return _test_bit_indices(
         plc,
         area,
@@ -589,7 +588,7 @@ def run_ext_word_area(
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     return _test_ext_word_indices(
         plc,
         area,
@@ -609,7 +608,7 @@ def run_ext_byte_area(
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for idx in pick_indices(rng, start, end, count):
@@ -641,8 +640,8 @@ def run_max_block_lengths(
     log_f=None,
     skip_errors: bool = False,
     pc10_word_count: int = 0x200,
-) -> List[Tuple[str, int, int]]:
-    results: List[Tuple[str, int, int]] = []
+) -> list[tuple[str, int, int]]:
+    results: list[tuple[str, int, int]] = []
 
     def run(label: str, fn) -> None:
         try:
@@ -762,12 +761,12 @@ def run_max_block_lengths(
 def _verify_ext_multi_case(
     plc: ToyopucClient,
     label: str,
-    bit_point: Tuple[int, int, int],
-    byte_point: Tuple[int, int],
-    word_point: Tuple[int, int],
+    bit_point: tuple[int, int, int],
+    byte_point: tuple[int, int],
+    word_point: tuple[int, int],
     rng: random.Random,
     log_f=None,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     bit_no, bit_pos, bit_addr = bit_point
     byte_no, byte_addr = byte_point
     word_no, word_addr = word_point
@@ -821,12 +820,12 @@ def _verify_ext_multi_case(
 def _verify_ext_multi_pair_case(
     plc: ToyopucClient,
     label: str,
-    bit_point: Tuple[int, int, int] | None,
-    byte_point: Tuple[int, int] | None,
-    word_point: Tuple[int, int] | None,
+    bit_point: tuple[int, int, int] | None,
+    byte_point: tuple[int, int] | None,
+    word_point: tuple[int, int] | None,
     rng: random.Random,
     log_f=None,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     bit_points_w = []
     bit_points_r = []
     byte_points_w = []
@@ -914,10 +913,10 @@ def run_ext_multi_mixed(
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> List[Tuple[str, int, int]]:
-    results: List[Tuple[str, int, int]] = []
+) -> list[tuple[str, int, int]]:
+    results: list[tuple[str, int, int]] = []
 
-    cases: List[Tuple[str, Tuple[int, int, int], Tuple[int, int], Tuple[int, int]]] = []
+    cases: list[tuple[str, tuple[int, int, int], tuple[int, int], tuple[int, int]]] = []
     cases.append(
         (
             "EX0000 + U0000(byte) + EN0000(word)",
@@ -971,12 +970,12 @@ def run_ext_multi_mixed(
             continue
         results.append((label, ok, total))
 
-    split_cases: List[
-        Tuple[
+    split_cases: list[
+        tuple[
             str,
-            Optional[Tuple[int, int, int]],
-            Optional[Tuple[int, int]],
-            Optional[Tuple[int, int]],
+            tuple[int, int, int] | None,
+            tuple[int, int] | None,
+            tuple[int, int] | None,
         ]
     ] = [
         (
@@ -1037,8 +1036,8 @@ def run_boundary_values(
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> List[Tuple[str, int, int]]:
-    results: List[Tuple[str, int, int]] = []
+) -> list[tuple[str, int, int]]:
+    results: list[tuple[str, int, int]] = []
 
     def run(label: str, fn) -> None:
         try:
@@ -1116,7 +1115,7 @@ def run_boundary_values(
     return results
 
 
-def _encode_pc10g_u(area: str, index: int) -> Tuple[int, int]:
+def _encode_pc10g_u(area: str, index: int) -> tuple[int, int]:
     if area != "U":
         raise ValueError("pc10g encoder only supports U")
     if index < 0x00000 or index > 0x1FFFF:
@@ -1131,12 +1130,12 @@ def _test_pc10_bit_area_ranges(
     plc: ToyopucClient,
     area: str,
     ex_no: int,
-    ranges: List[Tuple[int, int]],
+    ranges: list[tuple[int, int]],
     count: int,
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for start, end in ranges:
@@ -1145,10 +1144,10 @@ def _test_pc10_bit_area_ranges(
             try:
                 addr32 = encode_exno_bit_u32(ex_no, idx)
                 o, t = _verify_bit_sequence(
-                    lambda value: _pc10_multi_write_bits(plc, [addr32], [value]),
-                    lambda: bool(_pc10_multi_read_bits(plc, [addr32])[0]),
+                    lambda value: _pc10_multi_write_bits(plc, [addr32], [value]),  # noqa: B023
+                    lambda: bool(_pc10_multi_read_bits(plc, [addr32])[0]),  # noqa: B023
                     lambda suffix: _log_frames(
-                        log_f, plc, f"[PC10 BIT] {area}{idx:04X} {suffix}"
+                        log_f, plc, f"[PC10 BIT] {area}{idx:04X} {suffix}"  # noqa: B023
                     ),
                     f"[PC10 BIT] MISMATCH {area}{idx:04X}",
                     log_f,
@@ -1169,13 +1168,13 @@ def _test_pc10_bit_area_ranges(
 def _test_pc10_bit_area_ranges_with_builder(
     plc: ToyopucClient,
     label: str,
-    ranges: List[Tuple[int, int]],
+    ranges: list[tuple[int, int]],
     count: int,
     rng: random.Random,
     addr_builder,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for start, end in ranges:
@@ -1184,10 +1183,10 @@ def _test_pc10_bit_area_ranges_with_builder(
             try:
                 addr32 = addr_builder(idx)
                 o, t = _verify_bit_sequence(
-                    lambda value: _pc10_multi_write_bits(plc, [addr32], [value]),
-                    lambda: bool(_pc10_multi_read_bits(plc, [addr32])[0]),
+                    lambda value: _pc10_multi_write_bits(plc, [addr32], [value]),  # noqa: B023
+                    lambda: bool(_pc10_multi_read_bits(plc, [addr32])[0]),  # noqa: B023
                     lambda suffix: _log_frames(
-                        log_f, plc, f"[PC10 BIT] {label}{idx:04X} {suffix}"
+                        log_f, plc, f"[PC10 BIT] {label}{idx:04X} {suffix}"  # noqa: B023
                     ),
                     f"[PC10 BIT] MISMATCH {label}{idx:04X}",
                     log_f,
@@ -1208,12 +1207,12 @@ def _test_pc10_bit_area_ranges_with_builder(
 def _test_ext_bit_area_ranges(
     plc: ToyopucClient,
     area: str,
-    ranges: List[Tuple[int, int]],
+    ranges: list[tuple[int, int]],
     count: int,
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for start, end in ranges:
@@ -1222,10 +1221,10 @@ def _test_ext_bit_area_ranges(
             try:
                 no, bit_no, addr = _ext_bit_point(area, idx)
                 o, t = _verify_bit_sequence(
-                    lambda value: _ext_multi_write_bit(plc, no, bit_no, addr, value),
-                    lambda: bool(_ext_multi_read_bit(plc, no, bit_no, addr)),
+                    lambda value: _ext_multi_write_bit(plc, no, bit_no, addr, value),  # noqa: B023
+                    lambda: bool(_ext_multi_read_bit(plc, no, bit_no, addr)),  # noqa: B023
                     lambda suffix: _log_frames(
-                        log_f, plc, f"[EXT BIT] {area}{idx:04X} {suffix}"
+                        log_f, plc, f"[EXT BIT] {area}{idx:04X} {suffix}"  # noqa: B023
                     ),
                     f"[EXT BIT] MISMATCH {area}{idx:04X}",
                     log_f,
@@ -1246,13 +1245,13 @@ def _test_ext_bit_area_ranges(
 def _test_pc10_word_area_ranges_with_builder(
     plc: ToyopucClient,
     label: str,
-    ranges: List[Tuple[int, int]],
+    ranges: list[tuple[int, int]],
     count: int,
     rng: random.Random,
     addr_builder,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for start, end in ranges:
@@ -1261,10 +1260,10 @@ def _test_pc10_word_area_ranges_with_builder(
             try:
                 addr32 = addr_builder(idx)
                 o, t = _verify_word_sequence(
-                    lambda value: _pc10_multi_write_words(plc, [addr32], [value]),
-                    lambda: _pc10_multi_read_words(plc, [addr32])[0],
+                    lambda value: _pc10_multi_write_words(plc, [addr32], [value]),  # noqa: B023
+                    lambda: _pc10_multi_read_words(plc, [addr32])[0],  # noqa: B023
                     lambda suffix: _log_frames(
-                        log_f, plc, f"[PC10 WORD] {label}{idx:05X} {suffix}"
+                        log_f, plc, f"[PC10 WORD] {label}{idx:05X} {suffix}"  # noqa: B023
                     ),
                     f"[PC10 WORD] MISMATCH {label}{idx:05X}",
                     rng,
@@ -1332,13 +1331,13 @@ def _program_no(prefix: str) -> int:
         raise ValueError(f"Unsupported prefix: {prefix}") from exc
 
 
-def _prefixed_word_ext_addr(prefix: str, area: str, index: int) -> Tuple[int, int]:
+def _prefixed_word_ext_addr(prefix: str, area: str, index: int) -> tuple[int, int]:
     program_no = _program_no(prefix)
     parsed = parse_address(f"{area}{index:04X}", "word")
     return program_no, encode_program_word_address(parsed)
 
 
-def _prefixed_bit_ext_addr(prefix: str, area: str, index: int) -> Tuple[int, int, int]:
+def _prefixed_bit_ext_addr(prefix: str, area: str, index: int) -> tuple[int, int, int]:
     program_no = _program_no(prefix)
     parsed = parse_address(f"{area}{index:04X}", "bit")
     bit_no, addr = encode_program_bit_address(parsed)
@@ -1372,7 +1371,7 @@ _EXT_BIT_AREA_SPECS = {
 }
 
 
-def _ext_bit_point(area: str, index: int) -> Tuple[int, int, int]:
+def _ext_bit_point(area: str, index: int) -> tuple[int, int, int]:
     try:
         no, byte_base = _EXT_BIT_AREA_SPECS[area]
     except KeyError as exc:
@@ -1388,12 +1387,12 @@ def _test_prefixed_bit_area_ranges(
     plc: ToyopucClient,
     prefix: str,
     area: str,
-    ranges: List[Tuple[int, int]],
+    ranges: list[tuple[int, int]],
     count: int,
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for start, end in ranges:
@@ -1402,10 +1401,10 @@ def _test_prefixed_bit_area_ranges(
             try:
                 no, bit_no, addr = _prefixed_bit_ext_addr(prefix, area, idx)
                 o, t = _verify_bit_sequence(
-                    lambda value: _ext_multi_write_bit(plc, no, bit_no, addr, value),
-                    lambda: bool(_ext_multi_read_bit(plc, no, bit_no, addr)),
+                    lambda value: _ext_multi_write_bit(plc, no, bit_no, addr, value),  # noqa: B023
+                    lambda: bool(_ext_multi_read_bit(plc, no, bit_no, addr)),  # noqa: B023
                     lambda suffix: _log_frames(
-                        log_f, plc, f"[PREF BIT] {prefix}-{area}{idx:04X} {suffix}"
+                        log_f, plc, f"[PREF BIT] {prefix}-{area}{idx:04X} {suffix}"  # noqa: B023
                     ),
                     f"[PREF BIT] MISMATCH {prefix}-{area}{idx:04X}",
                     log_f,
@@ -1427,12 +1426,12 @@ def _test_prefixed_word_area_ranges(
     plc: ToyopucClient,
     prefix: str,
     area: str,
-    ranges: List[Tuple[int, int]],
+    ranges: list[tuple[int, int]],
     count: int,
     rng: random.Random,
     log_f=None,
     skip_errors: bool = False,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     ok = 0
     total = 0
     for start, end in ranges:
@@ -1441,10 +1440,10 @@ def _test_prefixed_word_area_ranges(
             try:
                 no, addr = _prefixed_word_ext_addr(prefix, area, idx)
                 o, t = _verify_word_sequence(
-                    lambda value: plc.write_ext_words(no, addr, [value]),
-                    lambda: plc.read_ext_words(no, addr, 1)[0],
+                    lambda value: plc.write_ext_words(no, addr, [value]),  # noqa: B023
+                    lambda: plc.read_ext_words(no, addr, 1)[0],  # noqa: B023
                     lambda suffix: _log_frames(
-                        log_f, plc, f"[PREF WORD] {prefix}-{area}{idx:04X} {suffix}"
+                        log_f, plc, f"[PREF WORD] {prefix}-{area}{idx:04X} {suffix}"  # noqa: B023
                     ),
                     f"[PREF WORD] MISMATCH {prefix}-{area}{idx:04X}",
                     rng,
@@ -1544,11 +1543,11 @@ def main() -> int:
 
     rng = random.Random(args.seed)
 
-    bit_areas: Dict[str, Tuple[int, int]] = {}
-    word_areas: Dict[str, Tuple[int, int]] = {}
-    byte_areas: Dict[str, Tuple[int, int]] = {}
-    ext_word_areas: Dict[str, Tuple[int, int]] = {}
-    ext_byte_areas: Dict[str, Tuple[int, int]] = {}
+    bit_areas: dict[str, tuple[int, int]] = {}
+    word_areas: dict[str, tuple[int, int]] = {}
+    byte_areas: dict[str, tuple[int, int]] = {}
+    ext_word_areas: dict[str, tuple[int, int]] = {}
+    ext_byte_areas: dict[str, tuple[int, int]] = {}
 
     # Define test ranges by area index (hex)
     if args.pc10g_full:
