@@ -16,6 +16,8 @@ Run them from the repository root or after installing the package.
 
 If you want the shortest path:
 
+- all high-level APIs (sync): `examples/high_level_all_sync.py`
+- all high-level APIs (async): `examples/high_level_all_async.py`
 - minimal basic read/write: `examples/high_level_minimal.py`
 - broader high-level example: `examples/high_level_basic.py`
 - UDP example: `examples/high_level_udp.py`
@@ -38,17 +40,21 @@ High-level address note:
 Quick copy/paste commands:
 
 ```powershell
-python examples/high_level_minimal.py --host 192.168.250.101 --port 1025
-python examples/high_level_basic.py --host 192.168.250.101 --port 1025
-python examples/high_level_udp.py --host 192.168.250.101 --port 1027 --local-port 12000
-python examples/fr_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --target FR000000 --value 0x1234
-python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode cpu-status
-python examples/clock_and_status.py --host 192.168.250.101 --port 1025
-python examples/device_monitor_gui.py --host 192.168.250.101 --port 1025
+python examples/high_level_minimal.py --host 192.168.250.100 --port 1025
+python examples/high_level_basic.py --host 192.168.250.100 --port 1025
+python examples/high_level_udp.py --host 192.168.250.100 --port 1027 --local-port 12000
+python examples/fr_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --target FR000000 --value 0x1234
+python examples/relay_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode cpu-status
+python examples/clock_and_status.py --host 192.168.250.100 --port 1025
+python examples/device_monitor_gui.py --host 192.168.250.100 --port 1025
 ```
 
 ## Files
 
+- `examples/high_level_all_sync.py`
+  All high-level synchronous utility helpers (`read`, `write`, `read_many`, `write_many`, `read_dwords`, `read_float32s`, `read_fr`, `write_fr`, `commit_fr`)
+- `examples/high_level_all_async.py`
+  All high-level asynchronous utility helpers via `open_and_connect` (`read_typed`, `write_typed`, `read_words`, `read_dwords`, `write_bit_in_word`, `read_named`, `poll`)
 - `examples/low_level_basic.py`
   Advanced low-level read/write example using `ToyopucClient`
 - `examples/high_level_minimal.py`
@@ -89,13 +95,13 @@ python examples/device_monitor_gui.py --protocol udp --local-port 12000
 Read and write one FR word without flash commit:
 
 ```powershell
-python examples/fr_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --target FR000000 --value 0x1234
+python examples/fr_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --target FR000000 --value 0x1234
 ```
 
 Read and write one FR word with flash commit:
 
 ```powershell
-python examples/fr_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --target FR000000 --value 0x1234 --commit
+python examples/fr_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --target FR000000 --value 0x1234 --commit
 ```
 
 Notes:
@@ -109,55 +115,55 @@ Notes:
 CPU status through relay:
 
 ```powershell
-python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode cpu-status
+python examples/relay_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode cpu-status
 ```
 
 Clock read through two relay hops:
 
 ```powershell
-python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2,P1-L2:N4" --mode clock-read
+python examples/relay_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2,P1-L2:N4" --mode clock-read
 ```
 
 CPU status A0 through relay:
 
 ```powershell
-python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode cpu-status-a0
+python examples/relay_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode cpu-status-a0
 ```
 
 Clock write through relay:
 
 ```powershell
-python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode clock-write --clock-value 2026-03-10T15:00:00
+python examples/relay_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode clock-write --clock-value 2026-03-10T15:00:00
 ```
 
 Word read through relay:
 
 ```powershell
-python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode word-read --device P1-D0000 --count 1
+python examples/relay_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode word-read --device P1-D0000 --count 1
 ```
 
 Word write through relay:
 
 ```powershell
-python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode word-write --device P1-D0000 --value 0x1234
+python examples/relay_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode word-write --device P1-D0000 --value 0x1234
 ```
 
 Repeated contiguous relay word write/readback test:
 
 ```powershell
-python -m tools.relay_block_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2,P1-L2:N4,P1-L2:N6" --device P1-D0000 --count 8 --loops 3 --value 0x1000 --step 1 --loop-step 0x0100
+python -m tools.relay_block_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2,P1-L2:N4,P1-L2:N6" --device P1-D0000 --count 8 --loops 3 --value 0x1000 --step 1 --loop-step 0x0100
 ```
 
 FR write through relay (RAM update only):
 
 ```powershell
-python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode fr-write --device FR000000 --value 0x1234
+python examples/relay_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode fr-write --device FR000000 --value 0x1234
 ```
 
 FR commit through relay:
 
 ```powershell
-python examples/relay_basic.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode fr-commit --device FR000000 --wait
+python examples/relay_basic.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode fr-commit --device FR000000 --wait
 ```
 
 
