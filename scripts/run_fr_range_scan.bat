@@ -24,8 +24,8 @@ echo Usage:
 echo   tools\run_fr_range_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [COARSE_STEP] [STOP_AFTER_NG]
 echo.
 echo Example ^(TCP^):
-echo   tools\run_fr_range_scan.bat 192.168.250.101 1025 tcp 0 16 32
+echo   tools\run_fr_range_scan.bat 192.168.250.100 1025 tcp 0 16 32
 echo.
 echo Example ^(UDP^):
-echo   tools\run_fr_range_scan.bat 192.168.250.101 1027 udp 12000 16 32
+echo   tools\run_fr_range_scan.bat 192.168.250.100 1027 udp 12000 16 32
 exit /b 2

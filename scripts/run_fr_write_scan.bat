@@ -90,11 +90,11 @@ echo Usage:
 echo   tools\run_fr_write_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CHUNK_WORDS] [PROGRESS_EVERY] [START] [END] [SEED] [LOG] [SKIP_COMMIT] [SKIP_VERIFY]
 echo.
 echo Small-range example ^(UDP^):
-echo   tools\run_fr_write_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 8 0x000000 0x0000FF 0xA500 fr_write_small.log
+echo   tools\run_fr_write_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 8 0x000000 0x0000FF 0xA500 fr_write_small.log
 echo.
 echo One-block example ^(UDP^):
-echo   tools\run_fr_write_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 16 0x000000 0x007FFF 0xA500 fr_write_block0.log
+echo   tools\run_fr_write_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 16 0x000000 0x007FFF 0xA500 fr_write_block0.log
 echo.
 echo Full-range example ^(destructive^):
-echo   tools\run_fr_write_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write_full.log
+echo   tools\run_fr_write_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write_full.log
 exit /b 2

@@ -64,10 +64,10 @@ echo Usage:
 echo   tools\run_c4c5_range_probe.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CASES] [LOG]
 echo.
 echo Default probe:
-echo   tools\run_c4c5_range_probe.bat 192.168.250.101 1027 udp 12000 5 2
+echo   tools\run_c4c5_range_probe.bat 192.168.250.100 1027 udp 12000 5 2
 echo.
 echo Wider probe:
-echo   tools\run_c4c5_range_probe.bat 192.168.250.101 1027 udp 12000 5 2 l1000,l2fff,m1000,m17ff,u00000,u07fff,u08000,u1ffff,eb00000,eb3ffff c4c5_range_probe.log
+echo   tools\run_c4c5_range_probe.bat 192.168.250.100 1027 udp 12000 5 2 l1000,l2fff,m1000,m17ff,u00000,u07fff,u08000,u1ffff,eb00000,eb3ffff c4c5_range_probe.log
 echo.
 echo PowerShell note:
 echo   comma lists may be passed either quoted or unquoted; unquoted lists are re-joined by this batch file

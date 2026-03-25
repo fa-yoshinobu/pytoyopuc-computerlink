@@ -366,7 +366,7 @@ Four-hop relays (`IV CPU`) follow the same pattern with another wrapper (`Transf
 - Verified on real hardware for this three-hop relay high-level API sweep:
   - hops: `P1-L2:N4 -> P1-L2:N6 -> P1-L2:N2`
   - command:
-    - `python -m tools.high_level_api_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --include-pc10-word`
+    - `python -m tools.high_level_api_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --include-pc10-word`
   - observed result:
     - `TOTAL: 24/24`
     - `ERROR CASES: 0`

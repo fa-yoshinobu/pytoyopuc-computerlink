@@ -76,5 +76,5 @@ echo Usage:
 echo   tools\run_final_whl_edge_matrix.bat HOST TCP_PORT [UDP_PORT] [LOCAL_PORT] [TIMEOUT] [RETRIES] [LOG_DIR]
 echo.
 echo Example:
-echo   tools\run_final_whl_edge_matrix.bat 192.168.250.101 1025 1027 12000 5 1 final_whl_edge_matrix_logs
+echo   tools\run_final_whl_edge_matrix.bat 192.168.250.100 1025 1027 12000 5 1 final_whl_edge_matrix_logs
 exit /b 1

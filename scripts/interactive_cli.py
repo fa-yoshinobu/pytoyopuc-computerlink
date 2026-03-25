@@ -255,7 +255,7 @@ def main() -> int:
     parser.add_argument("--log", default=None)
     cli_args = parser.parse_args()
 
-    host = cli_args.host if cli_args.host is not None else _prompt("Host", "192.168.0.10")
+    host = cli_args.host if cli_args.host is not None else _prompt("Host", "192.168.250.100")
     port = cli_args.port if cli_args.port is not None else int(_prompt("Port", "0"))
     protocol = cli_args.protocol if cli_args.protocol is not None else _prompt("Protocol (tcp/udp)", "tcp").lower()
     timeout = cli_args.timeout if cli_args.timeout is not None else float(_prompt("Timeout sec", "3.0"))

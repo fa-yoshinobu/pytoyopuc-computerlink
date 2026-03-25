@@ -63,14 +63,14 @@ echo Usage:
 echo   tools\run_fr_commit_test.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [MODE] [TARGET] [VALUE] [COMMIT_TIMEOUT] [POLL_INTERVAL] [TRY_A0]
 echo.
 echo Read example ^(UDP^):
-echo   tools\run_fr_commit_test.bat 192.168.250.101 1027 udp 12000 5 2 read FR000000
+echo   tools\run_fr_commit_test.bat 192.168.250.100 1027 udp 12000 5 2 read FR000000
 echo.
 echo Write+commit example ^(UDP^):
-echo   tools\run_fr_commit_test.bat 192.168.250.101 1027 udp 12000 5 2 write FR000000 0x1234 30 0.2
+echo   tools\run_fr_commit_test.bat 192.168.250.100 1027 udp 12000 5 2 write FR000000 0x1234 30 0.2
 echo.
 echo Restore example ^(UDP^):
-echo   tools\run_fr_commit_test.bat 192.168.250.101 1027 udp 12000 5 2 write FR000000 0xFFFF 30 0.2
+echo   tools\run_fr_commit_test.bat 192.168.250.100 1027 udp 12000 5 2 write FR000000 0xFFFF 30 0.2
 echo.
 echo Optional A0 try:
-echo   tools\run_fr_commit_test.bat 192.168.250.101 1027 udp 12000 5 2 read FR000000 0x1234 30 0.2 1
+echo   tools\run_fr_commit_test.bat 192.168.250.100 1027 udp 12000 5 2 read FR000000 0x1234 30 0.2 1
 exit /b 2

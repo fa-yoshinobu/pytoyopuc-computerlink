@@ -95,5 +95,5 @@ echo Usage:
 echo   tools\run_relay_matrix_test.bat HOST PORT [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [HOPS] [LOG]
 echo.
 echo Example:
-echo   tools\run_relay_matrix_test.bat 192.168.250.101 1027 udp 12000 10 1 P1-L2:N4,P1-L2:N6,P1-L2:N2 relay_matrix.log
+echo   tools\run_relay_matrix_test.bat 192.168.250.100 1027 udp 12000 10 1 P1-L2:N4,P1-L2:N6,P1-L2:N2 relay_matrix.log
 exit /b 1

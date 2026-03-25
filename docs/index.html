@@ -657,7 +657,6 @@
 <li><strong>Vendor Focused</strong>: Tailored for JTEKT TOYOPUC protocol specifications.</li>
 <li><strong>High-Level API</strong>: Simplified <code>read</code> and <code>write</code> methods for bits and words.</li>
 <li><strong>Robustness</strong>: Built-in handling for Toyopuc-specific memory ranges and boundary behaviors.</li>
-<li><strong>Zero Mojibake</strong>: Strictly English-based documentation and UTF-8 standards.</li>
 <li><strong>CI-Ready</strong>: Automated quality checks and standalone CLI tool generation.</li>
 </ul>
 <h2 id="quick-start">Quick Start</h2>
@@ -667,7 +666,7 @@
 <h3 id="basic-usage">Basic Usage</h3>
 <pre><code class="language-python">from toyopuc import ToyopucDeviceClient
 
-with ToyopucDeviceClient(&quot;192.168.1.5&quot;, 1025) as client:
+with ToyopucDeviceClient(&quot;192.168.250.100&quot;, 1025) as client:
     # Read D1000 (Word)
     val = client.read(&quot;D1000&quot;)
     print(f&quot;Value: {val}&quot;)

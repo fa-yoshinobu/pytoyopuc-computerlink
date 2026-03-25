@@ -1,6 +1,6 @@
 # Agent Guide: Toyopuc Computer Link Python
 
-This repository is part of the PLC Communication Workspace and follows the global standards defined in `D:\PLC_COMM_PROJ\AGENTS.md`.
+This repository is part of the PLC Communication Workspace and follows the global standards defined in `AGENTS.md`.
 
 ## 1. Project-Specific Context
 - **Protocol**: TOYOPUC Computer Link (JTEKT)

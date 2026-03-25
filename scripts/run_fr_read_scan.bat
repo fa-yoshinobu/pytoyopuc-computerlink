@@ -71,8 +71,8 @@ echo Usage:
 echo   tools\run_fr_read_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CHUNK_WORDS] [PROGRESS_EVERY] [START] [END] [STOP_AFTER_NG] [LOG]
 echo.
 echo Full-range example ^(UDP^):
-echo   tools\run_fr_read_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full.log
+echo   tools\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full.log
 echo.
 echo Small-range example ^(UDP^):
-echo   tools\run_fr_read_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 8 0x000000 0x00FFFF 0
+echo   tools\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 8 0x000000 0x00FFFF 0
 exit /b 2

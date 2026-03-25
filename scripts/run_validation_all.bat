@@ -127,5 +127,5 @@ echo Usage:
 echo   tools\run_validation_all.bat ^<HOST^> ^<PORT^> [PROTOCOL] [COUNT] [TIMEOUT] [RETRIES] [PC10_BLOCK_WORDS] [LOCAL_PORT] [RECOVERY_COUNT]
 echo.
 echo Example:
-echo   tools\run_validation_all.bat 192.168.250.101 1027 udp 4 5 2 0x200 12000 60
+echo   tools\run_validation_all.bat 192.168.250.100 1027 udp 4 5 2 0x200 12000 60
 exit /b 2

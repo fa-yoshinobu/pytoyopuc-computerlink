@@ -61,5 +61,5 @@ echo Usage:
 echo   tools\run_device_full_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CHUNK] [LOG_BASE]
 echo.
 echo Example:
-echo   tools\run_device_full_scan.bat 192.168.250.101 1027 udp 12000 5 2 512 device_full
+echo   tools\run_device_full_scan.bat 192.168.250.100 1027 udp 12000 5 2 512 device_full
 exit /b 2

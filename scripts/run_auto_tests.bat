@@ -158,5 +158,5 @@ echo Usage:
 echo   tools\run_auto_tests.bat ^<HOST^> ^<PORT^> [PROTOCOL] [COUNT] [TIMEOUT] [RETRIES] [PC10_BLOCK_WORDS] [LOCAL_PORT]
 echo.
 echo Example:
-echo   tools\run_auto_tests.bat 192.168.250.101 1025 udp 4 3 0 0x200 12000
+echo   tools\run_auto_tests.bat 192.168.250.100 1025 udp 4 3 0 0x200 12000
 exit /b 2

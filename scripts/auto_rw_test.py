@@ -1392,7 +1392,7 @@ def _test_prefixed_word_area_ranges(
 
 def main() -> int:
     p = argparse.ArgumentParser(description="Auto read/write verification")
-    p.add_argument("--host", default="192.168.0.10")
+    p.add_argument("--host", default="192.168.250.100")
     p.add_argument("--port", type=int, default=15000)
     p.add_argument(
         "--local-port",

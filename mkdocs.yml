@@ -12,8 +12,9 @@ plugins:
   - mkdocstrings:
       default_handler: python
 exclude_docs: |
-  maintainer/
-  user/MODEL_RANGES.md
+  internal_docs/**
+  maintainer/**
+  validation/**
 nav:
   - Overview: index.md
   - User Guide: user/USER_GUIDE.md

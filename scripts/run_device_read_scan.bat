@@ -74,5 +74,5 @@ echo Usage:
 echo   tools\run_device_read_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [TARGETS] [CHUNK] [LOG]
 echo.
 echo Example:
-echo   tools\run_device_read_scan.bat 192.168.250.101 1027 udp 12000 5 2 S,N,R,D,U,EB 128 read_scan.log
+echo   tools\run_device_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 S,N,R,D,U,EB 128 read_scan.log
 exit /b 2

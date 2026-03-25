@@ -11,7 +11,6 @@ A professional Python client library for JTEKT (Toyoda) TOYOPUC computer-link co
 - **Vendor Focused**: Tailored for JTEKT TOYOPUC protocol specifications.
 - **High-Level API**: Simplified `read` and `write` methods for bits and words.
 - **Robustness**: Built-in handling for Toyopuc-specific memory ranges and boundary behaviors.
-- **Zero Mojibake**: Strictly English-based documentation and UTF-8 standards.
 - **CI-Ready**: Automated quality checks and standalone CLI tool generation.
 
 ## Quick Start
@@ -25,7 +24,7 @@ pip install toyopuc-computerlink
 ```python
 from toyopuc import ToyopucDeviceClient
 
-with ToyopucDeviceClient("192.168.1.5", 1025) as client:
+with ToyopucDeviceClient("192.168.250.100", 1025) as client:
     # Read D1000 (Word)
     val = client.read("D1000")
     print(f"Value: {val}")

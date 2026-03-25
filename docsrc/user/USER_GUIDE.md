@@ -22,7 +22,7 @@ from toyopuc import open_and_connect
 
 async def main():
     # Use 'open_and_connect' for automatic session management
-    async with await open_and_connect("192.168.1.5", 1025) as plc:
+    async with await open_and_connect("192.168.250.100", 1025) as plc:
         # Read word device P1-D0000
         val = await plc.read("P1-D0000")
         print(f"P1-D0000 = {val}")
@@ -40,7 +40,7 @@ For scripts or environments where `asyncio` is not available, a synchronous wrap
 ```python
 from toyopuc import ToyopucDeviceClient
 
-with ToyopucDeviceClient("192.168.1.5", 1025) as plc:
+with ToyopucDeviceClient("192.168.250.100", 1025) as plc:
     # Read word device P1-D0000
     val = plc.read("P1-D0000")
     print(f"P1-D0000 = {val}")
@@ -108,7 +108,7 @@ from toyopuc import open_and_connect
 from toyopuc import read_typed, write_typed
 
 async def main():
-    async with await open_and_connect("192.168.1.5") as plc:
+    async with await open_and_connect("192.168.250.100") as plc:
         f = await read_typed(plc, "P1-D0100", "F")        # float32
         v = await read_typed(plc, "P1-D0200", "L")        # signed 32-bit
         await write_typed(plc, "P1-D0100", "F", 3.14)
@@ -173,7 +173,7 @@ import asyncio
 from toyopuc import open_and_connect, poll
 
 async def main():
-    async with await open_and_connect("192.168.1.5") as plc:
+    async with await open_and_connect("192.168.250.100") as plc:
         async for snapshot in poll(plc, ["P1-D0100", "P1-D0101:F"], interval=1.0):
             print(snapshot)
             # {"P1-D0100": 42, "P1-D0101:F": 3.14}

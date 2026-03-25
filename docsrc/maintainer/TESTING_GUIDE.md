@@ -98,7 +98,7 @@ Verified on `2026-03-10` against `TOYOPUC-Plus CPU (TCC-6740) + Plus EX2 (TCU-68
 - verified relay high-level API sweep:
   - hops: `P1-L2:N4 -> P1-L2:N6 -> P1-L2:N2`
   - command:
-    - `python -m tools.high_level_api_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --include-pc10-word --log relay_high_level_api.log`
+    - `python -m tools.high_level_api_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --include-pc10-word --log relay_high_level_api.log`
   - observed result:
     - `TOTAL: 24/24`
     - `ERROR CASES: 0`
@@ -112,7 +112,7 @@ Verified on `2026-03-10` against `TOYOPUC-Plus CPU (TCC-6740) + Plus EX2 (TCU-68
 - verified relay matrix expansion:
   - hops: `P1-L2:N4 -> P1-L2:N6 -> P1-L2:N2`
   - command:
-    - `python -m tools.relay_matrix_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --targets D0000,R0000,S0000,U08000 --counts 16,32 --loops 3 --value 0x1000 --step 1 --loop-step 0x0100 --clock-loops 3 --clock-start 2026-03-10T15:30:00`
+    - `python -m tools.relay_matrix_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --targets D0000,R0000,S0000,U08000 --counts 16,32 --loops 3 --value 0x1000 --step 1 --loop-step 0x0100 --clock-loops 3 --clock-start 2026-03-10T15:30:00`
   - observed result:
     - `D0000`: `count=16`, `count=32` both `3/3` loops passed
     - `R0000`: `count=16`, `count=32` both `3/3` loops passed
@@ -123,17 +123,17 @@ Verified on `2026-03-10` against `TOYOPUC-Plus CPU (TCC-6740) + Plus EX2 (TCU-68
     - repeated relay `clock-write` / readback / restore: `3/3` loops passed
 - verified relay low-level sweep:
   - UDP path:
-    - `python -m tools.relay_low_level_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --clock-value 2026-03-10T15:00:00`
+    - `python -m tools.relay_low_level_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --clock-value 2026-03-10T15:00:00`
     - passed: `cpu-status`, `clock-read`, `clock-write`, `CMD=20/21`, `CMD=1C/1D`, `CMD=24/25`, `CMD=94/95`, `CMD=96/97`, `CMD=98/99`, `CMD=C2/C3`
     - standalone relay `A0` returned relay NAK `0x15`
     - the `D0000L` single-byte case and `D0000/D0001` multi-word case did not hold the requested values on this path during the UDP sweep
   - TCP path:
-    - `python -m tools.relay_low_level_test --host 192.168.250.101 --port 1025 --protocol tcp --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2"`
+    - `python -m tools.relay_low_level_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2"`
     - passed: `cpu-status`, `clock-read`, `CMD=20/21`, `CMD=1C/1D`, `CMD=1E/1F`, `CMD=22/23`, `CMD=24/25`, `CMD=94/95`, `CMD=96/97`, `CMD=98/99`, `CMD=C2/C3`
     - standalone relay `A0` returned relay NAK `0x15`
 - verified relay abnormal-case sweep:
   - command:
-    - `python -m tools.relay_error_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12021 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --forbidden-write-device S0000 --out-of-range-word-index 0x3000`
+    - `python -m tools.relay_error_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12021 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --forbidden-write-device S0000 --out-of-range-word-index 0x3000`
   - observed result:
     - missing station: timeout, no reply
     - broken path: timeout, no reply
@@ -184,13 +184,13 @@ Verified simulator smoke result:
 For `TOYOPUC-Plus CPU (TCC-6740) + Plus EX2 (TCU-6858)`, the current broad validation batch is:
 
 ```bat
-tools\run_validation_all.bat 192.168.250.101 1025 tcp 4 5 2 0x200 0 60
+tools\run_validation_all.bat 192.168.250.100 1025 tcp 4 5 2 0x200 0 60
 ```
 
 UDP example:
 
 ```bat
-tools\run_validation_all.bat 192.168.250.101 1027 udp 4 5 2 0x200 12000 60
+tools\run_validation_all.bat 192.168.250.100 1027 udp 4 5 2 0x200 12000 60
 ```
 
 This batch covers:
@@ -222,7 +222,7 @@ Use `run_validation_all.bat` plus the focused helpers above. The batch is intent
 Start with explicit connection parameters:
 
 ```bash
-python -m tools.interactive_cli --host 192.168.250.101 --port 1025 --protocol tcp
+python -m tools.interactive_cli --host 192.168.250.100 --port 1025 --protocol tcp
 ```
 
 Supported connection options:
@@ -244,25 +244,25 @@ Dedicated command-line helper:
 Read current PLC clock:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1025 --protocol tcp
+python -m tools.clock_test --host 192.168.250.100 --port 1025 --protocol tcp
 ```
 
 Set PLC clock explicitly:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1025 --protocol tcp --set "2026-03-08 12:34:56"
+python -m tools.clock_test --host 192.168.250.100 --port 1025 --protocol tcp --set "2026-03-08 12:34:56"
 ```
 
 Set PLC clock to current local time:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1025 --protocol tcp --set-now
+python -m tools.clock_test --host 192.168.250.100 --port 1025 --protocol tcp --set-now
 ```
 
 UDP example:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
+python -m tools.clock_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
 ```
 
 Read test from Python with the low-level client:
@@ -271,7 +271,7 @@ Read test from Python with the low-level client:
 python - <<'PY'
 from toyopuc import ToyopucClient
 
-with ToyopucClient("192.168.250.101", 1025, protocol="tcp") as plc:
+with ToyopucClient("192.168.250.100", 1025, protocol="tcp") as plc:
     print(plc.read_clock())
 PY
 ```
@@ -282,7 +282,7 @@ Read test from Python with the high-level client:
 python - <<'PY'
 from toyopuc import ToyopucDeviceClient
 
-with ToyopucDeviceClient("192.168.250.101", 1025, protocol="tcp") as plc:
+with ToyopucDeviceClient("192.168.250.100", 1025, protocol="tcp") as plc:
     print(plc.read_clock())
 PY
 ```
@@ -313,13 +313,13 @@ Dedicated command-line helper:
 Read and decode CPU status:
 
 ```bash
-python -m tools.cpu_status_test --host 192.168.250.101 --port 1025 --protocol tcp
+python -m tools.cpu_status_test --host 192.168.250.100 --port 1025 --protocol tcp
 ```
 
 UDP example:
 
 ```bash
-python -m tools.cpu_status_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
+python -m tools.cpu_status_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
 ```
 
 The helper prints:
@@ -336,7 +336,7 @@ Raw `A0` check from Python:
 python - <<'PY'
 from toyopuc import ToyopucClient
 
-with ToyopucClient("192.168.250.101", 1025, protocol="tcp") as plc:
+with ToyopucClient("192.168.250.100", 1025, protocol="tcp") as plc:
     print(plc.read_cpu_status_a0_raw().hex(" ").upper())
 PY
 ```
@@ -363,13 +363,13 @@ The probe tries:
 Batch example:
 
 ```bat
-tools\run_fr_probe.bat 192.168.250.101 1027 udp 12000 5 2 "0x0,0x8000" "0x40,0x41"
+tools\run_fr_probe.bat 192.168.250.100 1027 udp 12000 5 2 "0x0,0x8000" "0x40,0x41"
 ```
 
 Direct Python example:
 
 ```bash
-python -m tools.fr_probe --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --indexes "0x0,0x8000" --register-exnos "0x40,0x41"
+python -m tools.fr_probe --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --indexes "0x0,0x8000" --register-exnos "0x40,0x41"
 ```
 
 Interpretation:
@@ -382,7 +382,7 @@ Interpretation:
 Read-only FR scan helper:
 
 ```bat
-tools\run_fr_read_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full.log
+tools\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full.log
 ```
 
 What it reports:
@@ -403,7 +403,7 @@ Interpretation:
 Write/commit/verify helper:
 
 ```bat
-tools\run_fr_write_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write_full.log
+tools\run_fr_write_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write_full.log
 ```
 
 What it does:
@@ -425,7 +425,7 @@ Low-level FR example:
 python - <<'PY'
 from toyopuc import ToyopucClient
 
-with ToyopucClient("192.168.250.101", 1025, protocol="tcp") as plc:
+with ToyopucClient("192.168.250.100", 1025, protocol="tcp") as plc:
     print(plc.read_fr_words(0x000000, 1))
     plc.write_fr_words_committed(0x000000, [0x1234])
 PY
@@ -438,7 +438,7 @@ python - <<'PY'
 from datetime import datetime
 from toyopuc import ToyopucClient
 
-with ToyopucClient("192.168.250.101", 1025, protocol="tcp") as plc:
+with ToyopucClient("192.168.250.100", 1025, protocol="tcp") as plc:
     plc.write_clock(datetime(2026, 3, 8, 12, 34, 56))
 PY
 ```
@@ -450,7 +450,7 @@ python - <<'PY'
 from datetime import datetime
 from toyopuc import ToyopucDeviceClient
 
-with ToyopucDeviceClient("192.168.250.101", 1025, protocol="tcp") as plc:
+with ToyopucDeviceClient("192.168.250.100", 1025, protocol="tcp") as plc:
     plc.write_clock(datetime(2026, 3, 8, 12, 34, 56))
 PY
 ```
@@ -472,25 +472,25 @@ It covers:
 Example:
 
 ```bash
-python -m tools.high_level_api_test --host 192.168.250.101 --port 1025 --protocol tcp --log high_level_api.log
+python -m tools.high_level_api_test --host 192.168.250.100 --port 1025 --protocol tcp --log high_level_api.log
 ```
 
 If the target model supports PC10 upper-word areas such as `U08000+`, add:
 
 ```bash
-python -m tools.high_level_api_test --host 192.168.250.101 --port 1025 --protocol tcp --include-pc10-word --log high_level_api.log
+python -m tools.high_level_api_test --host 192.168.250.100 --port 1025 --protocol tcp --include-pc10-word --log high_level_api.log
 ```
 
 UDP:
 
 ```bash
-python -m tools.high_level_api_test --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --skip-errors --log high_level_api_udp.log
+python -m tools.high_level_api_test --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --skip-errors --log high_level_api_udp.log
 ```
 
 Relay over UDP:
 
 ```bash
-python -m tools.high_level_api_test --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --include-pc10-word --log relay_high_level_api.log
+python -m tools.high_level_api_test --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --include-pc10-word --log relay_high_level_api.log
 ```
 
 Verified on `TOYOPUC-Plus CPU (TCC-6740) + Plus EX2 (TCU-6858)` over TCP:
@@ -554,13 +554,13 @@ It covers:
 Example:
 
 ```bash
-python -m tools.whl_addressing_test --host 192.168.250.101 --port 1025 --protocol tcp --log whl_addressing.log
+python -m tools.whl_addressing_test --host 192.168.250.100 --port 1025 --protocol tcp --log whl_addressing.log
 ```
 
 UDP:
 
 ```bash
-python -m tools.whl_addressing_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log whl_addressing_udp.log
+python -m tools.whl_addressing_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log whl_addressing_udp.log
 ```
 
 Typical addresses used by the test:
@@ -654,13 +654,13 @@ Rules:
 Example:
 
 ```bash
-python -m tools.manual_device_write_check --host 192.168.250.101 --port 1025 --protocol tcp
+python -m tools.manual_device_write_check --host 192.168.250.100 --port 1025 --protocol tcp
 ```
 
 UDP example:
 
 ```bash
-python -m tools.manual_device_write_check --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2
+python -m tools.manual_device_write_check --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2
 ```
 
 Optional:
@@ -681,19 +681,19 @@ This helper writes downward from a chosen end address and reports the last addre
 Example:
 
 ```bash
-python -m tools.find_last_writable --host 192.168.250.101 --port 1025 --protocol tcp --start D2FFF --stop D2FF0 --log last_d.log
+python -m tools.find_last_writable --host 192.168.250.100 --port 1025 --protocol tcp --start D2FFF --stop D2FF0 --log last_d.log
 ```
 
 Automatic known-tail probe:
 
 ```bash
-python -m tools.find_last_writable --host 192.168.250.101 --port 1025 --protocol tcp --auto-pending --log last_pending.log
+python -m tools.find_last_writable --host 192.168.250.100 --port 1025 --protocol tcp --auto-pending --log last_pending.log
 ```
 
 UDP example:
 
 ```bash
-python -m tools.find_last_writable --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --start U1FFFF --stop U1FFF0 --log last_u_udp.log
+python -m tools.find_last_writable --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --start U1FFFF --stop U1FFF0 --log last_u_udp.log
 ```
 
 Notes:
@@ -724,19 +724,19 @@ Rules:
 Example:
 
 ```bash
-python -m tools.recovery_write_loop --host 192.168.250.101 --port 1025 --protocol tcp --target M0000 --interval-ms 200
+python -m tools.recovery_write_loop --host 192.168.250.100 --port 1025 --protocol tcp --target M0000 --interval-ms 200
 ```
 
 UDP example:
 
 ```bash
-python -m tools.recovery_write_loop --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --target D0000 --interval-ms 200 --log recovery_udp.log
+python -m tools.recovery_write_loop --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --target D0000 --interval-ms 200 --log recovery_udp.log
 ```
 
 Read example:
 
 ```bash
-python -m tools.recovery_write_loop --host 192.168.250.101 --port 1025 --protocol tcp --target M0000 --mode read --expect 1 --interval-ms 200 --log recovery_read.log
+python -m tools.recovery_write_loop --host 192.168.250.100 --port 1025 --protocol tcp --target M0000 --mode read --expect 1 --interval-ms 200 --log recovery_read.log
 ```
 
 Supported targets:
@@ -751,37 +751,37 @@ Supported targets:
 Basic example:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --count 4 --log auto_basic.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --count 4 --log auto_basic.log
 ```
 
 UDP with fixed local port example:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --local-port 12000 --protocol udp --count 4 --timeout 5 --retries 2 --log auto_udp_basic.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --local-port 12000 --protocol udp --count 4 --timeout 5 --retries 2 --log auto_udp_basic.log
 ```
 
 Full PC10G example:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --count 4 --pc10g-full --include-p123 --skip-errors --log auto_pc10g_p123.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --count 4 --pc10g-full --include-p123 --skip-errors --log auto_pc10g_p123.log
 ```
 
 Block test:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --max-block-test --pc10-block-words 0x200 --skip-errors --log auto_block.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --max-block-test --pc10-block-words 0x200 --skip-errors --log auto_block.log
 ```
 
 Boundary test:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --boundary-test --skip-errors --log auto_boundary.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --boundary-test --skip-errors --log auto_boundary.log
 ```
 
 Mixed multi-point test:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --ext-multi-test --skip-errors --log auto_ext_multi.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --ext-multi-test --skip-errors --log auto_ext_multi.log
 ```
 
 ## Rules
@@ -858,13 +858,13 @@ python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp -
 Run all standard checks:
 
 ```bat
-tools\run_auto_tests.bat 192.168.250.101 1025 tcp 4 3 0 0x200
+tools\run_auto_tests.bat 192.168.250.100 1025 tcp 4 3 0 0x200
 ```
 
 UDP example with fixed local port:
 
 ```bat
-tools\run_auto_tests.bat 192.168.250.101 1025 udp 4 5 2 0x200 12000
+tools\run_auto_tests.bat 192.168.250.100 1025 udp 4 5 2 0x200 12000
 ```
 
 Meaning:
@@ -880,7 +880,7 @@ Meaning:
 Example `TCC-6740 + TCU-6858` range scan:
 
 ```bat
-tools\run_device_range_scan.bat 192.168.250.101 1025 tcp 0 16 32
+tools\run_device_range_scan.bat 192.168.250.100 1025 tcp 0 16 32
 ```
 
 This runs:
@@ -893,7 +893,7 @@ This runs:
 `FR` only:
 
 ```bat
-tools\run_fr_range_scan.bat 192.168.250.101 1025 tcp 0 16 32
+tools\run_fr_range_scan.bat 192.168.250.100 1025 tcp 0 16 32
 ```
 
 Note:
@@ -905,10 +905,10 @@ Note:
 Split runners:
 
 ```bat
-tools\run_quick_test.bat 192.168.250.101 1025
-tools\run_full_test.bat 192.168.250.101 1025
-tools\run_block_test.bat 192.168.250.101 1025 tcp 3 0 0x200
-tools\run_validation_all.bat 192.168.250.101 1027 udp 4 5 2 0x200 12000 60
+tools\run_quick_test.bat 192.168.250.100 1025
+tools\run_full_test.bat 192.168.250.100 1025
+tools\run_block_test.bat 192.168.250.100 1025 tcp 3 0 0x200
+tools\run_validation_all.bat 192.168.250.100 1027 udp 4 5 2 0x200 12000 60
 ```
 
 Generated outputs:
@@ -961,7 +961,7 @@ Generated outputs:
 Command:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --count 4 --pc10g-full --include-p123 --skip-errors --log auto_pc10g_p123.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --count 4 --pc10g-full --include-p123 --skip-errors --log auto_pc10g_p123.log
 ```
 
 Observed:
@@ -975,7 +975,7 @@ Observed:
 Command:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --max-block-test --skip-errors --log auto_block.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --max-block-test --skip-errors --log auto_block.log
 ```
 
 Observed:
@@ -989,7 +989,7 @@ Observed:
 Command:
 
 ```bash
-tools\run_full_test.bat 192.168.250.101 1027 udp 4 5 2 12000
+tools\run_full_test.bat 192.168.250.100 1027 udp 4 5 2 12000
 ```
 
 Observed:
@@ -1010,7 +1010,7 @@ Observed again later on the same date:
 Command:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --ext-multi-test --skip-errors --log auto_ext_multi_udp.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --ext-multi-test --skip-errors --log auto_ext_multi_udp.log
 ```
 
 ### Clock read on `TCC-6740 + TCU-6858`
@@ -1018,7 +1018,7 @@ python -m tools.auto_rw_test --host 192.168.250.101 --port 1027 --local-port 120
 Command:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1025 --protocol tcp
+python -m tools.clock_test --host 192.168.250.100 --port 1025 --protocol tcp
 ```
 
 Observed:
@@ -1040,7 +1040,7 @@ Interpretation:
 Command:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1025 --protocol tcp --set "2026-03-08 18:52:08"
+python -m tools.clock_test --host 192.168.250.100 --port 1025 --protocol tcp --set "2026-03-08 18:52:08"
 ```
 
 Observed:
@@ -1063,7 +1063,7 @@ Interpretation:
 Read command:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
+python -m tools.clock_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
 ```
 
 Observed stable read:
@@ -1076,7 +1076,7 @@ datetime: 2026-03-08 20:00:13
 Write command:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --set "2026-03-08 20:00:10"
+python -m tools.clock_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --set "2026-03-08 20:00:10"
 ```
 
 Observed after re-check:
@@ -1099,7 +1099,7 @@ Interpretation:
 Command:
 
 ```bash
-python -m tools.cpu_status_test --host 192.168.250.101 --port 1025 --protocol tcp
+python -m tools.cpu_status_test --host 192.168.250.100 --port 1025 --protocol tcp
 ```
 
 Observed in RUN:
@@ -1144,13 +1144,13 @@ Interpretation:
 Connection that worked:
 
 ```bash
-192.168.250.101:1027/udp with local_port=12000
+192.168.250.100:1027/udp with local_port=12000
 ```
 
 Full runtime sweep:
 
 ```bash
-tools\run_full_test.bat 192.168.250.101 1027 udp 4 5 2 12000
+tools\run_full_test.bat 192.168.250.100 1027 udp 4 5 2 12000
 ```
 
 Observed:
@@ -1166,7 +1166,7 @@ Observed:
 `W/H/L` addressing:
 
 ```bash
-python -m tools.whl_addressing_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log whl_nano10gx.log
+python -m tools.whl_addressing_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log whl_nano10gx.log
 ```
 
 Observed:
@@ -1177,7 +1177,7 @@ Observed:
 High-level API:
 
 ```bash
-python -m tools.high_level_api_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log high_level_nano10gx.log
+python -m tools.high_level_api_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log high_level_nano10gx.log
 ```
 
 Observed:
@@ -1188,7 +1188,7 @@ Observed:
 Clock read:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
+python -m tools.clock_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
 ```
 
 Observed:
@@ -1201,7 +1201,7 @@ datetime: 2026-03-09 19:45:16
 Clock write/readback:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --set "2026-03-09 20:00:10"
+python -m tools.clock_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --set "2026-03-09 20:00:10"
 ```
 
 Observed:
@@ -1215,7 +1215,7 @@ readback datetime: 2026-03-09 20:00:10
 CPU status:
 
 ```bash
-python -m tools.cpu_status_test --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
+python -m tools.cpu_status_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
 ```
 
 Observed:
@@ -1232,19 +1232,19 @@ Under program 3 running: True
 
 Range-scan note:
 
-- `tools\run_device_range_scan.bat 192.168.250.101 1027 udp 12000 16 32`
+- `tools\run_device_range_scan.bat 192.168.250.100 1027 udp 12000 16 32`
 - coarse scan showed continuous acceptance for documented families with no holes
 - `B` and prefixed upper ranges were confirmed in the coarse scan
 - `U00000-U1FFFF` was confirmed in the coarse scan
 - `EB` was observed continuously at least through `EB41FF0` before the helper stopped after repeated upper-range errors
 - `FR` was intentionally removed from the default target set and moved to a dedicated scan
-- `tools\run_fr_range_scan.bat 192.168.250.101 1027 udp 12000 16 32`
+- `tools\run_fr_range_scan.bat 192.168.250.100 1027 udp 12000 16 32`
 - dedicated FR scan reported `ok=0`, `holes: all unsupported`
 
 FR full-range read scan:
 
 ```bash
-tools\run_fr_read_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full.log
+tools\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full.log
 ```
 
 Observed before full-range write:
@@ -1258,7 +1258,7 @@ Observed before full-range write:
 FR full-range write/verify:
 
 ```bash
-tools\run_fr_write_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write_full_wait2.log
+tools\run_fr_write_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write_full_wait2.log
 ```
 
 Observed:
@@ -1273,7 +1273,7 @@ Observed:
 Persistence re-check after CPU reset:
 
 ```bash
-tools\run_fr_read_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full_after_reset_wait2.log
+tools\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full_after_reset_wait2.log
 ```
 
 Observed after reset:
@@ -1295,13 +1295,13 @@ Interpretation:
 Connection that worked:
 
 ```bash
-192.168.250.101:1025/tcp
+192.168.250.100:1025/tcp
 ```
 
 Full runtime sweep:
 
 ```bash
-tools\run_full_test.bat 192.168.250.101 1025 tcp 4 5 0
+tools\run_full_test.bat 192.168.250.100 1025 tcp 4 5 0
 ```
 
 Observed:
@@ -1314,7 +1314,7 @@ Observed:
 `W/H/L` addressing:
 
 ```bash
-python -m tools.whl_addressing_test --host 192.168.250.101 --port 1025 --protocol tcp --timeout 5 --retries 0 --log whl_nano10gx_tcp.log
+python -m tools.whl_addressing_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0 --log whl_nano10gx_tcp.log
 ```
 
 Observed:
@@ -1325,7 +1325,7 @@ Observed:
 High-level API:
 
 ```bash
-python -m tools.high_level_api_test --host 192.168.250.101 --port 1025 --protocol tcp --timeout 5 --retries 0 --log high_level_nano10gx_tcp.log
+python -m tools.high_level_api_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0 --log high_level_nano10gx_tcp.log
 ```
 
 Observed:
@@ -1336,7 +1336,7 @@ Observed:
 Clock read:
 
 ```bash
-python -m tools.clock_test --host 192.168.250.101 --port 1025 --protocol tcp --timeout 5 --retries 0
+python -m tools.clock_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0
 ```
 
 Observed:
@@ -1349,7 +1349,7 @@ datetime: 2026-03-09 20:32:54
 CPU status:
 
 ```bash
-python -m tools.cpu_status_test --host 192.168.250.101 --port 1025 --protocol tcp --timeout 5 --retries 0
+python -m tools.cpu_status_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0
 ```
 
 Observed:
@@ -1387,7 +1387,7 @@ Observed again later on the same date:
 Command:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --max-block-test --pc10-block-words 0x200 --skip-errors --log auto_block_udp.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --max-block-test --pc10-block-words 0x200 --skip-errors --log auto_block_udp.log
 ```
 
 Observed:
@@ -1402,7 +1402,7 @@ Observed:
 Command:
 
 ```bash
-python -m tools.auto_rw_test --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --boundary-test --skip-errors --log auto_boundary_udp.log
+python -m tools.auto_rw_test --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 5 --retries 2 --boundary-test --skip-errors --log auto_boundary_udp.log
 ```
 
 Observed:
@@ -1424,7 +1424,7 @@ Observed again later on the same date:
 Command:
 
 ```bash
-python -m tools.recovery_write_loop --host 192.168.250.101 --port 1025 --protocol tcp --target M0000 --interval-ms 200
+python -m tools.recovery_write_loop --host 192.168.250.100 --port 1025 --protocol tcp --target M0000 --interval-ms 200
 ```
 
 Observed:
@@ -1439,7 +1439,7 @@ Observed:
 Command:
 
 ```bash
-python -m tools.recovery_write_loop --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 1 --retries 0 --target D0000 --interval-ms 200 --log recovery_udp.log
+python -m tools.recovery_write_loop --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 1 --retries 0 --target D0000 --interval-ms 200 --log recovery_udp.log
 ```
 
 Observed:
@@ -1460,7 +1460,7 @@ Observed again later on the same date:
 Command:
 
 ```bash
-python -m tools.recovery_write_loop --host 192.168.250.101 --port 1025 --protocol tcp --target M0000 --mode read --expect 1 --interval-ms 200 --log recovery_read.log
+python -m tools.recovery_write_loop --host 192.168.250.100 --port 1025 --protocol tcp --target M0000 --mode read --expect 1 --interval-ms 200 --log recovery_read.log
 ```
 
 Observed:
@@ -1476,7 +1476,7 @@ Observed:
 Command:
 
 ```bash
-python -m tools.recovery_write_loop --host 192.168.250.101 --port 1027 --local-port 12000 --protocol udp --timeout 1 --retries 0 --target D0000 --mode read --expect 0xFFFF --interval-ms 200 --log recovery_read_udp.log
+python -m tools.recovery_write_loop --host 192.168.250.100 --port 1027 --local-port 12000 --protocol udp --timeout 1 --retries 0 --target D0000 --mode read --expect 0xFFFF --interval-ms 200 --log recovery_read_udp.log
 ```
 
 Observed:
@@ -1569,15 +1569,15 @@ Observed:
 
 ## PC3JX-D (TCC-6902) PC3 divisions mode note
 
-- `python -m tools.cpu_status_test --host 192.168.250.101 --port 1025 --protocol tcp --timeout 5 --retries 0`
+- `python -m tools.cpu_status_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0`
   - `pc3_mode=True`, `pc10_mode=False`, programs 1-3 were running, and all FR-related bits were clear.
-- `python -m tools.clock_test --host 192.168.250.101 --port 1025 --protocol tcp --timeout 5 --retries 0`
+- `python -m tools.clock_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0`
   - `datetime: 2026-03-10 08:00:57` was read successfully.
-- `tools\run_full_test.bat 192.168.250.101 1025 tcp 4 5 0`
+- `tools\run_full_test.bat 192.168.250.100 1025 tcp 4 5 0`
   - Basic ranges and lower prefixed ranges (`P1/P2/P3`) completed.
   - PC10 families (`U/EB/FR`) and upper prefixed ranges such as `P1-M1000` were `SKIP (unsupported)`.
   - `GX/GY/GM` may show partial sample counts such as `3/6` or `4/8` when random probes hit unsupported addresses; valid addresses were still writable.
-- `python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --count 4 --pc10g-full --include-p123 --skip-errors --log auto_pc3jx.log`
+- `python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --count 4 --pc10g-full --include-p123 --skip-errors --log auto_pc3jx.log`
   - The same coverage was recorded in the log (`TOTAL: 522/532`); only unsupported areas were skipped.
 - `tools\run_quick_test.bat`
   - This helper can still hit upper `D` word addresses and return `error_code=0x40` on PC3JX-D.
@@ -1585,21 +1585,21 @@ Observed:
 
 ## PC3JX-D (TCC-6902) Plus Expansion Mode note
 
-- `python -m tools.cpu_status_test --host 192.168.250.101 --port 1025 --protocol tcp --timeout 5 --retries 0`
+- `python -m tools.cpu_status_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0`
   - `pc3_mode=False`, `pc10_mode=True`, programs 1-3 were running.
-- `python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --count 4 --pc10g-full --include-p123 --skip-errors --log auto_pc10g_p123.log`
+- `python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --count 4 --pc10g-full --include-p123 --skip-errors --log auto_pc10g_p123.log`
   - Basic ranges and `U00000-U1FFFF` completed.
   - `EB` remained `SKIP (unsupported)`.
-- `python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --max-block-test --pc10-block-words 0x200 --skip-errors --log auto_block.log`
+- `python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --max-block-test --pc10-block-words 0x200 --skip-errors --log auto_block.log`
   - `U` block access (`x0200`) passed.
   - `EB` block access was skipped.
   - `B` does not exist on this model, so `B` byte/word tests were skipped.
-- `python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --boundary-test --skip-errors --log auto_boundary.log`
+- `python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --boundary-test --skip-errors --log auto_boundary.log`
   - PC10 boundary checks such as `U07FFE-U08001` passed.
   - `EB3FFFE-EB40001` remained skipped.
-- `python -m tools.auto_rw_test --host 192.168.250.101 --port 1025 --protocol tcp --ext-multi-test --skip-errors --log auto_ext_multi.log`
+- `python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --ext-multi-test --skip-errors --log auto_ext_multi.log`
   - Mixed extended access across `GX/GY`, `ES/EN`, and prefixed areas completed in PC10 mode.
-- `tools\run_full_test.bat 192.168.250.101 1025 tcp 4 5 0`
+- `tools\run_full_test.bat 192.168.250.100 1025 tcp 4 5 0`
   - `TOTAL: 544/544` with only `EB` skipped.
 - `tools\run_fr_commit_test.bat` / `tools\run_fr_write_scan.bat`
   - Both returned `error_code=0x40`; PC3JX-D does not expose `FR` even in PC10 mode.

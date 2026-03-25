@@ -122,16 +122,16 @@ Use this section as a quick picker:
 ### Nano 10GX UDP quick commands
 
 ```bat
-tools\run_device_full_scan.bat 192.168.250.101 1027 udp 12000 5 2 512 device_full
-tools\run_device_read_scan.bat 192.168.250.101 1027 udp 12000 5 2 S,N,R,D,P,K,V,T,C,L,X,Y,M,EP,EX,GX,GY,GM,U,EB,FR 512 device_read.log
-tools\run_device_range_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 16 device_range.log
-tools\run_fr_read_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read.log
-tools\run_fr_write_scan.bat 192.168.250.101 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write.log
-tools\run_program_no_probe.bat 192.168.250.101 1027 udp 12000 5 2 ext00,gx07,p1,p2,p3 0x00,0x01,0x02,0x03,0x07 program_no_probe.log
-tools\run_c4c5_range_probe.bat 192.168.250.101 1027 udp 12000 5 2 l1000,m1000,u00000,u08000,eb00000 c4c5_range.log
-python tools\final_whl_edge_test.py --host 192.168.250.101 --port 1027 --protocol udp --local-port 12000 --program-prefix P1 --write-mode bits --timeout 5 --retries 1 --log final_whl_edge_udp_bits.log
-tools\run_final_whl_edge_matrix.bat 192.168.250.101 1025 1027 12000 5 1 final_whl_edge_matrix_logs
-tools\run_sim_tests.bat 192.168.250.101 1027 udp 12000 5 2
+tools\run_device_full_scan.bat 192.168.250.100 1027 udp 12000 5 2 512 device_full
+tools\run_device_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 S,N,R,D,P,K,V,T,C,L,X,Y,M,EP,EX,GX,GY,GM,U,EB,FR 512 device_read.log
+tools\run_device_range_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 16 device_range.log
+tools\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read.log
+tools\run_fr_write_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write.log
+tools\run_program_no_probe.bat 192.168.250.100 1027 udp 12000 5 2 ext00,gx07,p1,p2,p3 0x00,0x01,0x02,0x03,0x07 program_no_probe.log
+tools\run_c4c5_range_probe.bat 192.168.250.100 1027 udp 12000 5 2 l1000,m1000,u00000,u08000,eb00000 c4c5_range.log
+python tools\final_whl_edge_test.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --program-prefix P1 --write-mode bits --timeout 5 --retries 1 --log final_whl_edge_udp_bits.log
+tools\run_final_whl_edge_matrix.bat 192.168.250.100 1025 1027 12000 5 1 final_whl_edge_matrix_logs
+tools\run_sim_tests.bat 192.168.250.100 1027 udp 12000 5 2
 ```
 
 

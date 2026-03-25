@@ -7,6 +7,7 @@ Mirrors the .NET ``ToyopucDeviceProfile`` / ``ToyopucDeviceProfiles`` /
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import ClassVar
 
 # ---------------------------------------------------------------------------
 # Address range
@@ -137,6 +138,19 @@ class ToyopucAddressingOptions:
     use_fr_pc10: bool = True
     use_upper_bit_pc10: bool = True
     use_upper_m_bit_pc10: bool = True
+
+    Default: ClassVar[ToyopucAddressingOptions]
+    Generic: ClassVar[ToyopucAddressingOptions]
+    ToyopucPlusStandard: ClassVar[ToyopucAddressingOptions]
+    ToyopucPlusExtended: ClassVar[ToyopucAddressingOptions]
+    Nano10GxMode: ClassVar[ToyopucAddressingOptions]
+    Nano10GxCompatible: ClassVar[ToyopucAddressingOptions]
+    Pc10GStandardPc3Jg: ClassVar[ToyopucAddressingOptions]
+    Pc10GMode: ClassVar[ToyopucAddressingOptions]
+    Pc3JxPc3Separate: ClassVar[ToyopucAddressingOptions]
+    Pc3JxPlusExpansion: ClassVar[ToyopucAddressingOptions]
+    Pc3JgMode: ClassVar[ToyopucAddressingOptions]
+    Pc3JgPc3Separate: ClassVar[ToyopucAddressingOptions]
 
     @staticmethod
     def from_profile(profile: str | None) -> ToyopucAddressingOptions:
