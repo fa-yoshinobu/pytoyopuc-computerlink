@@ -1,0 +1,1157 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://fa-yoshinobu.github.io/plc-comm-computerlink-python/user/USER_GUIDE/">
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../../api/client/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>User Guide - Toyopuc Computer Link Python API</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#user-guide-toyopuc-computer-link-python" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Toyopuc Computer Link Python API" class="md-header__button md-logo" aria-label="Toyopuc Computer Link Python API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Toyopuc Computer Link Python API
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              User Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Toyopuc Computer Link Python API" class="md-nav__button md-logo" aria-label="Toyopuc Computer Link Python API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Toyopuc Computer Link Python API
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#async-client-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Async client (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#synchronous-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Synchronous client
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-addressing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device Addressing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Device Addressing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#address-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#device-areas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device Areas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#byte-word-suffixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Byte / Word Suffixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typed-read-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typed Read / Write
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Typed Read / Write">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contiguous-array-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contiguous Array Read
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bit-in-word-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bit-in-Word Write
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#named-device-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Named-Device Read
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#polling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Polling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/client/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Client
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#async-client-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Async client (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#synchronous-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Synchronous client
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#device-addressing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device Addressing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Device Addressing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#address-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#device-areas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Device Areas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#byte-word-suffixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Byte / Word Suffixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typed-read-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typed Read / Write
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Typed Read / Write">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contiguous-array-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contiguous Array Read
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bit-in-word-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bit-in-Word Write
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#named-device-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Named-Device Read
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#polling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Polling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="user-guide-toyopuc-computer-link-python">User Guide: TOYOPUC Computer Link Python</h1>
+<p>Asynchronous Python client for JTEKT TOYOPUC PLCs using the Computer Link protocol.</p>
+<h2 id="installation">Installation</h2>
+<pre><code class="language-bash">pip install .
+</code></pre>
+<hr />
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="async-client-recommended">Async client (Recommended)</h3>
+<p>The high-level <code>AsyncToyopucDeviceClient</code> provides string-based address access and is the recommended way to use this library.</p>
+<pre><code class="language-python">import asyncio
+from toyopuc import open_and_connect
+
+async def main():
+    # Use 'open_and_connect' for automatic session management
+    async with await open_and_connect(&quot;192.168.1.5&quot;, 1025) as plc:
+        # Read word device P1-D0000
+        val = await plc.read(&quot;P1-D0000&quot;)
+        print(f&quot;P1-D0000 = {val}&quot;)
+
+        # Write word device P1-D0010
+        await plc.write(&quot;P1-D0010&quot;, 1234)
+
+asyncio.run(main())
+</code></pre>
+<h3 id="synchronous-client">Synchronous client</h3>
+<p>For scripts or environments where <code>asyncio</code> is not available, a synchronous wrapper is provided.</p>
+<pre><code class="language-python">from toyopuc import ToyopucDeviceClient
+
+with ToyopucDeviceClient(&quot;192.168.1.5&quot;, 1025) as plc:
+    # Read word device P1-D0000
+    val = plc.read(&quot;P1-D0000&quot;)
+    print(f&quot;P1-D0000 = {val}&quot;)
+</code></pre>
+<hr />
+<h2 id="device-addressing">Device Addressing</h2>
+<h3 id="address-format">Address Format</h3>
+<pre><code>[Program]-[AreaType][Address]
+</code></pre>
+<ul>
+<li><strong>Program</strong>: <code>P1</code>, <code>P2</code>, <code>P3</code> — program number (required for basic areas)</li>
+<li><strong>AreaType</strong>: device area code</li>
+<li><strong>Address</strong>: decimal or hex device number</li>
+</ul>
+<h3 id="device-areas">Device Areas</h3>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>D</code></td>
+<td>Data register (word)</td>
+<td><code>P1-D0100</code></td>
+</tr>
+<tr>
+<td><code>S</code></td>
+<td>Special register (word)</td>
+<td><code>P1-S0000</code></td>
+</tr>
+<tr>
+<td><code>N</code></td>
+<td>File register (word)</td>
+<td><code>P1-N0100</code></td>
+</tr>
+<tr>
+<td><code>M</code></td>
+<td>Internal relay (bit)</td>
+<td><code>P1-M0100</code></td>
+</tr>
+<tr>
+<td><code>P</code></td>
+<td>Shared relay (bit)</td>
+<td><code>P1-P0000</code></td>
+</tr>
+<tr>
+<td><code>X</code></td>
+<td>Input relay (bit)</td>
+<td><code>P1-X0000</code></td>
+</tr>
+<tr>
+<td><code>Y</code></td>
+<td>Output relay (bit)</td>
+<td><code>P1-Y0000</code></td>
+</tr>
+<tr>
+<td><code>T</code></td>
+<td>Timer (bit)</td>
+<td><code>P1-T0000</code></td>
+</tr>
+<tr>
+<td><code>C</code></td>
+<td>Counter (bit)</td>
+<td><code>P1-C0000</code></td>
+</tr>
+<tr>
+<td><code>ES</code></td>
+<td>Extended special register (word)</td>
+<td><code>ES0000</code></td>
+</tr>
+<tr>
+<td><code>EN</code></td>
+<td>Extended file register (word)</td>
+<td><code>EN0000</code></td>
+</tr>
+</tbody>
+</table>
+<p>Extended areas (<code>ES</code>, <code>EN</code>, <code>H</code>, <code>U</code>, <code>EB</code>, <code>FR</code>) do not require a program prefix.</p>
+<h3 id="byte-word-suffixes">Byte / Word Suffixes</h3>
+<p>Append <code>L</code>, <code>H</code>, or <code>W</code> to bit-area addresses for byte or packed-word access:</p>
+<pre><code class="language-python">plc.read(&quot;P1-M0010W&quot;)   # M0010 as packed word (16 bits)
+plc.read(&quot;P1-M0010L&quot;)   # low byte of packed word
+plc.read(&quot;P1-M0010H&quot;)   # high byte of packed word
+</code></pre>
+<hr />
+<h2 id="typed-read-write">Typed Read / Write</h2>
+<p>Utility functions handle type conversion automatically:</p>
+<table>
+<thead>
+<tr>
+<th>dtype</th>
+<th>Type</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"U"</code></td>
+<td>unsigned 16-bit int</td>
+<td>1 word</td>
+</tr>
+<tr>
+<td><code>"S"</code></td>
+<td>signed 16-bit int</td>
+<td>1 word</td>
+</tr>
+<tr>
+<td><code>"D"</code></td>
+<td>unsigned 32-bit int</td>
+<td>2 words</td>
+</tr>
+<tr>
+<td><code>"L"</code></td>
+<td>signed 32-bit int</td>
+<td>2 words</td>
+</tr>
+<tr>
+<td><code>"F"</code></td>
+<td>float32</td>
+<td>2 words</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">import asyncio
+from toyopuc import open_and_connect
+from toyopuc import read_typed, write_typed
+
+async def main():
+    async with await open_and_connect(&quot;192.168.1.5&quot;) as plc:
+        f = await read_typed(plc, &quot;P1-D0100&quot;, &quot;F&quot;)        # float32
+        v = await read_typed(plc, &quot;P1-D0200&quot;, &quot;L&quot;)        # signed 32-bit
+        await write_typed(plc, &quot;P1-D0100&quot;, &quot;F&quot;, 3.14)
+        await write_typed(plc, &quot;P1-D0200&quot;, &quot;S&quot;, -100)
+
+asyncio.run(main())
+</code></pre>
+<h3 id="contiguous-array-read">Contiguous Array Read</h3>
+<pre><code class="language-python">from toyopuc import read_words, read_dwords
+
+# Read 10 words from P1-D0000 → list[int]
+words = await read_words(plc, &quot;P1-D0000&quot;, 10)
+
+# Read 4 DWords (32-bit pairs) from P1-D0000 → list[int]
+dwords = await read_dwords(plc, &quot;P1-D0000&quot;, 4)
+</code></pre>
+<h3 id="bit-in-word-write">Bit-in-Word Write</h3>
+<pre><code class="language-python">from toyopuc import write_bit_in_word
+
+# Set bit 3 of P1-D0100 (read-modify-write)
+await write_bit_in_word(plc, &quot;P1-D0100&quot;, bit_index=3, value=True)
+</code></pre>
+<hr />
+<h2 id="named-device-read">Named-Device Read</h2>
+<p>Read multiple devices in one call using address strings with optional type suffixes.</p>
+<p>Address notation:</p>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"P1-D0100"</code></td>
+<td>D0100 as unsigned 16-bit</td>
+</tr>
+<tr>
+<td><code>"P1-D0100:F"</code></td>
+<td>D0100 as float32</td>
+</tr>
+<tr>
+<td><code>"P1-D0100:S"</code></td>
+<td>D0100 as signed 16-bit</td>
+</tr>
+<tr>
+<td><code>"P1-D0100:D"</code></td>
+<td>D0100–D0101 as unsigned 32-bit</td>
+</tr>
+<tr>
+<td><code>"P1-D0100:L"</code></td>
+<td>D0100–D0101 as signed 32-bit</td>
+</tr>
+<tr>
+<td><code>"P1-D0100.3"</code></td>
+<td>Bit 3 of D0100 (bool)</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">from toyopuc import read_named
+
+result = await read_named(plc, [&quot;P1-D0100&quot;, &quot;P1-D0101:F&quot;, &quot;P1-D0102:S&quot;, &quot;P1-D0100.3&quot;])
+# result == {&quot;P1-D0100&quot;: 42, &quot;P1-D0101:F&quot;: 3.14, &quot;P1-D0102:S&quot;: -1, &quot;P1-D0100.3&quot;: True}
+</code></pre>
+<hr />
+<h2 id="polling">Polling</h2>
+<p><code>poll</code> yields device snapshots at a fixed interval until the loop is broken.</p>
+<pre><code class="language-python">import asyncio
+from toyopuc import open_and_connect, poll
+
+async def main():
+    async with await open_and_connect(&quot;192.168.1.5&quot;) as plc:
+        async for snapshot in poll(plc, [&quot;P1-D0100&quot;, &quot;P1-D0101:F&quot;], interval=1.0):
+            print(snapshot)
+            # {&quot;P1-D0100&quot;: 42, &quot;P1-D0101:F&quot;: 3.14}
+
+asyncio.run(main())
+</code></pre>
+<p>Press <code>Ctrl+C</code> to stop.</p>
+<hr />
+<h2 id="error-handling">Error Handling</h2>
+<table>
+<thead>
+<tr>
+<th>Exception</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ToyopucError</code></td>
+<td>PLC returned an error response</td>
+</tr>
+<tr>
+<td><code>ToyopucProtocolError</code></td>
+<td>Malformed or unexpected protocol data</td>
+</tr>
+<tr>
+<td><code>ToyopucTimeoutError</code></td>
+<td>Communication timeout</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">from toyopuc import ToyopucError, ToyopucProtocolError, ToyopucTimeoutError
+
+try:
+    val = await plc.read(&quot;P1-D0000&quot;)
+except ToyopucTimeoutError:
+    print(&quot;Timeout — check IP address and Computer Link port.&quot;)
+except ToyopucProtocolError as e:
+    print(f&quot;Protocol error: {e}&quot;)
+except ToyopucError as e:
+    print(f&quot;PLC error: {e}&quot;)
+</code></pre>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ToyopucTimeoutError</code></td>
+<td>Wrong IP or port</td>
+<td>Default port is 1025; confirm in TOYOPUC network settings</td>
+</tr>
+<tr>
+<td><code>ToyopucProtocolError</code></td>
+<td>Invalid address format</td>
+<td>Ensure program prefix and device area are correct</td>
+</tr>
+<tr>
+<td>Wrong values</td>
+<td>Word/byte mismatch</td>
+<td>Check <code>W</code>/<code>L</code>/<code>H</code> suffix usage for bit-area devices</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,27 @@
+﻿# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Build and Distribution
+dist/
+build/
+publish/
+*.egg-info/
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Tools
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Local files
+local_folder/
+*.log
+.vscode/
+.idea/
+uv.lock
