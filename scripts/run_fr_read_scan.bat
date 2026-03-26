@@ -36,7 +36,7 @@ if "%START%"=="" set "START=0x000000"
 if "%END%"=="" set "END=0x1FFFFF"
 if "%STOP_AFTER_NG%"=="" set "STOP_AFTER_NG=0"
 if "%LOG%"=="" (
-  python -m tools.fr_read_scan ^
+  python scripts\\fr_read_scan.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -49,7 +49,7 @@ if "%LOG%"=="" (
     --end %END% ^
     --stop-after-ng %STOP_AFTER_NG%
 ) else (
-  python -m tools.fr_read_scan ^
+  python scripts\\fr_read_scan.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -68,11 +68,11 @@ exit /b %errorlevel%
 
 :usage
 echo Usage:
-echo   tools\run_fr_read_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CHUNK_WORDS] [PROGRESS_EVERY] [START] [END] [STOP_AFTER_NG] [LOG]
+echo   scripts\\run_fr_read_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CHUNK_WORDS] [PROGRESS_EVERY] [START] [END] [STOP_AFTER_NG] [LOG]
 echo.
 echo Full-range example ^(UDP^):
-echo   tools\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full.log
+echo   scripts\\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read_full.log
 echo.
 echo Small-range example ^(UDP^):
-echo   tools\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 8 0x000000 0x00FFFF 0
+echo   scripts\\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 8 0x000000 0x00FFFF 0
 exit /b 2

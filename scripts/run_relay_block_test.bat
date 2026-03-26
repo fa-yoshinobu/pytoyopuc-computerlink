@@ -74,7 +74,7 @@ for /L %%I in (1,1,%HOPS_END%) do (
 if not defined HOPS goto usage
 
 if defined LOG (
-  python -m tools.relay_block_test ^
+  python scripts\\relay_block_test.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -90,7 +90,7 @@ if defined LOG (
     --loop-step %LOOP_STEP% ^
     --log %LOG%
 ) else (
-  python -m tools.relay_block_test ^
+  python scripts\\relay_block_test.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -109,8 +109,8 @@ exit /b %errorlevel%
 
 :usage
 echo Usage:
-echo   tools\run_relay_block_test.bat HOST PORT [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] HOPS DEVICE COUNT LOOPS VALUE STEP LOOP_STEP [LOG]
+echo   scripts\\run_relay_block_test.bat HOST PORT [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] HOPS DEVICE COUNT LOOPS VALUE STEP LOOP_STEP [LOG]
 echo.
 echo Example:
-echo   tools\run_relay_block_test.bat 192.168.250.100 1027 udp 12000 10 1 P1-L2:N2,P1-L2:N4,P1-L2:N6 P1-D0000 8 3 0x1000 1 0x0100 relay_block.log
+echo   scripts\\run_relay_block_test.bat 192.168.250.100 1027 udp 12000 10 1 P1-L2:N2,P1-L2:N4,P1-L2:N6 P1-D0000 8 3 0x1000 1 0x0100 relay_block.log
 exit /b 1

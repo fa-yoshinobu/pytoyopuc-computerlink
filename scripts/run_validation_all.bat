@@ -62,25 +62,25 @@ echo Start            : %START_AT%
 echo.
 ) > "%SUMMARY%"
 
-call :run_step 1 "Full test" "python -m tools.auto_rw_test --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --count %COUNT% --timeout %TIMEOUT% --retries %RETRIES% --pc10g-full --include-p123 --skip-errors --log ""%LOGDIR%\full.log"""
+call :run_step 1 "Full test" "python scripts\\auto_rw_test.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --count %COUNT% --timeout %TIMEOUT% --retries %RETRIES% --pc10g-full --include-p123 --skip-errors --log ""%LOGDIR%\full.log"""
 if errorlevel 1 goto :failed
 
-call :run_step 2 "Mixed CMD=98/99" "python -m tools.auto_rw_test --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --ext-multi-test --skip-errors --log ""%LOGDIR%\ext_multi.log"""
+call :run_step 2 "Mixed CMD=98/99" "python scripts\\auto_rw_test.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --ext-multi-test --skip-errors --log ""%LOGDIR%\ext_multi.log"""
 if errorlevel 1 goto :failed
 
-call :run_step 3 "Block test" "python -m tools.auto_rw_test --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --max-block-test --pc10-block-words %PC10_BLOCK_WORDS% --skip-errors --log ""%LOGDIR%\block.log"""
+call :run_step 3 "Block test" "python scripts\\auto_rw_test.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --max-block-test --pc10-block-words %PC10_BLOCK_WORDS% --skip-errors --log ""%LOGDIR%\block.log"""
 if errorlevel 1 goto :failed
 
-call :run_step 4 "Boundary test" "python -m tools.auto_rw_test --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --boundary-test --skip-errors --log ""%LOGDIR%\boundary.log"""
+call :run_step 4 "Boundary test" "python scripts\\auto_rw_test.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --boundary-test --skip-errors --log ""%LOGDIR%\boundary.log"""
 if errorlevel 1 goto :failed
 
-call :run_step 5 "Recovery write" "python -m tools.recovery_write_loop --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout 1 --retries 0 --target D0000 --interval-ms 200 --count %RECOVERY_COUNT% --log ""%LOGDIR%\recovery_write.log"""
+call :run_step 5 "Recovery write" "python scripts\\recovery_write_loop.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout 1 --retries 0 --target D0000 --interval-ms 200 --count %RECOVERY_COUNT% --log ""%LOGDIR%\recovery_write.log"""
 if errorlevel 1 goto :failed
 
-call :run_step 6 "Recovery read" "python -m tools.recovery_write_loop --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout 1 --retries 0 --target D0000 --mode read --expect 0xFFFF --interval-ms 200 --count %RECOVERY_COUNT% --log ""%LOGDIR%\recovery_read.log"""
+call :run_step 6 "Recovery read" "python scripts\\recovery_write_loop.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout 1 --retries 0 --target D0000 --mode read --expect 0xFFFF --interval-ms 200 --count %RECOVERY_COUNT% --log ""%LOGDIR%\recovery_read.log"""
 if errorlevel 1 goto :failed
 
-call :run_step 7 "Last writable probe" "python -m tools.find_last_writable --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --auto-pending --log ""%LOGDIR%\last_pending.log"""
+call :run_step 7 "Last writable probe" "python scripts\\find_last_writable.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --auto-pending --log ""%LOGDIR%\last_pending.log"""
 if errorlevel 1 goto :failed
 
 for /f "usebackq delims=" %%i in (`powershell -NoProfile -Command "Get-Date -Format \"yyyy-MM-dd HH:mm:ss\""`) do set "END_AT=%%i"
@@ -124,8 +124,8 @@ exit /b 1
 
 :usage
 echo Usage:
-echo   tools\run_validation_all.bat ^<HOST^> ^<PORT^> [PROTOCOL] [COUNT] [TIMEOUT] [RETRIES] [PC10_BLOCK_WORDS] [LOCAL_PORT] [RECOVERY_COUNT]
+echo   scripts\\run_validation_all.bat ^<HOST^> ^<PORT^> [PROTOCOL] [COUNT] [TIMEOUT] [RETRIES] [PC10_BLOCK_WORDS] [LOCAL_PORT] [RECOVERY_COUNT]
 echo.
 echo Example:
-echo   tools\run_validation_all.bat 192.168.250.100 1027 udp 4 5 2 0x200 12000 60
+echo   scripts\\run_validation_all.bat 192.168.250.100 1027 udp 4 5 2 0x200 12000 60
 exit /b 2

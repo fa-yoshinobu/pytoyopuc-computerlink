@@ -1,4 +1,22 @@
+# ruff: noqa: E402
 from __future__ import annotations
+
+"""
+High-level relay example.
+
+What this sample shows:
+- relay CPU status
+- relay clock read / write
+- relay word read / write
+- relay FR read / write / commit
+
+Examples:
+    python samples/relay_basic.py --host 192.168.250.100 --port 1027 \
+        --protocol udp --local-port 12000 --hops "P1-L2:N2" --mode cpu-status
+    python samples/relay_basic.py --host 192.168.250.100 --port 1027 \
+        --protocol udp --local-port 12000 --hops "P1-L2:N2,P1-L2:N4" \
+        --mode word-read --device P1-D0000 --count 4
+"""
 
 import argparse
 import sys
@@ -23,7 +41,21 @@ def parse_datetime_iso(text: str) -> datetime:
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(description="Simple relay example")
+    p = argparse.ArgumentParser(
+        description="Simple relay example",
+        epilog=(
+            "Examples:\n"
+            "  python samples/relay_basic.py --host 192.168.250.100 --port 1027 "
+            '--protocol udp --local-port 12000 --hops "P1-L2:N2" --mode cpu-status\n'
+            "  python samples/relay_basic.py --host 192.168.250.100 --port 1027 "
+            '--protocol udp --local-port 12000 --hops "P1-L2:N2,P1-L2:N4" '
+            "--mode word-read --device P1-D0000 --count 4\n"
+            "  python samples/relay_basic.py --host 192.168.250.100 --port 1027 "
+            '--protocol udp --local-port 12000 --hops "P1-L2:N2" '
+            "--mode fr-write --device FR000000 --value 0x1234 --commit --wait"
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     p.add_argument("--host", required=True)
     p.add_argument("--port", required=True, type=int)
     p.add_argument("--protocol", choices=["tcp", "udp"], default="tcp")
@@ -67,6 +99,7 @@ def main() -> int:
         timeout=args.timeout,
         retries=args.retries,
     ) as plc:
+        print("scenario: relay high-level operations")
         print("hops =", args.hops)
         print("mode =", args.mode)
 

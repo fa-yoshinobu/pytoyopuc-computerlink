@@ -35,7 +35,7 @@ def main() -> int:
     with ToyopucClient(
         args.host,
         args.port,
-        protocol=args.protocol,
+        transport=args.protocol,
         local_port=args.local_port,
         timeout=args.timeout,
         retries=args.retries,

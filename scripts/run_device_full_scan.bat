@@ -32,18 +32,18 @@ if not "%LOG_BASE%"=="" (
 
 echo === Word/bulk device scan ===
 if defined SCAN_LOG (
-  call tools\run_device_read_scan.bat %HOST% %PORT% %PROTOCOL% %LOCAL_PORT% %TIMEOUT% %RETRIES% %SCAN_TARGETS% %CHUNK% %SCAN_LOG%
+  call scripts\\run_device_read_scan.bat %HOST% %PORT% %PROTOCOL% %LOCAL_PORT% %TIMEOUT% %RETRIES% %SCAN_TARGETS% %CHUNK% %SCAN_LOG%
 ) else (
-  call tools\run_device_read_scan.bat %HOST% %PORT% %PROTOCOL% %LOCAL_PORT% %TIMEOUT% %RETRIES% %SCAN_TARGETS% %CHUNK%
+  call scripts\\run_device_read_scan.bat %HOST% %PORT% %PROTOCOL% %LOCAL_PORT% %TIMEOUT% %RETRIES% %SCAN_TARGETS% %CHUNK%
 )
 if errorlevel 1 goto :fail
 
 echo(
 echo === Prefixed/device-no probe ===
 if defined PROBE_LOG (
-  call tools\run_program_no_probe.bat %HOST% %PORT% %PROTOCOL% %LOCAL_PORT% %TIMEOUT% %RETRIES% %PROBE_CASES% %PROBE_CANDIDATE_NOS% %PROBE_LOG%
+  call scripts\\run_program_no_probe.bat %HOST% %PORT% %PROTOCOL% %LOCAL_PORT% %TIMEOUT% %RETRIES% %PROBE_CASES% %PROBE_CANDIDATE_NOS% %PROBE_LOG%
 ) else (
-  call tools\run_program_no_probe.bat %HOST% %PORT% %PROTOCOL% %LOCAL_PORT% %TIMEOUT% %RETRIES% %PROBE_CASES% %PROBE_CANDIDATE_NOS%
+  call scripts\\run_program_no_probe.bat %HOST% %PORT% %PROTOCOL% %LOCAL_PORT% %TIMEOUT% %RETRIES% %PROBE_CASES% %PROBE_CANDIDATE_NOS%
 )
 if errorlevel 1 goto :fail
 
@@ -58,8 +58,8 @@ exit /b 1
 
 :usage
 echo Usage:
-echo   tools\run_device_full_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CHUNK] [LOG_BASE]
+echo   scripts\\run_device_full_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CHUNK] [LOG_BASE]
 echo.
 echo Example:
-echo   tools\run_device_full_scan.bat 192.168.250.100 1027 udp 12000 5 2 512 device_full
+echo   scripts\\run_device_full_scan.bat 192.168.250.100 1027 udp 12000 5 2 512 device_full
 exit /b 2

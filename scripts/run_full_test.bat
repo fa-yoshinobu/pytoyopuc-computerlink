@@ -18,7 +18,7 @@ if "%TIMEOUT%"=="" set "TIMEOUT=3"
 if "%RETRIES%"=="" set "RETRIES=0"
 if "%LOCAL_PORT%"=="" set "LOCAL_PORT=0"
 
-python -m tools.auto_rw_test ^
+python scripts\\auto_rw_test.py ^
   --host %HOST% ^
   --port %PORT% ^
   --local-port %LOCAL_PORT% ^
@@ -34,5 +34,5 @@ exit /b %errorlevel%
 
 :usage
 echo Usage:
-echo   tools\run_full_test.bat ^<HOST^> ^<PORT^> [PROTOCOL] [COUNT] [TIMEOUT] [RETRIES] [LOCAL_PORT]
+echo   scripts\\run_full_test.bat ^<HOST^> ^<PORT^> [PROTOCOL] [COUNT] [TIMEOUT] [RETRIES] [LOCAL_PORT]
 exit /b 2

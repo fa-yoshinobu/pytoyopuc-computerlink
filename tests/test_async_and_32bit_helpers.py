@@ -8,6 +8,7 @@ from toyopuc import (
     ToyopucDeviceClient,
     encode_word_address,
     parse_address,
+    read_named,
 )
 
 
@@ -50,6 +51,20 @@ class _DummyHighLevelClient(ToyopucDeviceClient):
 class _DummyAsyncHighLevelClient(AsyncToyopucDeviceClient):
     def __init__(self) -> None:
         object.__setattr__(self, "_client", _DummyHighLevelClient())
+
+
+class _DummyUtilitySyncClient:
+    def __init__(self) -> None:
+        self.values: dict[str, int] = {}
+
+    def read(self, device: str, count: int = 1) -> int:
+        assert count == 1
+        return self.values[device]
+
+
+class _DummyAsyncUtilityClient(AsyncToyopucDeviceClient):
+    def __init__(self) -> None:
+        object.__setattr__(self, "_client", _DummyUtilitySyncClient())
 
 
 def test_low_level_32bit_helpers_use_low_word_first() -> None:
@@ -96,3 +111,14 @@ def test_async_high_level_helpers_wrap_sync_implementation() -> None:
 
     assert client.word_reads == [(addr0, 2)]
     assert client.word_writes == [(addr0, [0x0000, 0x3FC0])]
+
+
+def test_read_named_supports_hex_bit_indices() -> None:
+    client = _DummyAsyncUtilityClient()
+    client.values = {"B0000": (1 << 10) | (1 << 15)}
+
+    async def run_checks() -> None:
+        snapshot = await read_named(client, ["B0000.A", "B0000.F"])
+        assert snapshot == {"B0000.A": True, "B0000.F": True}
+
+    asyncio.run(run_checks())

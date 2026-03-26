@@ -3,10 +3,15 @@
 Related documents:
 
 - [../README.md](../README.md)
-- [TESTING.md](TESTING.md)
-- [MODEL_RANGES.md](MODEL_RANGES.md)
-- [COMPUTER_LINK_SPEC.md](COMPUTER_LINK_SPEC.md)
-- [RELEASE.md](RELEASE.md)
+- [TESTING_GUIDE.md](TESTING_GUIDE.md)
+- [../user/MODEL_RANGES.md](../user/MODEL_RANGES.md)
+- [PROTOCOL_SPEC.md](PROTOCOL_SPEC.md)
+- [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
+
+Historical release snapshots in this folder are preserved as evidence.
+If an older note mentions retired scripts or samples, prefer the current
+entry points in [TESTING_GUIDE.md](TESTING_GUIDE.md) and
+[RELEASE_PROCESS.md](RELEASE_PROCESS.md).
 
 ## v1.0.3
 
@@ -29,7 +34,7 @@ Release date:
 ### Verification
 
 - API docs:
-  - `tools\build_api_docs.bat` passed
+  - `scripts\\build_api_docs.bat` passed
 - package checks:
   - `python -m build` passed
   - `python -m twine check dist/*` passed
@@ -47,7 +52,7 @@ Release date:
 - added unit regression tests for sparse `pc10-word` reads:
   - `test_high_level_read_many_pc10_word_sparse_uses_block_read_only`
   - `test_high_level_relay_read_many_pc10_word_sparse_uses_block_read_only`
-- documented the new regression guard in [TESTING.md](TESTING.md)
+- documented the new regression guard in [TESTING_GUIDE.md](TESTING_GUIDE.md)
 
 ### Verification
 
@@ -101,12 +106,12 @@ Verified feature groups:
 ### Included Documents
 
 - [../README.md](../README.md)
-- [TESTING.md](TESTING.md)
-- [COMPUTER_LINK_SPEC.md](COMPUTER_LINK_SPEC.md)
+- [TESTING_GUIDE.md](TESTING_GUIDE.md)
+- [PROTOCOL_SPEC.md](PROTOCOL_SPEC.md)
 - [MODEL_RANGES.md](MODEL_RANGES.md)
-- [PENDING.md](PENDING.md)
-- [RELEASE.md](RELEASE.md)
-- [../examples/README.md](../examples/README.md)
+- [TODO.md](../../TODO.md)
+- [RELEASE_PROCESS.md](RELEASE_PROCESS.md)
+- [../../samples/README.md](../../samples/README.md)
 
 ### Known Limitations
 
@@ -149,8 +154,8 @@ Release date:
 - explicit `GX`/`GY` naming (no synthetic `GXY` area in public behavior)
 - GUI immediate device-input validation for allowed and rejected forms
 - final-edge consistency tool:
-  - `tools/final_whl_edge_test.py` with `--write-mode bits|hl`
-  - `tools/run_final_whl_edge_matrix.bat` for `TCP/UDP x P1/P2/P3 x bits/hl`
+  - `scripts/final_whl_edge_test.py` with `--write-mode bits|hl`
+  - `scripts/run_final_whl_edge_matrix.bat` for `TCP/UDP x P1/P2/P3 x bits/hl`
 - relay high-level tool defaults aligned to prefixed targets (`P1-...`)
 - generated API docs refresh (`docsrc/api/*`)
 
@@ -185,7 +190,7 @@ plc.write("P1-M0000", 1)
 For relay high-level tools, use prefixed targets by default:
 
 ```powershell
-python examples/relay_basic.py --mode word-read --device P1-D0000
+python samples/relay_basic.py --mode word-read --device P1-D0000
 ```
 
 ### Verification
@@ -198,14 +203,14 @@ python examples/relay_basic.py --mode word-read --device P1-D0000
   - `python -m build`
   - `python -m twine check dist/*`
 - API docs:
-  - `tools\build_api_docs.bat`
+  - `scripts\\build_api_docs.bat`
 - hardware validation:
   - final-edge `W/H/L` consistency confirmed over TCP and UDP with both write modes
 
 ### Related Documents
 
 - [VER_1.0.1_FIX_NOTES.md](VER_1.0.1_FIX_NOTES.md)
-- [TESTING.md](TESTING.md)
-- [COMPUTER_LINK_SPEC.md](COMPUTER_LINK_SPEC.md)
+- [TESTING_GUIDE.md](TESTING_GUIDE.md)
+- [PROTOCOL_SPEC.md](PROTOCOL_SPEC.md)
 
 

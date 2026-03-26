@@ -192,7 +192,7 @@ def _parse_address(address: str) -> tuple[str, str, int | None]:
     if "." in address:
         base, bit_str = address.split(".", 1)
         try:
-            return base.strip(), "BIT_IN_WORD", int(bit_str)
+            return base.strip(), "BIT_IN_WORD", int(bit_str, 16)
         except ValueError:
             pass
     return address.strip(), "U", None

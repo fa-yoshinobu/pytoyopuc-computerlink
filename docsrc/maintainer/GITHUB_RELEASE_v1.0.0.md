@@ -60,13 +60,13 @@ Observed limitation:
 ## Included Documents
 
 - `README.md`
-- `docsrc/TESTING.md`
-- `docsrc/COMPUTER_LINK_SPEC.md`
+- `docsrc/maintainer/TESTING_GUIDE.md`
+- `docsrc/maintainer/PROTOCOL_SPEC.md`
 - `docsrc/MODEL_RANGES.md`
-- `docsrc/RELEASE.md`
+- `docsrc/maintainer/RELEASE_PROCESS.md`
 - `docsrc/RELEASE_NOTES.md`
-- `examples/README.md`
-- `tools/README.md`
+- `samples/README.md`
+- `scripts/README.md`
 
 ## Known Limitations
 

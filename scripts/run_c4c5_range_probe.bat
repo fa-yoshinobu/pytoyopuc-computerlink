@@ -47,7 +47,7 @@ if "%CASES%"=="" set "CASES=l1000,m1000,u00000,u08000,eb00000"
 set "LOG_ARG="
 if not "%LOG%"=="" set "LOG_ARG=--log ""%LOG%"""
 
-python -m tools.c4c5_range_probe ^
+python scripts\\c4c5_range_probe.py ^
   --host %HOST% ^
   --port %PORT% ^
   --protocol %PROTOCOL% ^
@@ -61,13 +61,13 @@ exit /b %errorlevel%
 
 :usage
 echo Usage:
-echo   tools\run_c4c5_range_probe.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CASES] [LOG]
+echo   scripts\\run_c4c5_range_probe.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CASES] [LOG]
 echo.
 echo Default probe:
-echo   tools\run_c4c5_range_probe.bat 192.168.250.100 1027 udp 12000 5 2
+echo   scripts\\run_c4c5_range_probe.bat 192.168.250.100 1027 udp 12000 5 2
 echo.
 echo Wider probe:
-echo   tools\run_c4c5_range_probe.bat 192.168.250.100 1027 udp 12000 5 2 l1000,l2fff,m1000,m17ff,u00000,u07fff,u08000,u1ffff,eb00000,eb3ffff c4c5_range_probe.log
+echo   scripts\\run_c4c5_range_probe.bat 192.168.250.100 1027 udp 12000 5 2 l1000,l2fff,m1000,m17ff,u00000,u07fff,u08000,u1ffff,eb00000,eb3ffff c4c5_range_probe.log
 echo.
 echo PowerShell note:
 echo   comma lists may be passed either quoted or unquoted; unquoted lists are re-joined by this batch file

@@ -18,6 +18,7 @@ exclude_docs: |
 nav:
   - Overview: index.md
   - User Guide: user/USER_GUIDE.md
+  - Model Ranges: user/MODEL_RANGES.md
   - API Reference:
       - Client: api/client.md
 

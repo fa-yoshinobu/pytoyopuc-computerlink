@@ -23,8 +23,8 @@ behavior, prefix-required high-level inputs, and end-to-end verification tools.
 - explicit `GX`/`GY` handling (no synthetic `GXY`)
 - GUI immediate validation for valid/invalid device text
 - final-edge consistency tool:
-  - `tools/final_whl_edge_test.py` (`--write-mode bits|hl`)
-  - `tools/run_final_whl_edge_matrix.bat`
+  - `scripts/final_whl_edge_test.py` (`--write-mode bits|hl`)
+  - `scripts/run_final_whl_edge_matrix.bat`
 - relay high-level defaults aligned to prefixed targets (`P1-...`)
 - refreshed API docs under `docsrc/api`
 
@@ -60,7 +60,7 @@ plc.write("P1-M0000", 1)
 - `python -m mypy ...` (target files) -> passed
 - `python -m build` -> passed
 - `python -m twine check dist/*` -> passed
-- `tools\build_api_docs.bat` -> passed
+- `scripts\build_api_docs.bat` -> passed
 
 Hardware note:
 
@@ -70,14 +70,14 @@ Hardware note:
 ## Included Documents
 
 - `README.md`
-- `docsrc/TESTING.md`
-- `docsrc/COMPUTER_LINK_SPEC.md`
+- `docsrc/maintainer/TESTING_GUIDE.md`
+- `docsrc/maintainer/PROTOCOL_SPEC.md`
 - `docsrc/MODEL_RANGES.md`
-- `docsrc/RELEASE.md`
+- `docsrc/maintainer/RELEASE_PROCESS.md`
 - `docsrc/RELEASE_NOTES.md`
 - `docsrc/VER_1.0.1_FIX_NOTES.md`
-- `examples/README.md`
-- `tools/README.md`
+- `samples/README.md`
+- `scripts/README.md`
 
 ## Assets
 

@@ -1,4 +1,21 @@
+# ruff: noqa: E402
 from __future__ import annotations
+
+"""
+Common high-level tasks for TOYOPUC users.
+
+What this sample shows:
+- word read / write
+- bit read / write
+- `read_many(...)`
+- packed `W/H/L` access on bit families
+- extended-area access such as `ES0000`
+
+Examples:
+    python samples/high_level_basic.py --host 192.168.250.100 --port 1025
+    python samples/high_level_basic.py --host 192.168.250.100 --port 1027 \
+        --protocol udp --local-port 12000
+"""
 
 import argparse
 import sys
@@ -11,8 +28,16 @@ from toyopuc import ToyopucDeviceClient
 
 
 def main() -> int:
-    # Basic high-level example including W/H/L addressing for bit-device families.
-    p = argparse.ArgumentParser(description="Basic high-level Toyopuc client example")
+    p = argparse.ArgumentParser(
+        description="Basic high-level Toyopuc client example",
+        epilog=(
+            "Examples:\n"
+            "  python samples/high_level_basic.py --host 192.168.250.100 --port 1025\n"
+            "  python samples/high_level_basic.py --host 192.168.250.100 --port 1027 "
+            "--protocol udp --local-port 12000"
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     p.add_argument("--host", required=True)
     p.add_argument("--port", required=True, type=int)
     p.add_argument("--protocol", choices=["tcp", "udp"], default="tcp")
@@ -29,6 +54,7 @@ def main() -> int:
         timeout=args.timeout,
         retries=args.retries,
     ) as plc:
+        print("scenario: daily high-level tasks")
         plc.write("P1-D0000", 0x1234)
         print("P1-D0000 =", hex(plc.read("P1-D0000")))
 

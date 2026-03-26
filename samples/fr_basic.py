@@ -1,4 +1,20 @@
+# ruff: noqa: E402
 from __future__ import annotations
+
+"""
+High-level FR storage example.
+
+What this sample shows:
+- read one FR word
+- write one FR word
+- optionally commit the touched FR block to flash
+
+Examples:
+    python samples/fr_basic.py --host 192.168.250.100 --port 1027 \
+        --protocol udp --local-port 12000 --target FR000000 --value 0x1234
+    python samples/fr_basic.py --host 192.168.250.100 --port 1027 \
+        --protocol udp --local-port 12000 --target FR000000 --value 0x1234 --commit
+"""
 
 import argparse
 import sys
@@ -15,8 +31,17 @@ def parse_int_auto(text: str) -> int:
 
 
 def main() -> int:
-    # FR example: read one FR word, write a new value, and optionally persist it.
-    p = argparse.ArgumentParser(description="FR read/write example")
+    p = argparse.ArgumentParser(
+        description="FR read/write example",
+        epilog=(
+            "Examples:\n"
+            "  python samples/fr_basic.py --host 192.168.250.100 --port 1027 "
+            "--protocol udp --local-port 12000 --target FR000000 --value 0x1234\n"
+            "  python samples/fr_basic.py --host 192.168.250.100 --port 1027 "
+            "--protocol udp --local-port 12000 --target FR000000 --value 0x1234 --commit"
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     p.add_argument("--host", required=True)
     p.add_argument("--port", required=True, type=int)
     p.add_argument("--protocol", choices=["tcp", "udp"], default="tcp")
@@ -36,6 +61,7 @@ def main() -> int:
         timeout=args.timeout,
         retries=args.retries,
     ) as plc:
+        print("scenario: FR read / write with optional flash commit")
         before = plc.read_fr(args.target)
         print("target =", args.target)
         print("before =", hex(before))

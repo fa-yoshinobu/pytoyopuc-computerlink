@@ -64,7 +64,7 @@ if "%CANDIDATE_NOS%"=="" set "CANDIDATE_NOS=0x00,0x01,0x02,0x03,0x07"
 set "LOG_ARG="
 if not "%LOG%"=="" set "LOG_ARG=--log ""%LOG%"""
 
-python -m tools.program_no_probe ^
+python scripts\\program_no_probe.py ^
   --host %HOST% ^
   --port %PORT% ^
   --protocol %PROTOCOL% ^
@@ -88,16 +88,16 @@ exit /b 0
 
 :usage
 echo Usage:
-echo   tools\run_program_no_probe.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CASES] [CANDIDATE_NOS] [LOG]
+echo   scripts\\run_program_no_probe.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [CASES] [CANDIDATE_NOS] [LOG]
 echo.
 echo Default probe ^(EX/GX/P1^):
-echo   tools\run_program_no_probe.bat 192.168.250.100 1027 udp 12000 5 2
+echo   scripts\\run_program_no_probe.bat 192.168.250.100 1027 udp 12000 5 2
 echo.
 echo Include P2/P3:
-echo   tools\run_program_no_probe.bat 192.168.250.100 1027 udp 12000 5 2 ext00,gx07,p1,p2,p3
+echo   scripts\\run_program_no_probe.bat 192.168.250.100 1027 udp 12000 5 2 ext00,gx07,p1,p2,p3
 echo.
 echo With log:
-echo   tools\run_program_no_probe.bat 192.168.250.100 1027 udp 12000 5 2 ext00,gx07,p1 0x00,0x01,0x02,0x03,0x07 program_no_probe.log
+echo   scripts\\run_program_no_probe.bat 192.168.250.100 1027 udp 12000 5 2 ext00,gx07,p1 0x00,0x01,0x02,0x03,0x07 program_no_probe.log
 echo.
 echo PowerShell note:
 echo   comma lists may be passed either quoted or unquoted; unquoted lists are re-joined by this batch file

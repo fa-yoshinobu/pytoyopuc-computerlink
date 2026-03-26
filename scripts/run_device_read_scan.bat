@@ -50,7 +50,7 @@ if "%CHUNK%"=="" set "CHUNK=64"
 set "LOG_ARG="
 if not "%LOG%"=="" set "LOG_ARG=--log ""%LOG%"""
 
-python -m tools.device_read_scan ^
+python scripts\\device_read_scan.py ^
   --host %HOST% ^
   --port %PORT% ^
   --protocol %PROTOCOL% ^
@@ -71,8 +71,8 @@ exit /b 1
 
 :usage
 echo Usage:
-echo   tools\run_device_read_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [TARGETS] [CHUNK] [LOG]
+echo   scripts\\run_device_read_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [TARGETS] [CHUNK] [LOG]
 echo.
 echo Example:
-echo   tools\run_device_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 S,N,R,D,U,EB 128 read_scan.log
+echo   scripts\\run_device_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 S,N,R,D,U,EB 128 read_scan.log
 exit /b 2

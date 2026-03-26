@@ -57,7 +57,7 @@ if %ARGCOUNT% GEQ 1 (
 if not defined HOPS set "HOPS=P1-L2:N2"
 
 if defined LOG (
-  python -m tools.relay_matrix_test ^
+  python scripts\\relay_matrix_test.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -73,7 +73,7 @@ if defined LOG (
     --loop-step 0x0100 ^
     --log %LOG%
 ) else (
-  python -m tools.relay_matrix_test ^
+  python scripts\\relay_matrix_test.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -92,8 +92,8 @@ exit /b %errorlevel%
 
 :usage
 echo Usage:
-echo   tools\run_relay_matrix_test.bat HOST PORT [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [HOPS] [LOG]
+echo   scripts\\run_relay_matrix_test.bat HOST PORT [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [HOPS] [LOG]
 echo.
 echo Example:
-echo   tools\run_relay_matrix_test.bat 192.168.250.100 1027 udp 12000 10 1 P1-L2:N4,P1-L2:N6,P1-L2:N2 relay_matrix.log
+echo   scripts\\run_relay_matrix_test.bat 192.168.250.100 1027 udp 12000 10 1 P1-L2:N4,P1-L2:N6,P1-L2:N2 relay_matrix.log
 exit /b 1

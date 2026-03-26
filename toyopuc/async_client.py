@@ -2,27 +2,23 @@ from __future__ import annotations
 
 import asyncio
 import functools
+import weakref
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from .client import ToyopucClient
 from .high_level import ToyopucDeviceClient
 
 
-async def _run_sync_in_worker(func: Callable[..., Any], /, *args: Any, **kwargs: Any) -> Any:
-    try:
-        to_thread = asyncio.to_thread
-    except AttributeError:
-        loop = asyncio.get_running_loop()
-        call = functools.partial(func, *args, **kwargs)
-        return await loop.run_in_executor(None, call)
-    return await to_thread(func, *args, **kwargs)
+def _shutdown_executor(executor: ThreadPoolExecutor) -> None:
+    executor.shutdown(wait=False, cancel_futures=True)
 
 
 def _install_async_wrapper(async_cls: type, method_name: str) -> None:
     async def _async_method(self: Any, *args: Any, **kwargs: Any) -> Any:
         bound = getattr(self._client, method_name)
-        return await _run_sync_in_worker(bound, *args, **kwargs)
+        return await self._run_sync_in_worker(bound, *args, **kwargs)
 
     _async_method.__name__ = method_name
     _async_method.__qualname__ = f"{async_cls.__name__}.{method_name}"
@@ -34,12 +30,23 @@ class _AsyncToyopucClientBase:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         object.__setattr__(self, "_client", self._sync_client_cls(*args, **kwargs))
+        executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix=type(self).__name__)
+        object.__setattr__(self, "_executor", executor)
+        object.__setattr__(self, "_executor_finalizer", weakref.finalize(self, _shutdown_executor, executor))
+
+    async def _run_sync_in_worker(self, func: Callable[..., Any], /, *args: Any, **kwargs: Any) -> Any:
+        loop = asyncio.get_running_loop()
+        call = functools.partial(func, *args, **kwargs)
+        executor = self.__dict__.get("_executor")
+        if executor is None:
+            return await loop.run_in_executor(None, call)
+        return await loop.run_in_executor(executor, call)
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self._client, name)
 
     def __setattr__(self, name: str, value: Any) -> None:
-        if name == "_client" or hasattr(type(self), name):
+        if name in {"_client", "_executor", "_executor_finalizer"} or hasattr(type(self), name):
             object.__setattr__(self, name, value)
             return
         setattr(self._client, name, value)

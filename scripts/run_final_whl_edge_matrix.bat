@@ -30,7 +30,7 @@ for %%P in (P1 P2 P3) do (
     set "LOG_FILE=%LOG_DIR%\tcp_%%P_%%M.log"
     echo.
     echo [TCP] prefix=%%P mode=%%M
-    python tools\final_whl_edge_test.py ^
+    python scripts\\final_whl_edge_test.py ^
       --host %HOST% ^
       --port %TCP_PORT% ^
       --protocol tcp ^
@@ -48,7 +48,7 @@ for %%P in (P1 P2 P3) do (
     set "LOG_FILE=%LOG_DIR%\udp_%%P_%%M.log"
     echo.
     echo [UDP] prefix=%%P mode=%%M
-    python tools\final_whl_edge_test.py ^
+    python scripts\\final_whl_edge_test.py ^
       --host %HOST% ^
       --port %UDP_PORT% ^
       --protocol udp ^
@@ -73,8 +73,8 @@ exit /b %OVERALL%
 
 :usage
 echo Usage:
-echo   tools\run_final_whl_edge_matrix.bat HOST TCP_PORT [UDP_PORT] [LOCAL_PORT] [TIMEOUT] [RETRIES] [LOG_DIR]
+echo   scripts\\run_final_whl_edge_matrix.bat HOST TCP_PORT [UDP_PORT] [LOCAL_PORT] [TIMEOUT] [RETRIES] [LOG_DIR]
 echo.
 echo Example:
-echo   tools\run_final_whl_edge_matrix.bat 192.168.250.100 1025 1027 12000 5 1 final_whl_edge_matrix_logs
+echo   scripts\\run_final_whl_edge_matrix.bat 192.168.250.100 1025 1027 12000 5 1 final_whl_edge_matrix_logs
 exit /b 1

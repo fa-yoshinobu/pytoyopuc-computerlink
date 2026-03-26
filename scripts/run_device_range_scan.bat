@@ -60,8 +60,8 @@ echo.
 
 echo [1/2] Coarse forward scan
 echo [1/2] Coarse forward scan>> "%SUMMARY%"
-echo Command: python -m tools.exhaustive_writable_scan --host %HOST% --port %PORT% --protocol %PROTOCOL% --local-port %LOCAL_PORT% --targets %TARGETS% %INCLUDE_FR% --step %COARSE_STEP% --refine-boundary --stop-after-ng %STOP_AFTER_NG% --log "%COARSE_LOG%">> "%SUMMARY%"
-python -m tools.exhaustive_writable_scan --host %HOST% --port %PORT% --protocol %PROTOCOL% --local-port %LOCAL_PORT% --targets %TARGETS% %INCLUDE_FR% --step %COARSE_STEP% --refine-boundary --stop-after-ng %STOP_AFTER_NG% --log "%COARSE_LOG%"
+echo Command: python scripts\\exhaustive_writable_scan.py --host %HOST% --port %PORT% --protocol %PROTOCOL% --local-port %LOCAL_PORT% --targets %TARGETS% %INCLUDE_FR% --step %COARSE_STEP% --refine-boundary --stop-after-ng %STOP_AFTER_NG% --log "%COARSE_LOG%">> "%SUMMARY%"
+python scripts\\exhaustive_writable_scan.py --host %HOST% --port %PORT% --protocol %PROTOCOL% --local-port %LOCAL_PORT% --targets %TARGETS% %INCLUDE_FR% --step %COARSE_STEP% --refine-boundary --stop-after-ng %STOP_AFTER_NG% --log "%COARSE_LOG%"
 if errorlevel 1 goto :failed
 
 echo.>> "%SUMMARY%"
@@ -87,8 +87,8 @@ if not "%FINE_TARGETS%"=="" (
   echo Fine Targets   : %FINE_TARGETS%
   echo [2/2] Fine forward scan>> "%SUMMARY%"
   echo Fine Targets   : %FINE_TARGETS%>> "%SUMMARY%"
-  echo Command: python -m tools.exhaustive_writable_scan --host %HOST% --port %PORT% --protocol %PROTOCOL% --local-port %LOCAL_PORT% --targets %FINE_TARGETS% %INCLUDE_FR% --step 1 --stop-after-ng %STOP_AFTER_NG% --log "%FINE_LOG%">> "%SUMMARY%"
-  python -m tools.exhaustive_writable_scan --host %HOST% --port %PORT% --protocol %PROTOCOL% --local-port %LOCAL_PORT% --targets %FINE_TARGETS% %INCLUDE_FR% --step 1 --stop-after-ng %STOP_AFTER_NG% --log "%FINE_LOG%"
+  echo Command: python scripts\\exhaustive_writable_scan.py --host %HOST% --port %PORT% --protocol %PROTOCOL% --local-port %LOCAL_PORT% --targets %FINE_TARGETS% %INCLUDE_FR% --step 1 --stop-after-ng %STOP_AFTER_NG% --log "%FINE_LOG%">> "%SUMMARY%"
+  python scripts\\exhaustive_writable_scan.py --host %HOST% --port %PORT% --protocol %PROTOCOL% --local-port %LOCAL_PORT% --targets %FINE_TARGETS% %INCLUDE_FR% --step 1 --stop-after-ng %STOP_AFTER_NG% --log "%FINE_LOG%"
   if errorlevel 1 goto :failed
 
   echo.>> "%SUMMARY%"
@@ -113,13 +113,13 @@ exit /b 1
 
 :usage
 echo Usage:
-echo   tools\run_device_range_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [COARSE_STEP] [STOP_AFTER_NG] [TARGETS]
+echo   scripts\\run_device_range_scan.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [COARSE_STEP] [STOP_AFTER_NG] [TARGETS]
 echo.
 echo Example ^(TCP^):
-echo   tools\run_device_range_scan.bat 192.168.250.100 1025 tcp 0 16 32
+echo   scripts\\run_device_range_scan.bat 192.168.250.100 1025 tcp 0 16 32
 echo.
 echo Example ^(UDP^):
-echo   tools\run_device_range_scan.bat 192.168.250.100 1027 udp 12000 16 32
+echo   scripts\\run_device_range_scan.bat 192.168.250.100 1027 udp 12000 16 32
 echo.
 echo Note:
 echo   By default, this scans all device families currently listed in the project docs.

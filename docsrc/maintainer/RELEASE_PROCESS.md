@@ -4,9 +4,9 @@ Related documents:
 
 - [../README.md](../README.md)
 - [RELEASE_NOTES.md](RELEASE_NOTES.md)
-- [TESTING.md](TESTING.md)
-- [MODEL_RANGES.md](MODEL_RANGES.md)
-- [COMPUTER_LINK_SPEC.md](COMPUTER_LINK_SPEC.md)
+- [TESTING_GUIDE.md](TESTING_GUIDE.md)
+- [../user/MODEL_RANGES.md](../user/MODEL_RANGES.md)
+- [PROTOCOL_SPEC.md](PROTOCOL_SPEC.md)
 
 This document is a practical checklist for releasing the library as a package.
 
@@ -25,10 +25,10 @@ Confirm what is part of the release.
 - keep:
   - `toyopuc/`
   - `README.md`
-  - `docsrc/TESTING.md`
-  - `docsrc/COMPUTER_LINK_SPEC.md`
-  - `docsrc/MODEL_RANGES.md`
-  - `docsrc/PENDING.md`
+  - `docsrc/maintainer/TESTING_GUIDE.md`
+  - `docsrc/maintainer/PROTOCOL_SPEC.md`
+  - `docsrc/user/MODEL_RANGES.md`
+  - `TODO.md`
   - `LICENSE`
   - `pyproject.toml`
 - exclude:
@@ -92,15 +92,15 @@ Verify that the docs match the code.
   - high-level usage
   - UDP `local_port` note
   - supported / unsupported behavior notes
-- [TESTING.md](TESTING.md)
+- [TESTING_GUIDE.md](TESTING_GUIDE.md)
   - test tools usage
   - verified results
-- [COMPUTER_LINK_SPEC.md](COMPUTER_LINK_SPEC.md)
+- [PROTOCOL_SPEC.md](PROTOCOL_SPEC.md)
   - protocol summary
   - example messages
-- [MODEL_RANGES.md](MODEL_RANGES.md)
+- [../user/MODEL_RANGES.md](../user/MODEL_RANGES.md)
   - model-specific writable ranges
-- [PENDING.md](PENDING.md)
+- [TODO.md](../../TODO.md)
   - open items clearly separated from verified behavior
 
 ## 6. Verified Hardware Notes
@@ -133,7 +133,7 @@ Confirm caution notes are present before release.
 Run syntax checks:
 
 ```bash
-python -m py_compile toyopuc\__init__.py toyopuc\address.py toyopuc\client.py toyopuc\exceptions.py toyopuc\high_level.py toyopuc\protocol.py tools\auto_rw_test.py tools\exhaustive_writable_scan.py tools\find_last_writable.py tools\high_level_api_test.py tools\interactive_cli.py tools\manual_device_write_check.py tools\recovery_write_loop.py tools\sim_server.py
+cmd /c run_ci.bat
 ```
 
 Optional import smoke test:
@@ -146,6 +146,17 @@ PY
 ```
 
 ## 9. Build Check
+
+Canonical pre-release entry point:
+
+```bat
+release_check.bat
+```
+
+This runs:
+
+1. `run_ci.bat`
+2. `build_docs.bat`
 
 Build the package locally before publishing.
 
@@ -163,7 +174,7 @@ If generating API docs:
 
 ```bash
 pip install .[docs]
-tools\build_api_docs.bat
+scripts\\build_api_docs.bat
 ```
 
 Current status:
@@ -176,9 +187,9 @@ Recommended release order:
 1. `python -m build`
 2. `python -m twine check dist/*`
 3. `pip install .[docs]`
-4. `tools\build_api_docs.bat`
+4. `scripts\\build_api_docs.bat`
 
-Treat `tools\build_api_docs.bat` as part of the normal release flow when docstrings or public API have changed.
+Treat `scripts\\build_api_docs.bat` as part of the normal release flow when docstrings or public API have changed.
 
 ## 10. Final Git Check
 
@@ -224,6 +235,6 @@ Current release note file:
 After release:
 
 - record tag / version
-- keep [MODEL_RANGES.md](MODEL_RANGES.md) updated when new hardware is tested
-- move completed items out of [PENDING.md](PENDING.md)
+- keep [../user/MODEL_RANGES.md](../user/MODEL_RANGES.md) updated when new hardware is tested
+- move completed items out of [TODO.md](../../TODO.md)
 

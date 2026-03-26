@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://fa-yoshinobu.github.io/plc-comm-computerlink-python/user/MODEL_RANGES/">
       
       
+        <link rel="prev" href="../USER_GUIDE/">
+      
+      
+        <link rel="next" href="../../api/client/">
       
       
         
@@ -21,7 +25,7 @@
     
     
       
-        <title>Model-Specific Writable Ranges - Toyopuc Computer Link Python API</title>
+        <title>Model Ranges - Toyopuc Computer Link Python API</title>
       
     
     
@@ -108,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Model-Specific Writable Ranges
+              Model Ranges
             
           </span>
         </div>
@@ -255,6 +259,362 @@
       
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model Ranges
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model Ranges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#toyopuc-plus-cpu-tcc-6740-plus-ex2-tcu-6858" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TOYOPUC-Plus CPU (TCC-6740) + Plus EX2 (TCU-6858)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TOYOPUC-Plus CPU (TCC-6740) + Plus EX2 (TCU-6858)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-bit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Bit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basic-word" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Word
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefixed-bit-p1p2p3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefixed Bit (P1/P2/P3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefixed-word-p1p2p3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefixed Word (P1/P2/P3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extension-bit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extension Bit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extension-word" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extension Word
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nano-10gx-tuc-1157" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nano 10GX (TUC-1157)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Nano 10GX (TUC-1157)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-bit_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Bit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basic-word_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Word
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefixed-bit-p1p2p3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefixed Bit (P1/P2/P3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefixed-word-p1p2p3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefixed Word (P1/P2/P3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extended-bit-word" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extended Bit / Word
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fr_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FR
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pc10g-cpu-tcc-6353" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PC10G-CPU (TCC-6353)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PC10G-CPU (TCC-6353)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-bit_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Bit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#basic-word_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic Word
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefixed-bit-p1p2p3_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefixed Bit (P1/P2/P3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefixed-word-p1p2p3_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefixed Word (P1/P2/P3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extension-bit_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extension Bit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extension-word_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extension Word
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#notes_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
   
   
     
@@ -266,10 +626,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -287,8 +647,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -661,10 +1021,10 @@
 <h1 id="model-specific-writable-ranges">Model-Specific Writable Ranges</h1>
 <p>Related documents:</p>
 <ul>
-<li><a href="../README.md">../README.md</a></li>
-<li><a href="TESTING.md">TESTING.md</a></li>
-<li><a href="COMPUTER_LINK_SPEC.md">COMPUTER_LINK_SPEC.md</a></li>
-<li><a href="RELEASE_NOTES.md">RELEASE_NOTES.md</a></li>
+<li><a href="../USER_GUIDE/">USER_GUIDE.md</a></li>
+<li><a href="https://github.com/fa-yoshinobu/plc-comm-computerlink-python/blob/main/README.md">Project README</a></li>
+<li><a href="https://github.com/fa-yoshinobu/plc-comm-computerlink-python/blob/main/docsrc/maintainer/TESTING_GUIDE.md">Maintainer Testing Guide</a></li>
+<li><a href="https://github.com/fa-yoshinobu/plc-comm-computerlink-python/blob/main/docsrc/maintainer/RELEASE_NOTES.md">Maintainer Release Notes</a></li>
 </ul>
 <p>This document records writable device ranges confirmed per hardware model.</p>
 <p>The intent is practical:
@@ -674,11 +1034,11 @@
 <p>Evidence types used in this file:</p>
 <ul>
 <li><code>exhaustive scan</code>
-  Confirmed by <code>tools/exhaustive_writable_scan.py</code>.</li>
+  Confirmed by <code>scripts/exhaustive_writable_scan.py</code>.</li>
 <li><code>runtime tests</code>
-  Confirmed by the normal runtime test set in <a href="TESTING.md">TESTING.md</a>.</li>
+  Confirmed by the normal runtime test set in the maintainer testing guide.</li>
 </ul>
-<p>These ranges are based primarily on <code>tools/exhaustive_writable_scan.py</code>.</p>
+<p>These ranges are based primarily on <code>scripts/exhaustive_writable_scan.py</code>.</p>
 <h2 id="toyopuc-plus-cpu-tcc-6740-plus-ex2-tcu-6858">TOYOPUC-Plus CPU (TCC-6740) + Plus EX2 (TCU-6858)</h2>
 <p>Source command:</p>
 <pre><code class="language-bash">python -m tools.exhaustive_writable_scan --host &lt;HOST&gt; --port &lt;PORT&gt; --protocol tcp --targets all --log exhaustive.log
@@ -1087,19 +1447,19 @@
 </ul>
 <h2 id="nano-10gx-tuc-1157">Nano 10GX (TUC-1157)</h2>
 <p>Source commands:</p>
-<pre><code class="language-bash">tools\run_quick_test.bat 192.168.250.100 1025 tcp 4 5 0
-tools\run_full_test.bat 192.168.250.100 1025 tcp 4 5 0
-python -m tools.whl_addressing_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0 --log whl_nano10gx_tcp.log
-python -m tools.high_level_api_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0 --log high_level_nano10gx_tcp.log
-python -m tools.clock_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0
-python -m tools.cpu_status_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0
-tools\run_full_test.bat 192.168.250.100 1027 udp 4 5 2 12000
-python -m tools.whl_addressing_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log whl_nano10gx.log
-python -m tools.high_level_api_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log high_level_nano10gx.log
-python -m tools.clock_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
-python -m tools.clock_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --set &quot;2026-03-09 20:00:10&quot;
-python -m tools.cpu_status_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
-tools\run_device_range_scan.bat 192.168.250.100 1027 udp 12000 16 32
+<pre><code class="language-bash">scripts\run_quick_test.bat 192.168.250.100 1025 tcp 4 5 0
+scripts\run_full_test.bat 192.168.250.100 1025 tcp 4 5 0
+python -m scripts.whl_addressing_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0 --log whl_nano10gx_tcp.log
+python -m scripts.high_level_api_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0 --log high_level_nano10gx_tcp.log
+python -m scripts.clock_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0
+python -m scripts.cpu_status_test --host 192.168.250.100 --port 1025 --protocol tcp --timeout 5 --retries 0
+scripts\run_full_test.bat 192.168.250.100 1027 udp 4 5 2 12000
+python -m scripts.whl_addressing_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log whl_nano10gx.log
+python -m scripts.high_level_api_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --skip-errors --log high_level_nano10gx.log
+python -m scripts.clock_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
+python -m scripts.clock_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2 --set &quot;2026-03-09 20:00:10&quot;
+python -m scripts.cpu_status_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 5 --retries 2
+scripts\run_device_range_scan.bat 192.168.250.100 1027 udp 12000 16 32
 </code></pre>
 <p>Evidence:</p>
 <ul>
@@ -1367,13 +1727,13 @@ tools\run_device_range_scan.bat 192.168.250.100 1027 udp 12000 16 32
 </table>
 <h2 id="pc10g-cpu-tcc-6353">PC10G-CPU (TCC-6353)</h2>
 <p>Source commands (UDP unless noted):</p>
-<pre><code class="language-text">tools\run_device_full_scan.bat 192.168.250.100 1027 udp 12000 5 2 512 device_full
-tools\run_device_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 S,N,R,D,P,K,V,T,C,L,X,Y,M,EP,EX,GX,GY,GM,U,EB,FR 512 device_read.log
-tools\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read.log
-tools\run_fr_write_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write.log
-tools\run_program_no_probe.bat 192.168.250.100 1027 udp 12000 5 2 ext00,gx07,p1,p2,p3 0x00,0x01,0x02,0x03,0x07 program_no_probe.log
-tools\run_c4c5_range_probe.bat 192.168.250.100 1027 udp 12000 5 2 l1000,m1000,u00000,u08000,eb00000 c4c5_range.log
-tools\run_sim_tests.bat 192.168.250.100 1027 udp 12000 5 2
+<pre><code class="language-text">scripts\run_device_full_scan.bat 192.168.250.100 1027 udp 12000 5 2 512 device_full
+scripts\run_device_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 S,N,R,D,P,K,V,T,C,L,X,Y,M,EP,EX,GX,GY,GM,U,EB,FR 512 device_read.log
+scripts\run_fr_read_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0 fr_read.log
+scripts\run_fr_write_scan.bat 192.168.250.100 1027 udp 12000 5 2 0x200 64 0x000000 0x1FFFFF 0xA500 fr_write.log
+scripts\run_program_no_probe.bat 192.168.250.100 1027 udp 12000 5 2 ext00,gx07,p1,p2,p3 0x00,0x01,0x02,0x03,0x07 program_no_probe.log
+scripts\run_c4c5_range_probe.bat 192.168.250.100 1027 udp 12000 5 2 l1000,m1000,u00000,u08000,eb00000 c4c5_range.log
+scripts\run_sim_tests.bat 192.168.250.100 1027 udp 12000 5 2
 python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --ext-multi-test --skip-errors --log auto_ext_multi.log
 python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --boundary-test --skip-errors --log auto_boundary.log
 python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp --max-block-test --pc10-block-words 0x200 --skip-errors --log auto_block.log
@@ -1628,8 +1988,8 @@ python -m tools.auto_rw_test --host 192.168.250.100 --port 1025 --protocol tcp -
 </table>
 <h3 id="notes_1">Notes</h3>
 <ul>
-<li><code>tools\run_device_full_scan.bat</code> + <code>tools\run_device_read_scan.bat</code> cover the full scan in less than a minute when using 512-word chunks; the combined output is stored in <code>device_full*</code> / <code>device_read.log</code>.</li>
-<li><code>tools\run_device_full_scan.bat</code> already chains the FR scan and the prefixed program-number probe, so re-running that single batch file is enough for future regressions.</li>
+<li><code>scripts\run_device_full_scan.bat</code> + <code>scripts\run_device_read_scan.bat</code> cover the full scan in less than a minute when using 512-word chunks; the combined output is stored in <code>device_full*</code> / <code>device_read.log</code>.</li>
+<li><code>scripts\run_device_full_scan.bat</code> already chains the FR scan and the prefixed program-number probe, so re-running that single batch file is enough for future regressions.</li>
 <li><code>B</code> area is not implemented on the tested PC10G unit, so block/byte tests mark <code>B0000-B1FFF</code> as <code>SKIP (unsupported)</code>.</li>
 <li>PC10 multi (<code>CMD=C4/C5</code>) is still required for <code>L1000+</code>, <code>M1000+</code>, <code>U</code>, and <code>EB</code>; direct basic bit/word commands stay on <code>CMD=20/21</code> or <code>CMD=94/95</code>.</li>
 <li>EB access uses Ex No. <code>0x10-0x17</code> consistently; the helper rejects anything higher to avoid undefined ranges.</li>

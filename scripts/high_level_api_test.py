@@ -173,7 +173,7 @@ def _fr_guard_case(plc: ToyopucDeviceClient, hops: str, log_f) -> tuple[int, int
 
     total += 1
     try:
-        plc.write_many({"FR000000": 0x1234, "D0000": 0x5678})
+        plc.write_many({"FR000000": 0x1234, "P1-D0000": 0x5678})
     except ValueError as exc:
         line = f"FR write_many guard = OK ({exc})"
         print(line)
@@ -215,24 +215,24 @@ def main() -> int:
 
     single_cases: list[tuple[str, Callable[[ToyopucDeviceClient], tuple[int, int]]]] = [
         (
-            "single bit/basic",
-            lambda plc: _single_bit_case(plc, args.hops, "M0000", log_f),
-        ),
-        (
-            "single word/basic",
-            lambda plc: _single_word_case(plc, args.hops, "D0000", rng, log_f),
-        ),
-        (
-            "single byte/basic",
-            lambda plc: _single_byte_case(plc, args.hops, "D0000L", rng, log_f),
-        ),
-        (
-            "single bit/prefixed",
+            "single bit/profile-bound P1",
             lambda plc: _single_bit_case(plc, args.hops, "P1-M0000", log_f),
         ),
         (
-            "single word/prefixed",
+            "single word/profile-bound P1",
             lambda plc: _single_word_case(plc, args.hops, "P1-D0000", rng, log_f),
+        ),
+        (
+            "single byte/profile-bound P1",
+            lambda plc: _single_byte_case(plc, args.hops, "P1-D0000L", rng, log_f),
+        ),
+        (
+            "single bit/profile-bound P2",
+            lambda plc: _single_bit_case(plc, args.hops, "P2-M0000", log_f),
+        ),
+        (
+            "single word/profile-bound P2",
+            lambda plc: _single_word_case(plc, args.hops, "P2-D0000", rng, log_f),
         ),
         (
             "single bit/extended",
@@ -252,15 +252,15 @@ def main() -> int:
         )
 
     sequence_cases: list[tuple[str, str, Sequence[int]]] = [
-        ("sequence words/basic", "D0000", [rng.randint(0, 0xFFFF) for _ in range(3)]),
-        ("sequence bytes/basic", "D0000L", [rng.randint(0, 0xFF) for _ in range(4)]),
-        ("sequence bits/basic", "M0000", [1, 0, 1, 1]),
+        ("sequence words/profile-bound", "P1-D0000", [rng.randint(0, 0xFFFF) for _ in range(3)]),
+        ("sequence bytes/profile-bound", "P1-D0000L", [rng.randint(0, 0xFF) for _ in range(4)]),
+        ("sequence bits/profile-bound", "P1-M0000", [1, 0, 1, 1]),
     ]
 
     mixed_items = {
-        "D0000": 0x1234,
-        "M0000": 1,
-        "P1-R0000": 0x5678,
+        "P1-D0000": 0x1234,
+        "P1-M0000": 1,
+        "P2-R0000": 0x5678,
         "ES0000": 0x9ABC,
     }
     if args.include_pc10_word:
@@ -269,7 +269,7 @@ def main() -> int:
     with ToyopucDeviceClient(
         args.host,
         args.port,
-        protocol=args.protocol,
+        transport=args.protocol,
         local_port=args.local_port,
         timeout=args.timeout,
         retries=args.retries,

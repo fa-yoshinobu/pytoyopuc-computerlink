@@ -3,9 +3,9 @@
 Related documents:
 
 - [../README.md](../README.md)
-- [TESTING.md](TESTING.md)
-- [MODEL_RANGES.md](MODEL_RANGES.md)
-- [../tools/README.md](../tools/README.md)
+- [TESTING_GUIDE.md](TESTING_GUIDE.md)
+- [../user/MODEL_RANGES.md](../user/MODEL_RANGES.md)
+- [../../scripts/README.md](../../scripts/README.md)
 
 This document is a working protocol summary for the 2ET Ethernet module.
 
@@ -19,7 +19,7 @@ This file is organized into three parts:
 2. command groups
 3. address and `Ex No.` tables
 
-Testing and operational usage are documented in [TESTING.md](TESTING.md).
+Testing and operational usage are documented in [TESTING_GUIDE.md](TESTING_GUIDE.md).
 
 Status labels for this file:
 
@@ -366,7 +366,7 @@ Four-hop relays (`IV CPU`) follow the same pattern with another wrapper (`Transf
 - Verified on real hardware for this three-hop relay high-level API sweep:
   - hops: `P1-L2:N4 -> P1-L2:N6 -> P1-L2:N2`
   - command:
-    - `python -m tools.high_level_api_test --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --include-pc10-word`
+    - `python scripts\\high_level_api_test.py --host 192.168.250.100 --port 1027 --protocol udp --local-port 12000 --timeout 10 --retries 1 --hops "P1-L2:N4,P1-L2:N6,P1-L2:N2" --include-pc10-word`
   - observed result:
     - `TOTAL: 24/24`
     - `ERROR CASES: 0`

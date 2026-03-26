@@ -60,8 +60,8 @@ echo.
 
 echo [1/4] Basic areas
 echo [1/4] Basic areas>> "%SUMMARY%"
-echo Command: python -m tools.auto_rw_test --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --count %COUNT% --timeout %TIMEOUT% --retries %RETRIES% --log "%LOGDIR%\basic.log">> "%SUMMARY%"
-python -m tools.auto_rw_test ^
+echo Command: python scripts\\auto_rw_test.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --count %COUNT% --timeout %TIMEOUT% --retries %RETRIES% --log "%LOGDIR%\basic.log">> "%SUMMARY%"
+python scripts\\auto_rw_test.py ^
   --host %HOST% ^
   --port %PORT% ^
   --local-port %LOCAL_PORT% ^
@@ -78,8 +78,8 @@ echo.>> "%SUMMARY%"
 echo.
 echo [2/4] Mixed CMD=98/99
 echo [2/4] Mixed CMD=98/99>> "%SUMMARY%"
-echo Command: python -m tools.auto_rw_test --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --ext-multi-test --skip-errors --log "%LOGDIR%\ext_multi.log">> "%SUMMARY%"
-python -m tools.auto_rw_test ^
+echo Command: python scripts\\auto_rw_test.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --ext-multi-test --skip-errors --log "%LOGDIR%\ext_multi.log">> "%SUMMARY%"
+python scripts\\auto_rw_test.py ^
   --host %HOST% ^
   --port %PORT% ^
   --local-port %LOCAL_PORT% ^
@@ -96,8 +96,8 @@ echo.>> "%SUMMARY%"
 
 echo [3/4] PC10G full + P1/P2/P3
 echo [3/4] PC10G full + P1/P2/P3>> "%SUMMARY%"
-echo Command: python -m tools.auto_rw_test --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --count %COUNT% --timeout %TIMEOUT% --retries %RETRIES% --pc10g-full --include-p123 --skip-errors --log "%LOGDIR%\pc10g_full.log">> "%SUMMARY%"
-python -m tools.auto_rw_test ^
+echo Command: python scripts\\auto_rw_test.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --count %COUNT% --timeout %TIMEOUT% --retries %RETRIES% --pc10g-full --include-p123 --skip-errors --log "%LOGDIR%\pc10g_full.log">> "%SUMMARY%"
+python scripts\\auto_rw_test.py ^
   --host %HOST% ^
   --port %PORT% ^
   --local-port %LOCAL_PORT% ^
@@ -117,8 +117,8 @@ echo.>> "%SUMMARY%"
 echo.
 echo [4/4] Block length test
 echo [4/4] Block length test>> "%SUMMARY%"
-echo Command: python -m tools.auto_rw_test --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --max-block-test --pc10-block-words %PC10_BLOCK_WORDS% --skip-errors --log "%LOGDIR%\block.log">> "%SUMMARY%"
-python -m tools.auto_rw_test ^
+echo Command: python scripts\\auto_rw_test.py --host %HOST% --port %PORT% --local-port %LOCAL_PORT% --protocol %PROTOCOL% --timeout %TIMEOUT% --retries %RETRIES% --max-block-test --pc10-block-words %PC10_BLOCK_WORDS% --skip-errors --log "%LOGDIR%\block.log">> "%SUMMARY%"
+python scripts\\auto_rw_test.py ^
   --host %HOST% ^
   --port %PORT% ^
   --local-port %LOCAL_PORT% ^
@@ -155,8 +155,8 @@ exit /b 1
 
 :usage
 echo Usage:
-echo   tools\run_auto_tests.bat ^<HOST^> ^<PORT^> [PROTOCOL] [COUNT] [TIMEOUT] [RETRIES] [PC10_BLOCK_WORDS] [LOCAL_PORT]
+echo   scripts\\run_auto_tests.bat ^<HOST^> ^<PORT^> [PROTOCOL] [COUNT] [TIMEOUT] [RETRIES] [PC10_BLOCK_WORDS] [LOCAL_PORT]
 echo.
 echo Example:
-echo   tools\run_auto_tests.bat 192.168.250.100 1025 udp 4 3 0 0x200 12000
+echo   scripts\\run_auto_tests.bat 192.168.250.100 1025 udp 4 3 0 0x200 12000
 exit /b 2

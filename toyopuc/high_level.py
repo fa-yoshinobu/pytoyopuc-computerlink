@@ -38,6 +38,10 @@ from .protocol import (
     build_ext_multi_write,
     build_ext_word_read,
     build_ext_word_write,
+    build_multi_byte_read,
+    build_multi_byte_write,
+    build_multi_word_read,
+    build_multi_word_write,
     build_pc10_block_read,
     build_pc10_block_write,
     build_pc10_multi_read,
@@ -96,6 +100,8 @@ _EXT_BIT_SPECS = {
 }
 
 T = TypeVar("T")
+_DEVICE_CACHE_MAX = 512
+_RUN_PLAN_CACHE_MAX = 256
 
 
 def _require(value: T | None, label: str) -> T:
@@ -533,6 +539,33 @@ def _read_pc10_multi_bits(client: ToyopucClient, addrs32: Sequence[int]) -> list
     return [(data[i // 8] >> (i % 8)) & 0x01 for i in range(len(addrs32))]
 
 
+def _parse_ext_multi_bit_data(data: bytes, count: int) -> list[int]:
+    need = (count + 7) // 8
+    if len(data) < need:
+        raise ToyopucProtocolError("Extended multi-bit response too short")
+    return [(data[i // 8] >> (i % 8)) & 0x01 for i in range(count)]
+
+
+def _build_pc10_multi_word_read_payload(addrs32: Sequence[int]) -> bytes:
+    payload = bytearray(4 + len(addrs32) * 4)
+    payload[2] = len(addrs32) & 0xFF
+    for i, addr32 in enumerate(addrs32):
+        payload[4 + i * 4 : 8 + i * 4] = addr32.to_bytes(4, "little")
+    return bytes(payload)
+
+
+def _parse_pc10_multi_word_data(data: bytes, count: int) -> list[int]:
+    need = 4 + count * 2
+    if len(data) < need:
+        raise ToyopucProtocolError("PC10 multi-word response too short")
+    return [int.from_bytes(data[4 + i * 2 : 6 + i * 2], "little") for i in range(count)]
+
+
+def _read_pc10_multi_words(client: ToyopucClient, addrs32: Sequence[int]) -> list[int]:
+    data = client.pc10_multi_read(_build_pc10_multi_word_read_payload(addrs32))
+    return _parse_pc10_multi_word_data(data, len(addrs32))
+
+
 def _read_pc10_block_word(client: ToyopucClient, addr32: int) -> int:
     data = client.pc10_block_read(addr32, 2)
     return int.from_bytes(data[:2], "little")
@@ -551,6 +584,17 @@ def _pack_pc10_multi_bit_payload(addr32_values: Sequence[tuple[int, int]]) -> by
         if int(value) & 0x01:
             bit_bytes[i // 8] |= 1 << (i % 8)
     payload.extend(bit_bytes)
+    return bytes(payload)
+
+
+def _pack_pc10_multi_word_payload(addr32_values: Sequence[tuple[int, int]]) -> bytes:
+    payload = bytearray(4 + len(addr32_values) * 4 + len(addr32_values) * 2)
+    payload[2] = len(addr32_values) & 0xFF
+    for i, (addr32, _) in enumerate(addr32_values):
+        payload[4 + i * 4 : 8 + i * 4] = addr32.to_bytes(4, "little")
+    values_offset = 4 + len(addr32_values) * 4
+    for i, (_, value) in enumerate(addr32_values):
+        payload[values_offset + i * 2 : values_offset + i * 2 + 2] = int(value & 0xFFFF).to_bytes(2, "little")
     return bytes(payload)
 
 
@@ -634,12 +678,54 @@ def _is_consecutive_pc10_word(devices: list[ResolvedDevice]) -> bool:
     return all(d.addr32 == a0 + i * 2 for i, d in enumerate(devices))
 
 
+def _contains_packed_pc10_word_device(devices: list[ResolvedDevice]) -> bool:
+    return any(d.scheme == "pc10-word" and d.unit == "word" and d.packed for d in devices)
+
+
+def _pc10_word_segment_length(devices: list[ResolvedDevice], start: int) -> int:
+    a0 = _require(devices[start].addr32, "pc10 addr32")
+    run = 1
+    while start + run < len(devices):
+        if _require(devices[start + run].addr32, "pc10 addr32") != a0 + run * 2:
+            break
+        run += 1
+    return run
+
+
 class ToyopucDeviceClient(ToyopucClient):
     """High-level client that accepts string device addresses."""
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._resolved_device_cache: dict[str, ResolvedDevice] = {}
+        self._run_plan_cache: dict[tuple[bool, tuple[ResolvedDevice, ...]], tuple[int, ...]] = {}
+
+    def _get_run_plan(self, devices: list[ResolvedDevice], split_pc10: bool) -> tuple[int, ...]:
+        key = (split_pc10, tuple(devices))
+        plan = self._run_plan_cache.get(key)
+        if plan is None:
+            lengths: list[int] = []
+            idx = 0
+            while idx < len(devices):
+                run = _batch_run_length(devices, idx, split_pc10)
+                lengths.append(run)
+                idx += run
+            plan = tuple(lengths)
+            if len(self._run_plan_cache) >= _RUN_PLAN_CACHE_MAX:
+                self._run_plan_cache.clear()
+            self._run_plan_cache[key] = plan
+        return plan
+
     def resolve_device(self, device: str) -> ResolvedDevice:
         """Resolve a string address into a `ResolvedDevice`."""
-        return resolve_device(device)
+        key = device.strip().upper()
+        resolved = self._resolved_device_cache.get(key)
+        if resolved is None:
+            resolved = resolve_device(key)
+            if len(self._resolved_device_cache) >= _DEVICE_CACHE_MAX:
+                self._resolved_device_cache.clear()
+            self._resolved_device_cache[key] = resolved
+        return resolved
 
     def relay_read(
         self,
@@ -721,17 +807,28 @@ class ToyopucDeviceClient(ToyopucClient):
         hops: str | Iterable[tuple[int, int]],
         devices: Sequence[str | ResolvedDevice],
     ) -> list[object]:
-        """Read multiple devices through relay hops and preserve input order."""
-        return [self.relay_read(hops, device) for device in devices]
+        """Read multiple devices through relay hops with batching when possible."""
+        resolved = [self.resolve_device(d) if isinstance(d, str) else d for d in devices]
+        return self._relay_read_runs(hops, resolved, split_pc10=False)
 
     def relay_write_many(
         self,
         hops: str | Iterable[tuple[int, int]],
         items: Mapping[str | ResolvedDevice, object],
     ) -> None:
-        """Write multiple devices through relay hops in input order."""
+        """Write multiple devices through relay hops with batching when possible."""
+        resolved_items = []
         for device, value in items.items():
-            self.relay_write(hops, device, value)
+            resolved = self.resolve_device(device) if isinstance(device, str) else device
+            resolved_items.append((resolved, value))
+        if not resolved_items:
+            return
+        self._relay_write_runs(
+            hops,
+            [resolved for resolved, _ in resolved_items],
+            [value for _, value in resolved_items],
+            split_pc10=True,
+        )
 
     def read_fr(self, device: str | ResolvedDevice, count: int = 1) -> Any:
         """Read one or more FR words using the dedicated FR path."""
@@ -888,20 +985,25 @@ class ToyopucDeviceClient(ToyopucClient):
         self._write_resolved_device(resolved, value)
 
     def read_many(self, devices: Sequence[str | ResolvedDevice]) -> list[object]:
-        """Read multiple devices and preserve input order."""
+        """Read multiple devices with batching when possible and preserve input order."""
         resolved = [self.resolve_device(d) if isinstance(d, str) else d for d in devices]
-        return [self._read_resolved_device(item) for item in resolved]
+        return self._read_runs(resolved, split_pc10=False)
 
     def write_many(self, items: Mapping[str | ResolvedDevice, object]) -> None:
-        """Write multiple devices in mapping iteration order."""
+        """Write multiple devices with batching when possible in mapping iteration order."""
         resolved_items = []
         for device, value in items.items():
             resolved = self.resolve_device(device) if isinstance(device, str) else device
             if resolved.area == "FR":
                 _raise_generic_fr_write_error()
             resolved_items.append((resolved, value))
-        for resolved, value in resolved_items:
-            self._write_resolved_device(resolved, value)
+        if not resolved_items:
+            return
+        self._write_runs(
+            [resolved for resolved, _ in resolved_items],
+            [value for _, value in resolved_items],
+            split_pc10=True,
+        )
 
     def read_dword(self, device: int | str | ResolvedDevice) -> int:
         """Read one 32-bit value from two consecutive word devices."""
@@ -1549,7 +1651,13 @@ class ToyopucDeviceClient(ToyopucClient):
             no = _require(devices[0].no, "no")
             addr = _require(devices[0].addr, "addr")
             return self.read_ext_words(no, addr, len(devices))
-        return [int(self._read_resolved_device(d)) for d in devices]
+        return unpack_u16_le(
+            self.read_ext_multi(
+                [],
+                [],
+                [(_require(d.no, "no"), _require(d.addr, "addr")) for d in devices],
+            )
+        )[: len(devices)]
 
     def _read_ext_byte_batch(self, devices: list[ResolvedDevice]) -> list[int]:
         no0 = devices[0].no
@@ -1557,19 +1665,40 @@ class ToyopucDeviceClient(ToyopucClient):
             addrs = [_require(d.addr, "addr") for d in devices]
             if all(a == addrs[0] + i for i, a in enumerate(addrs)):
                 return list(self.read_ext_bytes(no0, addrs[0], len(devices)))
-        return [int(self._read_resolved_device(d)) for d in devices]
+        return list(
+            self.read_ext_multi(
+                [],
+                [(_require(d.no, "no"), _require(d.addr, "addr")) for d in devices],
+                [],
+            )[: len(devices)]
+        )
 
     def _read_ext_bit_batch(self, devices: list[ResolvedDevice]) -> list[bool]:
         bits = [(_require(d.no, "no"), _require(d.bit_no, "bit_no"), _require(d.addr, "addr")) for d in devices]
         data = self.read_ext_multi(bits, [], [])
-        return [bool(v & 0x01) for v in data]
+        return [bool(v) for v in _parse_ext_multi_bit_data(data, len(devices))]
+
+    def _read_pc10_word_batch_by_segments(self, devices: list[ResolvedDevice]) -> list[int]:
+        values: list[int] = []
+        segment_start = 0
+        while segment_start < len(devices):
+            segment_len = _pc10_word_segment_length(devices, segment_start)
+            start_addr = _require(devices[segment_start].addr32, "pc10 addr32")
+            words = unpack_u16_le(self.pc10_block_read(start_addr, segment_len * 2))
+            if len(words) < segment_len:
+                raise ToyopucProtocolError("PC10 block-read response too short")
+            values.extend(words[:segment_len])
+            segment_start += segment_len
+        return values
 
     def _read_pc10_word_batch(self, devices: list[ResolvedDevice]) -> list[int]:
         if _is_consecutive_pc10_word(devices):
             addr32 = _require(devices[0].addr32, "pc10 addr32")
             raw = self.pc10_block_read(addr32, len(devices) * 2)
             return [int.from_bytes(raw[i * 2 : i * 2 + 2], "little") for i in range(len(devices))]
-        return [_read_pc10_block_word(self, _require(d.addr32, "pc10 addr32")) for d in devices]
+        if _contains_packed_pc10_word_device(devices):
+            return self._read_pc10_word_batch_by_segments(devices)
+        return _read_pc10_multi_words(self, [_require(d.addr32, "pc10 addr32") for d in devices])
 
     def _read_pc10_byte_batch(self, devices: list[ResolvedDevice]) -> list[int]:
         addrs32 = [_require(d.addr32, "pc10 addr32") for d in devices]
@@ -1603,8 +1732,7 @@ class ToyopucDeviceClient(ToyopucClient):
     def _read_runs(self, devices: list[ResolvedDevice], split_pc10: bool) -> list[Any]:
         results: list[Any] = [None] * len(devices)
         idx = 0
-        while idx < len(devices):
-            run = _batch_run_length(devices, idx, split_pc10)
+        for run in self._get_run_plan(devices, split_pc10):
             batch = self._read_batch(devices[idx : idx + run])
             for j, v in enumerate(batch):
                 results[idx + j] = v
@@ -1622,7 +1750,22 @@ class ToyopucDeviceClient(ToyopucClient):
             if resp.cmd != 0x1C:
                 raise ToyopucProtocolError("Unexpected CMD in relay word-read response")
             return unpack_u16_le(resp.data)[: len(devices)]
-        return [int(self._relay_read_resolved_device(hops, d)) for d in devices]
+        resp = self.send_via_relay(hops, build_multi_word_read([_require(d.basic_addr, "basic_addr") for d in devices]))
+        if resp.cmd != 0x22:
+            raise ToyopucProtocolError("Unexpected CMD in relay multi-word-read response")
+        return unpack_u16_le(resp.data)[: len(devices)]
+
+    def _relay_read_basic_byte_batch(self, hops: Any, devices: list[ResolvedDevice]) -> list[int]:
+        addrs = [_require(d.basic_addr, "basic_addr") for d in devices]
+        if _is_consecutive_basic(devices):
+            resp = self.send_via_relay(hops, build_byte_read(addrs[0], len(devices)))
+            if resp.cmd != 0x1E:
+                raise ToyopucProtocolError("Unexpected CMD in relay byte-read response")
+            return list(resp.data[: len(devices)])
+        resp = self.send_via_relay(hops, build_multi_byte_read(addrs))
+        if resp.cmd != 0x24:
+            raise ToyopucProtocolError("Unexpected CMD in relay multi-byte-read response")
+        return list(resp.data[: len(devices)])
 
     def _relay_read_ext_word_batch(self, hops: Any, devices: list[ResolvedDevice]) -> list[int]:
         if _is_consecutive_ext_word(devices):
@@ -1632,23 +1775,79 @@ class ToyopucDeviceClient(ToyopucClient):
             if resp.cmd != 0x94:
                 raise ToyopucProtocolError("Unexpected CMD in relay ext-word-read response")
             return unpack_u16_le(resp.data)[: len(devices)]
-        return [int(self._relay_read_resolved_device(hops, d)) for d in devices]
+        resp = self.send_via_relay(
+            hops,
+            build_ext_multi_read(
+                [],
+                [],
+                [(_require(d.no, "no"), _require(d.addr, "addr")) for d in devices],
+            ),
+        )
+        if resp.cmd != 0x98:
+            raise ToyopucProtocolError("Unexpected CMD in relay ext multi-read response")
+        return unpack_u16_le(resp.data)[: len(devices)]
+
+    def _relay_read_ext_byte_batch(self, hops: Any, devices: list[ResolvedDevice]) -> list[int]:
+        no0 = devices[0].no
+        if no0 is not None and all(d.no == no0 for d in devices):
+            addrs = [_require(d.addr, "addr") for d in devices]
+            if all(a == addrs[0] + i for i, a in enumerate(addrs)):
+                resp = self.send_via_relay(hops, build_ext_byte_read(no0, addrs[0], len(devices)))
+                if resp.cmd != 0x96:
+                    raise ToyopucProtocolError("Unexpected CMD in relay ext byte-read response")
+                return list(resp.data[: len(devices)])
+        resp = self.send_via_relay(
+            hops,
+            build_ext_multi_read(
+                [],
+                [(_require(d.no, "no"), _require(d.addr, "addr")) for d in devices],
+                [],
+            ),
+        )
+        if resp.cmd != 0x98:
+            raise ToyopucProtocolError("Unexpected CMD in relay ext multi-read response")
+        return list(resp.data[: len(devices)])
 
     def _relay_read_ext_bit_batch(self, hops: Any, devices: list[ResolvedDevice]) -> list[bool]:
         bits = [(_require(d.no, "no"), _require(d.bit_no, "bit_no"), _require(d.addr, "addr")) for d in devices]
         resp = self.send_via_relay(hops, build_ext_multi_read(bits, [], []))
         if resp.cmd != 0x98:
             raise ToyopucProtocolError("Unexpected CMD in relay ext-multi-read response")
-        return [bool(resp.data[i] & 0x01) for i in range(len(devices))]
+        return [bool(v) for v in _parse_ext_multi_bit_data(resp.data, len(devices))]
+
+    def _relay_read_pc10_word_batch_by_segments(self, hops: Any, devices: list[ResolvedDevice]) -> list[int]:
+        values: list[int] = []
+        segment_start = 0
+        while segment_start < len(devices):
+            segment_len = _pc10_word_segment_length(devices, segment_start)
+            start_addr = _require(devices[segment_start].addr32, "pc10 addr32")
+            resp = self.send_via_relay(hops, build_pc10_block_read(start_addr, segment_len * 2))
+            if resp.cmd != 0xC2:
+                raise ToyopucProtocolError("Unexpected CMD in relay PC10 block-read response")
+            words = unpack_u16_le(resp.data)
+            if len(words) < segment_len:
+                raise ToyopucProtocolError("PC10 block-read response too short")
+            values.extend(words[:segment_len])
+            segment_start += segment_len
+        return values
 
     def _relay_read_pc10_word_batch(self, hops: Any, devices: list[ResolvedDevice]) -> list[int]:
         if _is_consecutive_pc10_word(devices):
             addr32 = _require(devices[0].addr32, "pc10 addr32")
             resp = self.send_via_relay(hops, build_pc10_block_read(addr32, len(devices) * 2))
-            if resp.cmd != 0xC0:
+            if resp.cmd != 0xC2:
                 raise ToyopucProtocolError("Unexpected CMD in relay PC10 block-read response")
             return [int.from_bytes(resp.data[i * 2 : i * 2 + 2], "little") for i in range(len(devices))]
-        return [int(self._relay_read_resolved_device(hops, d)) for d in devices]
+        if _contains_packed_pc10_word_device(devices):
+            return self._relay_read_pc10_word_batch_by_segments(hops, devices)
+        payload = _build_pc10_multi_word_read_payload([_require(d.addr32, "pc10 addr32") for d in devices])
+        resp = self.send_via_relay(
+            hops,
+            build_pc10_multi_read(payload),
+        )
+        if resp.cmd != 0xC4:
+            raise ToyopucProtocolError("Unexpected CMD in relay PC10 multi-read response")
+        return _parse_pc10_multi_word_data(resp.data, len(devices))
 
     def _relay_read_pc10_bit_batch(self, hops: Any, devices: list[ResolvedDevice]) -> list[bool]:
         addrs32 = [_require(d.addr32, "pc10 addr32") for d in devices]
@@ -1661,27 +1860,41 @@ class ToyopucDeviceClient(ToyopucClient):
         bit_data = resp.data[4:]
         return [bool((bit_data[i // 8] >> (i % 8)) & 0x01) for i in range(len(devices))]
 
+    def _relay_read_pc10_byte_batch(self, hops: Any, devices: list[ResolvedDevice]) -> list[int]:
+        addrs32 = [_require(d.addr32, "pc10 addr32") for d in devices]
+        if all(a == addrs32[0] + i for i, a in enumerate(addrs32)):
+            resp = self.send_via_relay(hops, build_pc10_block_read(addrs32[0], len(devices)))
+            if resp.cmd != 0xC2:
+                raise ToyopucProtocolError("Unexpected CMD in relay PC10 block-read response")
+            return list(resp.data[: len(devices)])
+        return [int(self._relay_read_resolved_device(hops, d)) for d in devices]
+
     def _relay_read_batch(self, hops: Any, devices: list[ResolvedDevice]) -> list[Any]:
         if not devices:
             return []
         key = _batch_key(devices[0])
         if key == "basic-word":
             return self._relay_read_basic_word_batch(hops, devices)
+        if key == "basic-byte":
+            return self._relay_read_basic_byte_batch(hops, devices)
         if key == "ext-word":
             return self._relay_read_ext_word_batch(hops, devices)
+        if key == "ext-byte":
+            return self._relay_read_ext_byte_batch(hops, devices)
         if key == "ext-bit":
             return self._relay_read_ext_bit_batch(hops, devices)
         if key == "pc10-word":
             return self._relay_read_pc10_word_batch(hops, devices)
         if key == "pc10-bit":
             return self._relay_read_pc10_bit_batch(hops, devices)
+        if key == "pc10-byte":
+            return self._relay_read_pc10_byte_batch(hops, devices)
         return [self._relay_read_resolved_device(hops, d) for d in devices]
 
     def _relay_read_runs(self, hops: Any, devices: list[ResolvedDevice], split_pc10: bool) -> list[Any]:
         results: list[Any] = [None] * len(devices)
         idx = 0
-        while idx < len(devices):
-            run = _batch_run_length(devices, idx, split_pc10)
+        for run in self._get_run_plan(devices, split_pc10):
             batch = self._relay_read_batch(hops, devices[idx : idx + run])
             for j, v in enumerate(batch):
                 results[idx + j] = v
@@ -1699,14 +1912,72 @@ class ToyopucDeviceClient(ToyopucClient):
         else:
             self.write_words_multi(list(zip(addrs, values, strict=False)))
 
+    def _write_basic_byte_batch(self, devices: list[ResolvedDevice], values: list[int]) -> None:
+        self.write_bytes_multi(
+            [(_require(d.basic_addr, "basic_addr"), v & 0xFF) for d, v in zip(devices, values, strict=False)]
+        )
+
     def _write_ext_word_batch(self, devices: list[ResolvedDevice], values: list[int]) -> None:
         if _is_consecutive_ext_word(devices):
             no = _require(devices[0].no, "no")
             addr = _require(devices[0].addr, "addr")
             self.write_ext_words(no, addr, values)
         else:
-            for d, v in zip(devices, values, strict=False):
-                self._write_resolved_device(d, v)
+            self.write_ext_multi(
+                [],
+                [],
+                [(_require(d.no, "no"), _require(d.addr, "addr"), v) for d, v in zip(devices, values, strict=False)],
+            )
+
+    def _write_ext_byte_batch(self, devices: list[ResolvedDevice], values: list[int]) -> None:
+        no0 = devices[0].no
+        if no0 is not None and all(d.no == no0 for d in devices):
+            addrs = [_require(d.addr, "addr") for d in devices]
+            if all(a == addrs[0] + i for i, a in enumerate(addrs)):
+                self.write_ext_bytes(no0, addrs[0], values)
+                return
+        self.write_ext_multi(
+            [],
+            [(_require(d.no, "no"), _require(d.addr, "addr"), v) for d, v in zip(devices, values, strict=False)],
+            [],
+        )
+
+    def _write_ext_bit_batch(self, devices: list[ResolvedDevice], values: list[int]) -> None:
+        self.write_ext_multi(
+            [
+                (_require(d.no, "no"), _require(d.bit_no, "bit_no"), _require(d.addr, "addr"), v & 0x01)
+                for d, v in zip(devices, values, strict=False)
+            ],
+            [],
+            [],
+        )
+
+    def _write_pc10_word_batch(self, devices: list[ResolvedDevice], values: list[int]) -> None:
+        if _is_consecutive_pc10_word(devices):
+            addr32 = _require(devices[0].addr32, "pc10 addr32")
+            data = b"".join((int(v) & 0xFFFF).to_bytes(2, "little") for v in values)
+            self.pc10_block_write(addr32, data)
+            return
+        self.pc10_multi_write(
+            _pack_pc10_multi_word_payload(
+                [(_require(d.addr32, "pc10 addr32"), v) for d, v in zip(devices, values, strict=False)]
+            )
+        )
+
+    def _write_pc10_bit_batch(self, devices: list[ResolvedDevice], values: list[int]) -> None:
+        self.pc10_multi_write(
+            _pack_pc10_multi_bit_payload(
+                [(_require(d.addr32, "pc10 addr32"), v & 0x01) for d, v in zip(devices, values, strict=False)]
+            )
+        )
+
+    def _write_pc10_byte_batch(self, devices: list[ResolvedDevice], values: list[int]) -> None:
+        addrs32 = [_require(d.addr32, "pc10 addr32") for d in devices]
+        if all(a == addrs32[0] + i for i, a in enumerate(addrs32)):
+            self.pc10_block_write(addrs32[0], bytes(v & 0xFF for v in values))
+            return
+        for d, v in zip(devices, values, strict=False):
+            self._write_resolved_device(d, v)
 
     def _write_batch(self, devices: list[ResolvedDevice], values: list[Any]) -> None:
         if not devices:
@@ -1715,16 +1986,33 @@ class ToyopucDeviceClient(ToyopucClient):
         if key == "basic-word":
             self._write_basic_word_batch(devices, [int(v) & 0xFFFF for v in values])
             return
+        if key == "basic-byte":
+            self._write_basic_byte_batch(devices, [int(v) & 0xFF for v in values])
+            return
         if key == "ext-word":
             self._write_ext_word_batch(devices, [int(v) & 0xFFFF for v in values])
+            return
+        if key == "ext-byte":
+            self._write_ext_byte_batch(devices, [int(v) & 0xFF for v in values])
+            return
+        if key == "ext-bit":
+            self._write_ext_bit_batch(devices, [int(v) & 0x01 for v in values])
+            return
+        if key == "pc10-word":
+            self._write_pc10_word_batch(devices, [int(v) & 0xFFFF for v in values])
+            return
+        if key == "pc10-bit":
+            self._write_pc10_bit_batch(devices, [int(v) & 0x01 for v in values])
+            return
+        if key == "pc10-byte":
+            self._write_pc10_byte_batch(devices, [int(v) & 0xFF for v in values])
             return
         for d, v in zip(devices, values, strict=False):
             self._write_resolved_device(d, v)
 
     def _write_runs(self, devices: list[ResolvedDevice], values: list[Any], split_pc10: bool) -> None:
         idx = 0
-        while idx < len(devices):
-            run = _batch_run_length(devices, idx, split_pc10)
+        for run in self._get_run_plan(devices, split_pc10):
             self._write_batch(devices[idx : idx + run], values[idx : idx + run])
             idx += run
 
@@ -1734,9 +2022,124 @@ class ToyopucDeviceClient(ToyopucClient):
             resp = self.send_via_relay(hops, build_word_write(start, values))
             if resp.cmd != 0x1D:
                 raise ToyopucProtocolError("Unexpected CMD in relay word-write response")
-        else:
-            for d, v in zip(devices, values, strict=False):
-                self._relay_write_resolved_device(hops, d, v)
+            return
+        resp = self.send_via_relay(
+            hops,
+            build_multi_word_write(
+                [(_require(d.basic_addr, "basic_addr"), v) for d, v in zip(devices, values, strict=False)]
+            ),
+        )
+        if resp.cmd != 0x23:
+            raise ToyopucProtocolError("Unexpected CMD in relay multi-word-write response")
+
+    def _relay_write_basic_byte_batch(self, hops: Any, devices: list[ResolvedDevice], values: list[int]) -> None:
+        addrs = [_require(d.basic_addr, "basic_addr") for d in devices]
+        if _is_consecutive_basic(devices):
+            resp = self.send_via_relay(hops, build_byte_write(addrs[0], values))
+            if resp.cmd != 0x1F:
+                raise ToyopucProtocolError("Unexpected CMD in relay byte-write response")
+            return
+        resp = self.send_via_relay(
+            hops,
+            build_multi_byte_write(list(zip(addrs, values, strict=False))),
+        )
+        if resp.cmd != 0x25:
+            raise ToyopucProtocolError("Unexpected CMD in relay multi-byte-write response")
+
+    def _relay_write_ext_word_batch(self, hops: Any, devices: list[ResolvedDevice], values: list[int]) -> None:
+        if _is_consecutive_ext_word(devices):
+            no = _require(devices[0].no, "no")
+            addr = _require(devices[0].addr, "addr")
+            resp = self.send_via_relay(hops, build_ext_word_write(no, addr, values))
+            if resp.cmd != 0x95:
+                raise ToyopucProtocolError("Unexpected CMD in relay ext word-write response")
+            return
+        resp = self.send_via_relay(
+            hops,
+            build_ext_multi_write(
+                [],
+                [],
+                [(_require(d.no, "no"), _require(d.addr, "addr"), v) for d, v in zip(devices, values, strict=False)],
+            ),
+        )
+        if resp.cmd != 0x99:
+            raise ToyopucProtocolError("Unexpected CMD in relay ext multi-write response")
+
+    def _relay_write_ext_byte_batch(self, hops: Any, devices: list[ResolvedDevice], values: list[int]) -> None:
+        no0 = devices[0].no
+        if no0 is not None and all(d.no == no0 for d in devices):
+            addrs = [_require(d.addr, "addr") for d in devices]
+            if all(a == addrs[0] + i for i, a in enumerate(addrs)):
+                resp = self.send_via_relay(hops, build_ext_byte_write(no0, addrs[0], values))
+                if resp.cmd != 0x97:
+                    raise ToyopucProtocolError("Unexpected CMD in relay ext byte-write response")
+                return
+        resp = self.send_via_relay(
+            hops,
+            build_ext_multi_write(
+                [],
+                [(_require(d.no, "no"), _require(d.addr, "addr"), v) for d, v in zip(devices, values, strict=False)],
+                [],
+            ),
+        )
+        if resp.cmd != 0x99:
+            raise ToyopucProtocolError("Unexpected CMD in relay ext multi-write response")
+
+    def _relay_write_ext_bit_batch(self, hops: Any, devices: list[ResolvedDevice], values: list[int]) -> None:
+        resp = self.send_via_relay(
+            hops,
+            build_ext_multi_write(
+                [
+                    (_require(d.no, "no"), _require(d.bit_no, "bit_no"), _require(d.addr, "addr"), v & 0x01)
+                    for d, v in zip(devices, values, strict=False)
+                ],
+                [],
+                [],
+            ),
+        )
+        if resp.cmd != 0x99:
+            raise ToyopucProtocolError("Unexpected CMD in relay ext multi-write response")
+
+    def _relay_write_pc10_word_batch(self, hops: Any, devices: list[ResolvedDevice], values: list[int]) -> None:
+        if _is_consecutive_pc10_word(devices):
+            addr32 = _require(devices[0].addr32, "pc10 addr32")
+            data = b"".join((int(v) & 0xFFFF).to_bytes(2, "little") for v in values)
+            resp = self.send_via_relay(hops, build_pc10_block_write(addr32, data))
+            if resp.cmd != 0xC3:
+                raise ToyopucProtocolError("Unexpected CMD in relay PC10 block-write response")
+            return
+        resp = self.send_via_relay(
+            hops,
+            build_pc10_multi_write(
+                _pack_pc10_multi_word_payload(
+                    [(_require(d.addr32, "pc10 addr32"), v) for d, v in zip(devices, values, strict=False)]
+                )
+            ),
+        )
+        if resp.cmd != 0xC5:
+            raise ToyopucProtocolError("Unexpected CMD in relay PC10 multi-write response")
+
+    def _relay_write_pc10_bit_batch(self, hops: Any, devices: list[ResolvedDevice], values: list[int]) -> None:
+        resp = self.send_via_relay(
+            hops,
+            build_pc10_multi_write(
+                _pack_pc10_multi_bit_payload(
+                    [(_require(d.addr32, "pc10 addr32"), v & 0x01) for d, v in zip(devices, values, strict=False)]
+                )
+            ),
+        )
+        if resp.cmd != 0xC5:
+            raise ToyopucProtocolError("Unexpected CMD in relay PC10 multi-write response")
+
+    def _relay_write_pc10_byte_batch(self, hops: Any, devices: list[ResolvedDevice], values: list[int]) -> None:
+        addrs32 = [_require(d.addr32, "pc10 addr32") for d in devices]
+        if all(a == addrs32[0] + i for i, a in enumerate(addrs32)):
+            resp = self.send_via_relay(hops, build_pc10_block_write(addrs32[0], bytes(v & 0xFF for v in values)))
+            if resp.cmd != 0xC3:
+                raise ToyopucProtocolError("Unexpected CMD in relay PC10 block-write response")
+            return
+        for d, v in zip(devices, values, strict=False):
+            self._relay_write_resolved_device(hops, d, v)
 
     def _relay_write_batch(self, hops: Any, devices: list[ResolvedDevice], values: list[Any]) -> None:
         if not devices:
@@ -1745,12 +2148,32 @@ class ToyopucDeviceClient(ToyopucClient):
         if key == "basic-word":
             self._relay_write_basic_word_batch(hops, devices, [int(v) & 0xFFFF for v in values])
             return
+        if key == "basic-byte":
+            self._relay_write_basic_byte_batch(hops, devices, [int(v) & 0xFF for v in values])
+            return
+        if key == "ext-word":
+            self._relay_write_ext_word_batch(hops, devices, [int(v) & 0xFFFF for v in values])
+            return
+        if key == "ext-byte":
+            self._relay_write_ext_byte_batch(hops, devices, [int(v) & 0xFF for v in values])
+            return
+        if key == "ext-bit":
+            self._relay_write_ext_bit_batch(hops, devices, [int(v) & 0x01 for v in values])
+            return
+        if key == "pc10-word":
+            self._relay_write_pc10_word_batch(hops, devices, [int(v) & 0xFFFF for v in values])
+            return
+        if key == "pc10-bit":
+            self._relay_write_pc10_bit_batch(hops, devices, [int(v) & 0x01 for v in values])
+            return
+        if key == "pc10-byte":
+            self._relay_write_pc10_byte_batch(hops, devices, [int(v) & 0xFF for v in values])
+            return
         for d, v in zip(devices, values, strict=False):
             self._relay_write_resolved_device(hops, d, v)
 
     def _relay_write_runs(self, hops: Any, devices: list[ResolvedDevice], values: list[Any], split_pc10: bool) -> None:
         idx = 0
-        while idx < len(devices):
-            run = _batch_run_length(devices, idx, split_pc10)
+        for run in self._get_run_plan(devices, split_pc10):
             self._relay_write_batch(hops, devices[idx : idx + run], values[idx : idx + run])
             idx += run

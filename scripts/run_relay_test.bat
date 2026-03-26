@@ -61,7 +61,7 @@ if "%DEVICE%"=="" set "DEVICE=D0000"
 if "%COUNT%"=="" set "COUNT=1"
 
 if /I "%INNER%"=="raw" (
-  python -m tools.relay_test ^
+  python scripts\\relay_test.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -72,7 +72,7 @@ if /I "%INNER%"=="raw" (
     --inner %INNER% ^
     --raw-inner "%EXTRA%"
 ) else if /I "%INNER%"=="word-write" (
-  python -m tools.relay_test ^
+  python scripts\\relay_test.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -85,7 +85,7 @@ if /I "%INNER%"=="raw" (
     --count %COUNT% ^
     --value %EXTRA%
 ) else if /I "%INNER%"=="clock-write" (
-  python -m tools.relay_test ^
+  python scripts\\relay_test.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -96,7 +96,7 @@ if /I "%INNER%"=="raw" (
     --inner %INNER% ^
     --clock-value "%DEVICE%"
 ) else (
-  python -m tools.relay_test ^
+  python scripts\\relay_test.py ^
     --host %HOST% ^
     --port %PORT% ^
     --protocol %PROTOCOL% ^
@@ -113,23 +113,23 @@ exit /b %errorlevel%
 
 :usage
 echo Usage:
-echo   tools\run_relay_test.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [HOPS] [INNER] [DEVICE] [COUNT] [EXTRA]
+echo   scripts\\run_relay_test.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [HOPS] [INNER] [DEVICE] [COUNT] [EXTRA]
 echo.
 echo CPU status example ^(UDP^):
-echo   tools\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 cpu-status
+echo   scripts\\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 cpu-status
 echo.
 echo CPU status A0 example ^(UDP^):
-echo   tools\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 cpu-status-a0
+echo   scripts\\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 cpu-status-a0
 echo.
 echo Clock write example ^(UDP^):
-echo   tools\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 clock-write 2026-03-10T15:00:00
+echo   scripts\\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 clock-write 2026-03-10T15:00:00
 echo.
 echo Word read example ^(UDP^):
-echo   tools\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 word-read D0000 1
+echo   scripts\\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 word-read D0000 1
 echo.
 echo Word write example ^(UDP^):
-echo   tools\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 word-write D0000 1 0x1234
+echo   scripts\\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 word-write D0000 1 0x1234
 echo.
 echo Raw inner example ^(UDP^):
-echo   tools\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 raw D0000 1 "00 00 03 00 32 11 00"
+echo   scripts\\run_relay_test.bat 192.168.250.100 1027 udp 12000 5 2 P1-L2:N2 raw D0000 1 "00 00 03 00 32 11 00"
 exit /b 2

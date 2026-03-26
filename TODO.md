@@ -7,10 +7,10 @@ This file tracks the remaining tasks and known issues for the Toyopuc Computer L
 - [ ] **Addressing Matrix**: Convert the current probe knowledge into a maintained device/profile matrix that is easy to review before releases.
 
 ## 2. Testing and Validation
-- [ ] **Regression Automation**: Promote the current `scripts/` probes into a repeatable regression workflow with clear pass/fail outputs.
+- [x] **Regression Automation**: Promoted the current `scripts/` probes into `run_ci.bat` with simulator-backed smoke coverage and explicit pass/fail handling.
 
 ## 3. Documentation and Quality
 - [x] **Naming Sweep**: Audit the remaining docs and maintainer notes for stale wording after the `ToyopucDeviceClient` rename.
-- [ ] **Static Analysis Scope**: Decide the target `ruff` / `mypy` coverage for package code versus scripts and samples, then close the gap.
+- [x] **Static Analysis Scope**: Keep `mypy` focused on `toyopuc/`, run `ruff` across `toyopuc/tests/scripts/samples`, and compile-check `scripts/` plus `samples/` in CI.
 
 

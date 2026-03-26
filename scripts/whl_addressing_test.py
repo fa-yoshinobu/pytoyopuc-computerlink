@@ -1,5 +1,6 @@
 import argparse
 import random
+import re
 from collections.abc import Callable
 
 from toyopuc import ToyopucDeviceClient, ToyopucError, resolve_device
@@ -107,9 +108,11 @@ def _bit_area_for_packed_byte(byte_addr: str) -> tuple[str, int]:
     if "-" in text:
         prefix, body = text.split("-", 1)
         prefix = prefix + "-"
-    area = body[:-5]
-    index = int(body[-5:-1], 16)
-    suffix = body[-1]
+    match = re.fullmatch(r"([A-Z]+)([0-9A-F]+)([LH])", body)
+    if not match:
+        raise ValueError(f"invalid packed byte address: {byte_addr!r}")
+    area, index_text, suffix = match.groups()
+    index = int(index_text, 16)
     bit_start = index * 0x10 + (8 if suffix == "H" else 0)
     return f"{prefix}{area}{bit_start:04X}", bit_start
 
@@ -150,26 +153,26 @@ def main() -> int:
     error_cases = 0
 
     cases: list[tuple[str, Callable[[ToyopucDeviceClient], tuple[int, int]]]] = [
-        ("W/H/L word/basic", lambda plc: _single_word_case(plc, "M0010W", rng, log_f)),
+        ("W/H/L word/profile-bound P1", lambda plc: _single_word_case(plc, "P1-M010W", rng, log_f)),
         (
-            "W/H/L byte/basic low",
-            lambda plc: _single_byte_case(plc, "X0010L", rng, log_f),
-        ),
-        (
-            "W/H/L byte/basic high",
-            lambda plc: _single_byte_case(plc, "X0010H", rng, log_f),
-        ),
-        (
-            "W/H/L word/prefixed",
-            lambda plc: _single_word_case(plc, "P1-M0010W", rng, log_f),
-        ),
-        (
-            "W/H/L byte/prefixed low",
+            "W/H/L byte/profile-bound P1 low",
             lambda plc: _single_byte_case(plc, "P1-X0010L", rng, log_f),
         ),
         (
-            "W/H/L byte/prefixed high",
+            "W/H/L byte/profile-bound P1 high",
             lambda plc: _single_byte_case(plc, "P1-X0010H", rng, log_f),
+        ),
+        (
+            "W/H/L word/profile-bound P2",
+            lambda plc: _single_word_case(plc, "P2-M010W", rng, log_f),
+        ),
+        (
+            "W/H/L byte/profile-bound P2 low",
+            lambda plc: _single_byte_case(plc, "P2-X0010L", rng, log_f),
+        ),
+        (
+            "W/H/L byte/profile-bound P2 high",
+            lambda plc: _single_byte_case(plc, "P2-X0010H", rng, log_f),
         ),
         (
             "W/H/L word/extended",
@@ -193,32 +196,32 @@ def main() -> int:
             lambda plc: _single_byte_case(plc, "GX0010H", rng, log_f),
         ),
         (
-            "W/H/L word-byte relation basic",
-            lambda plc: _paired_word_byte_case(plc, "M0010W", "M0010L", "M0010H", rng, log_f),
+            "W/H/L word-byte relation profile-bound P1",
+            lambda plc: _paired_word_byte_case(plc, "P1-M010W", "P1-M010L", "P1-M010H", rng, log_f),
         ),
         (
-            "W/H/L word-byte relation prefixed",
-            lambda plc: _paired_word_byte_case(plc, "P1-M0010W", "P1-M0010L", "P1-M0010H", rng, log_f),
+            "W/H/L word-byte relation profile-bound P2",
+            lambda plc: _paired_word_byte_case(plc, "P2-M010W", "P2-M010L", "P2-M010H", rng, log_f),
         ),
         (
             "W/H/L word-byte relation extended",
             lambda plc: _paired_word_byte_case(plc, "EX0010W", "EX0010L", "EX0010H", rng, log_f),
         ),
         (
-            "W/H/L byte->bits basic low",
-            lambda plc: _byte_to_bits_case(plc, "M0010L", rng, log_f),
+            "W/H/L byte->bits profile-bound P1 low",
+            lambda plc: _byte_to_bits_case(plc, "P1-M010L", rng, log_f),
         ),
         (
-            "W/H/L byte->bits basic high",
-            lambda plc: _byte_to_bits_case(plc, "M0010H", rng, log_f),
+            "W/H/L byte->bits profile-bound P1 high",
+            lambda plc: _byte_to_bits_case(plc, "P1-M010H", rng, log_f),
         ),
         (
-            "W/H/L byte->bits prefixed low",
-            lambda plc: _byte_to_bits_case(plc, "P1-M0010L", rng, log_f),
+            "W/H/L byte->bits profile-bound P2 low",
+            lambda plc: _byte_to_bits_case(plc, "P2-M010L", rng, log_f),
         ),
         (
-            "W/H/L byte->bits prefixed high",
-            lambda plc: _byte_to_bits_case(plc, "P1-M0010H", rng, log_f),
+            "W/H/L byte->bits profile-bound P2 high",
+            lambda plc: _byte_to_bits_case(plc, "P2-M010H", rng, log_f),
         ),
         (
             "W/H/L byte->bits extended low",
@@ -241,7 +244,7 @@ def main() -> int:
     with ToyopucDeviceClient(
         args.host,
         args.port,
-        protocol=args.protocol,
+        transport=args.protocol,
         local_port=args.local_port,
         timeout=args.timeout,
         retries=args.retries,

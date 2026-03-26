@@ -18,7 +18,7 @@ if "%RETRIES%"=="" set "RETRIES=0"
 if "%PC10_BLOCK_WORDS%"=="" set "PC10_BLOCK_WORDS=0x200"
 if "%LOCAL_PORT%"=="" set "LOCAL_PORT=0"
 
-python -m tools.auto_rw_test ^
+python scripts\\auto_rw_test.py ^
   --host %HOST% ^
   --port %PORT% ^
   --local-port %LOCAL_PORT% ^
@@ -33,5 +33,5 @@ exit /b %errorlevel%
 
 :usage
 echo Usage:
-echo   tools\run_block_test.bat ^<HOST^> ^<PORT^> [PROTOCOL] [TIMEOUT] [RETRIES] [PC10_BLOCK_WORDS] [LOCAL_PORT]
+echo   scripts\\run_block_test.bat ^<HOST^> ^<PORT^> [PROTOCOL] [TIMEOUT] [RETRIES] [PC10_BLOCK_WORDS] [LOCAL_PORT]
 exit /b 2

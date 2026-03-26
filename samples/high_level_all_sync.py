@@ -36,6 +36,12 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description="TOYOPUC Computer Link synchronous high-level API sample",
         formatter_class=argparse.RawTextHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python samples/high_level_all_sync.py --host 192.168.250.100 --port 1025\n"
+            "  python samples/high_level_all_sync.py --host 192.168.250.100 --transport udp --port 1027\n"
+            "  python samples/high_level_all_sync.py --host 192.168.250.100 --timeout 5 --retries 2 --retry-delay 0.5\n"
+        ),
     )
     p.add_argument("--host", required=True, help="PLC IP address or hostname")
     p.add_argument(
@@ -79,7 +85,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    # ToyopucDeviceClient / ToyopucClient constructor options:
+    # ToyopucDeviceClient constructor options:
     #   host        - TOYOPUC PLC IP / hostname
     #   port        - Computer Link port (set in TOYOPUC network parameters;
     #                 default is 1025)
@@ -99,6 +105,7 @@ def main() -> None:
         retry_delay=args.retry_delay,
     ) as plc:
         print(f"Connected to {args.host}:{args.port} via {args.transport}")
+        print("scenario: full synchronous high-level cookbook")
 
         # ---------------------------------------------------------------
         # 1. read / write - single device

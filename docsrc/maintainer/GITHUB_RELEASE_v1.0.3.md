@@ -24,14 +24,14 @@ Documentation and repository-link refresh release.
 
 ## Verification
 
-- `tools\build_api_docs.bat` -> passed
+- `scripts\build_api_docs.bat` -> passed
 - `python -m build` -> passed
 - `python -m twine check dist/*` -> passed
 
 ## Included Documents
 
 - `README.md`
-- `docsrc/RELEASE.md`
+- `docsrc/maintainer/RELEASE_PROCESS.md`
 - `docsrc/RELEASE_NOTES.md`
 - `docsrc/api/*`
 

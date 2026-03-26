@@ -37,7 +37,7 @@ if not "%~7"=="" if not "%ARG10%"=="" (
   )
 )
 
-python -m tools.fr_probe ^
+python scripts\\fr_probe.py ^
   --host %HOST% ^
   --port %PORT% ^
   --protocol %PROTOCOL% ^
@@ -51,12 +51,12 @@ exit /b %errorlevel%
 
 :usage
 echo Usage:
-echo   tools\run_fr_probe.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [INDEXES] [REGISTER_EXNOS]
+echo   scripts\\run_fr_probe.bat ^<HOST^> ^<PORT^> [PROTOCOL] [LOCAL_PORT] [TIMEOUT] [RETRIES] [INDEXES] [REGISTER_EXNOS]
 echo.
 echo Example ^(TCP^):
-echo   tools\run_fr_probe.bat 192.168.250.100 1025 tcp 0 5 0 "0x0,0x8000" "0x40,0x41"
+echo   scripts\\run_fr_probe.bat 192.168.250.100 1025 tcp 0 5 0 "0x0,0x8000" "0x40,0x41"
 echo.
 echo Example ^(UDP^):
-echo   tools\run_fr_probe.bat 192.168.250.100 1027 udp 12000 5 2 "0x0,0x8000" "0x40,0x41"
-echo   tools\run_fr_probe.bat 192.168.250.100 1027 udp 12000 5 2 0x0,0x8000 0x40,0x41
+echo   scripts\\run_fr_probe.bat 192.168.250.100 1027 udp 12000 5 2 "0x0,0x8000" "0x40,0x41"
+echo   scripts\\run_fr_probe.bat 192.168.250.100 1027 udp 12000 5 2 0x0,0x8000 0x40,0x41
 exit /b 2

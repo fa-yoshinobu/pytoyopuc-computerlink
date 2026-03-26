@@ -300,10 +300,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
+  <a href="#synchronous-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Basic Usage
+        Synchronous example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asynchronous-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asynchronous example
       
     </span>
   </a>
@@ -316,10 +327,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
+  <a href="#common-user-tasks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Documentation
+        Common user tasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#user-docs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User docs
       
     </span>
   </a>
@@ -339,21 +361,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#quality-checks" class="md-nav__link">
+  <a href="#local-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quality Checks
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#local-ci-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Local CI Run
+        Local checks
       
     </span>
   </a>
@@ -417,6 +428,33 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="user/MODEL_RANGES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model Ranges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
     
     
     
@@ -426,10 +464,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -447,8 +485,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -554,10 +592,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#basic-usage" class="md-nav__link">
+  <a href="#synchronous-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Basic Usage
+        Synchronous example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asynchronous-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asynchronous example
       
     </span>
   </a>
@@ -570,10 +619,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
+  <a href="#common-user-tasks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Documentation
+        Common user tasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#user-docs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User docs
       
     </span>
   </a>
@@ -593,21 +653,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#quality-checks" class="md-nav__link">
+  <a href="#local-checks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quality Checks
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#local-ci-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Local CI Run
+        Local checks
       
     </span>
   </a>
@@ -649,53 +698,88 @@
 
 <h1 id="toyopuc-computer-link-python">Toyopuc Computer Link Python</h1>
 <p><a href="https://www.python.org/downloads/"><img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11+-blue.svg" /></a>
-<a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a>
+<a href="https://github.com/fa-yoshinobu/plc-comm-computerlink-python/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a>
 <a href="https://github.com/astral-sh/ruff"><img alt="Static Analysis: Ruff" src="https://img.shields.io/badge/Lint-Ruff-black.svg" /></a></p>
-<p>A professional Python client library for JTEKT (Toyoda) TOYOPUC computer-link communication. Supporting TOYOPUC-Plus, Nano 10GX, and other compatible models.</p>
+<p>A user-focused Python library for JTEKT TOYOPUC Computer Link communication. The recommended entry points are the high-level <code>ToyopucDeviceClient</code> class and the async helper functions in <code>toyopuc</code>.</p>
 <h2 id="key-features">Key Features</h2>
 <ul>
-<li><strong>Vendor Focused</strong>: Tailored for JTEKT TOYOPUC protocol specifications.</li>
-<li><strong>High-Level API</strong>: Simplified <code>read</code> and <code>write</code> methods for bits and words.</li>
-<li><strong>Robustness</strong>: Built-in handling for Toyopuc-specific memory ranges and boundary behaviors.</li>
-<li><strong>CI-Ready</strong>: Automated quality checks and standalone CLI tool generation.</li>
+<li><strong>High-Level First</strong>: Read and write by device string such as <code>P1-D0000</code>, <code>P1-M0000</code>, <code>ES0000</code>, and <code>FR000000</code>.</li>
+<li><strong>Common Tasks Included</strong>: Batch reads, typed 32-bit / float access, bit-in-word updates, FR writes, relay access, and GUI monitoring.</li>
+<li><strong>Profile-Aware Addressing</strong>: Supports TOYOPUC-Plus, Nano 10GX, PC10G, and related profiles.</li>
+<li><strong>Practical Samples</strong>: Sync, async, UDP, FR, relay, clock/status, and GUI examples are included.</li>
 </ul>
 <h2 id="quick-start">Quick Start</h2>
 <h3 id="installation">Installation</h3>
 <pre><code class="language-bash">pip install toyopuc-computerlink
 </code></pre>
-<h3 id="basic-usage">Basic Usage</h3>
+<h3 id="synchronous-example">Synchronous example</h3>
 <pre><code class="language-python">from toyopuc import ToyopucDeviceClient
 
 with ToyopucDeviceClient(&quot;192.168.250.100&quot;, 1025) as client:
-    # Read D1000 (Word)
-    val = client.read(&quot;D1000&quot;)
-    print(f&quot;Value: {val}&quot;)
+    value = client.read(&quot;P1-D0000&quot;)
+    print(f&quot;P1-D0000 = {value}&quot;)
 
-    # Write to M0 (Bit)
-    client.write(&quot;M0&quot;, True)
+    client.write(&quot;P1-D0001&quot;, 1234)
+    client.write(&quot;P1-M0000&quot;, 1)
+
+    snapshot = client.read_many([&quot;P1-D0000&quot;, &quot;P1-D0001&quot;, &quot;P1-M0000&quot;])
+    print(snapshot)
 </code></pre>
-<h2 id="documentation">Documentation</h2>
-<p>Follows the workspace-wide hierarchical documentation policy:</p>
+<h3 id="asynchronous-example">Asynchronous example</h3>
+<pre><code class="language-python">import asyncio
+from toyopuc import open_and_connect, read_named, read_typed, write_typed
+
+async def main() -&gt; None:
+    async with await open_and_connect(&quot;192.168.250.100&quot;, 1025) as plc:
+        speed = await read_typed(plc, &quot;P1-D0100&quot;, &quot;F&quot;)
+        print(f&quot;speed = {speed}&quot;)
+
+        await write_typed(plc, &quot;P1-D0200&quot;, &quot;L&quot;, -500)
+
+        values = await read_named(plc, [&quot;P1-D0000&quot;, &quot;P1-D0100:F&quot;, &quot;P1-D0000.0&quot;])
+        print(values)
+
+asyncio.run(main())
+</code></pre>
+<p>Basic area families <code>P/K/V/T/C/L/X/Y/M/S/N/R/D</code> require a <code>P1-</code>, <code>P2-</code>, or <code>P3-</code> prefix when a profile is in use.</p>
+<h2 id="common-user-tasks">Common user tasks</h2>
 <ul>
-<li><a href="user/USER_GUIDE/"><strong>User Guide</strong></a>: Detailed usage and connection setup.</li>
-<li><a href="user/MODEL_RANGES/"><strong>Model Ranges</strong></a>: Supported device ranges for different Toyopuc models.</li>
-<li><a href="validation/reports/"><strong>QA Reports</strong></a>: Formal evidence of communication with real Toyopuc hardware.</li>
-<li><a href="maintainer/PROTOCOL_SPEC/"><strong>Protocol Spec</strong></a>: Internal technical details of the computer-link protocol.</li>
+<li>Read or write one device: <code>client.read("P1-D0000")</code>, <code>client.write("P1-M0000", 1)</code></li>
+<li>Read a mixed snapshot: <code>client.read_many([...])</code> or <code>await read_named(plc, [...])</code></li>
+<li>Read 32-bit or float values: <code>client.read_dword(...)</code>, <code>client.read_float32(...)</code>, <code>await read_typed(..., "D" / "L" / "F")</code></li>
+<li>Change one flag bit inside a word: <code>await write_bit_in_word(plc, "P1-D0100", bit_index=3, value=True)</code></li>
+<li>Read or write FR storage: <code>client.read_fr(...)</code>, <code>client.write_fr(..., commit=True)</code></li>
+<li>Work through relay: <code>samples/relay_basic.py</code></li>
+<li>Inspect clock and CPU status: <code>samples/clock_and_status.py</code></li>
 </ul>
+<h2 id="user-docs">User docs</h2>
+<ul>
+<li><a href="user/USER_GUIDE/"><strong>User Guide</strong></a>: Step-by-step high-level usage from connection to FR / relay workflows.</li>
+<li><a href="https://github.com/fa-yoshinobu/plc-comm-computerlink-python/blob/main/samples/README.md"><strong>Sample Guide</strong></a>: Sample programs grouped by task.</li>
+<li><a href="user/MODEL_RANGES/"><strong>Model Ranges</strong></a>: Supported device ranges for different Toyopuc models.</li>
+</ul>
+<p>Start with these sample programs:</p>
+<ul>
+<li><code>samples/high_level_minimal.py</code></li>
+<li><code>samples/high_level_basic.py</code></li>
+<li><code>samples/high_level_all_sync.py</code></li>
+<li><code>samples/high_level_all_async.py</code></li>
+<li><code>samples/high_level_udp.py</code></li>
+<li><code>samples/fr_basic.py</code></li>
+<li><code>samples/relay_basic.py</code></li>
+<li><code>samples/clock_and_status.py</code></li>
+</ul>
+<p>Maintainer-only protocol details remain under <code>docsrc/maintainer/</code>.</p>
 <h2 id="development-ci">Development &amp; CI</h2>
 <p>Quality is managed via <code>run_ci.bat</code>.</p>
-<h3 id="quality-checks">Quality Checks</h3>
-<ul>
-<li><strong>Linting &amp; Formatting</strong>: <a href="https://ruff.rs/">Ruff</a></li>
-<li><strong>Type Checking</strong>: <a href="http://mypy-lang.org/">Mypy</a></li>
-<li><strong>Unit Testing</strong>: Python <code>unittest</code></li>
-</ul>
-<h3 id="local-ci-run">Local CI Run</h3>
+<h3 id="local-checks">Local checks</h3>
 <pre><code class="language-bash">run_ci.bat
 </code></pre>
-<p>Validates the code and builds a standalone CLI tool in the <code>publish/</code> directory.</p>
+<p>For a release-style verification including docs:</p>
+<pre><code class="language-bash">release_check.bat
+</code></pre>
 <h2 id="license">License</h2>
-<p>Distributed under the <a href="LICENSE">MIT License</a>.</p>
+<p>Distributed under the <a href="https://github.com/fa-yoshinobu/plc-comm-computerlink-python/blob/main/LICENSE">MIT License</a>.</p>
 
 
 

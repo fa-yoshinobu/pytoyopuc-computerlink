@@ -263,6 +263,7 @@ class ToyopucClient:
         self._last_rx: bytes | None = None
         self._fr_wait_prefers_a0: bool | None = None
         self._relay_fr_wait_prefers_a0: bool | None = None
+        self._relay_hops_cache: dict[str, tuple[tuple[int, int], ...]] = {}
         self.trace_hook = trace_hook
 
     def __enter__(self) -> ToyopucClient:
@@ -297,7 +298,8 @@ class ToyopucClient:
 
     def _fire_trace(self, direction: ToyopucTraceDirection, data: bytes) -> None:
         if self.trace_hook is not None:
-            self.trace_hook(ToyopucTraceFrame(direction, bytes(data), datetime.now(timezone.utc)))
+            payload = data if isinstance(data, bytes) else bytes(data)
+            self.trace_hook(ToyopucTraceFrame(direction, payload, datetime.now(timezone.utc)))
 
     @property
     def last_tx(self) -> bytes | None:
@@ -307,20 +309,25 @@ class ToyopucClient:
     def last_rx(self) -> bytes | None:
         return self._last_rx
 
-    def _recv_exact(self, n: int) -> bytes:
+    def _recv_exact_into(self, buffer: bytearray | memoryview) -> None:
         assert self._sock is not None
-        chunks = []
-        remaining = n
+        view = memoryview(buffer)
+        offset = 0
+        remaining = len(view)
         while remaining > 0:
             try:
-                chunk = self._sock.recv(remaining)
+                received = self._sock.recv_into(view[offset:], remaining)
             except TimeoutError as e:
                 raise ToyopucTimeoutError("Receive timeout") from e
-            if not chunk:
+            if received <= 0:
                 raise ToyopucProtocolError("Connection closed while receiving")
-            chunks.append(chunk)
-            remaining -= len(chunk)
-        return b"".join(chunks)
+            offset += received
+            remaining -= received
+
+    def _recv_exact(self, n: int) -> bytes:
+        buffer = bytearray(n)
+        self._recv_exact_into(buffer)
+        return bytes(buffer)
 
     def _send_and_recv(self, payload: bytes) -> ResponseFrame:
         attempt = 0
@@ -337,11 +344,14 @@ class ToyopucClient:
             try:
                 if self.transport == "tcp":
                     self._sock.sendall(payload)
-                    header = self._recv_exact(4)
+                    header = bytearray(4)
+                    self._recv_exact_into(header)
                     ll, lh = header[2], header[3]
                     length = ll | (lh << 8)
-                    body = self._recv_exact(length)
-                    frame = header + body
+                    frame_buffer = bytearray(4 + length)
+                    frame_buffer[:4] = header
+                    self._recv_exact_into(memoryview(frame_buffer)[4:])
+                    frame = bytes(frame_buffer)
                 else:
                     self._sock.sendto(payload, (self.host, self.port))
                     frame, _ = self._sock.recvfrom(self.recv_bufsize)
@@ -692,7 +702,19 @@ class ToyopucClient:
 
     def send_via_relay(self, hops: str | Iterable[tuple[int, int]], inner_payload: bytes) -> ResponseFrame:
         """Send a command through relay hops and return the final inner response."""
-        outer = self.relay_nested(normalize_relay_hops(hops), inner_payload)
+        normalized: tuple[tuple[int, int], ...]
+        if isinstance(hops, str):
+            cached = self._relay_hops_cache.get(hops)
+            if cached is None:
+                normalized = tuple(normalize_relay_hops(hops))
+                if len(self._relay_hops_cache) >= 128:
+                    self._relay_hops_cache.clear()
+                self._relay_hops_cache[hops] = normalized
+            else:
+                normalized = cached
+        else:
+            normalized = tuple(normalize_relay_hops(hops))
+        outer = self.relay_nested(normalized, inner_payload)
         layers, final = unwrap_relay_response_chain(outer)
         if final is None:
             last = layers[-1]

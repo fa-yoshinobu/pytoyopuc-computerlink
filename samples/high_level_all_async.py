@@ -43,6 +43,12 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description="TOYOPUC Computer Link asynchronous high-level API sample",
         formatter_class=argparse.RawTextHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python samples/high_level_all_async.py --host 192.168.250.100 --port 1025\n"
+            "  python samples/high_level_all_async.py --host 192.168.250.100 --port 1025 --poll-count 2\n"
+            "  python samples/high_level_all_async.py --host 192.168.250.100 --port 1025 --poll-count 5\n"
+        ),
     )
     p.add_argument("--host", required=True, help="PLC IP address or hostname")
     p.add_argument(
@@ -192,6 +198,8 @@ async def demo_poll(plc, count: int) -> None:
 
 
 async def run(args: argparse.Namespace) -> None:
+    print("scenario: full asynchronous high-level cookbook")
+
     # 1. open_and_connect shortcut
     await demo_open_and_connect(args.host, args.port)
 
