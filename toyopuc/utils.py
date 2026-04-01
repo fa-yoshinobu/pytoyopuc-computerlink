@@ -1,4 +1,10 @@
-"""High-level utility helpers for the TOYOPUC client."""
+"""High-level utility helpers for the TOYOPUC client.
+
+These helpers provide the user-facing surface that samples and generated API
+documentation should point to first. They wrap the lower-level async client
+with typed reads and writes, named snapshots, polling, and explicit
+single-request or chunked contiguous access helpers.
+"""
 
 from __future__ import annotations
 
@@ -18,7 +24,14 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class ToyopucConnectionOptions:
-    """Stable connection settings for one TOYOPUC session."""
+    """Stable connection settings for one TOYOPUC session.
+
+    Attributes:
+        host: PLC hostname or IP address.
+        port: TOYOPUC computer-link port.
+        timeout: Socket timeout in seconds.
+        retries: Number of retry attempts performed by the async client.
+    """
 
     host: str
     port: int = 1025
@@ -27,7 +40,16 @@ class ToyopucConnectionOptions:
 
 
 def normalize_address(device: str, *, profile: str | None = None) -> str:
-    """Return the canonical TOYOPUC device string."""
+    """Return the canonical TOYOPUC device string.
+
+    Args:
+        device: User-facing device text such as ``"p1-d0100"``.
+        profile: Optional addressing profile used by :func:`resolve_device`.
+
+    Returns:
+        Canonical uppercase address text suitable for logs and configuration
+        storage.
+    """
 
     from .high_level import resolve_device
 
@@ -39,7 +61,11 @@ async def read_words_single_request(
     device: str,
     count: int,
 ) -> list[int]:
-    """Read contiguous word values using one high-level logical operation."""
+    """Read contiguous word values using one high-level logical operation.
+
+    This is the explicit atomic path for a contiguous word range. If the
+    caller wants multiple protocol requests, use :func:`read_words_chunked`.
+    """
 
     return await read_words(client, device, count)
 
@@ -49,7 +75,11 @@ async def read_dwords_single_request(
     device: str,
     count: int,
 ) -> list[int]:
-    """Read contiguous dword values using one high-level logical operation."""
+    """Read contiguous dword values using one high-level logical operation.
+
+    The helper requests dwords through the client with ``atomic_transfer=True``
+    so each logical 32-bit value stays intact.
+    """
 
     values = await client.read_dwords(device, count, atomic_transfer=True)
     return [int(value) & 0xFFFFFFFF for value in values]
@@ -60,7 +90,11 @@ async def write_words_single_request(
     device: str,
     values: list[int],
 ) -> None:
-    """Write contiguous word values using one high-level logical operation."""
+    """Write contiguous word values using one high-level logical operation.
+
+    This helper is intended for ranges that should remain one logical write
+    from the caller's perspective.
+    """
 
     sync_client = cast(Any, client._client)
     runner = cast(Any, client._run_sync_in_worker)
@@ -73,7 +107,11 @@ async def write_dwords_single_request(
     device: str,
     values: list[int],
 ) -> None:
-    """Write contiguous dword values using one high-level logical operation."""
+    """Write contiguous dword values using one high-level logical operation.
+
+    The helper uses ``atomic_transfer=True`` so the logical dword range is
+    written through the dedicated dword API instead of implicit word pairs.
+    """
 
     await client.write_dwords(device, [int(value) & 0xFFFFFFFF for value in values], atomic_transfer=True)
 
@@ -84,7 +122,11 @@ async def read_words_chunked(
     count: int,
     max_words_per_request: int = 64,
 ) -> list[int]:
-    """Read contiguous word values across multiple logical operations."""
+    """Read contiguous word values across multiple logical operations.
+
+    Chunking is explicit here. Use this helper only when the caller accepts
+    multi-request read semantics.
+    """
 
     if max_words_per_request <= 0:
         raise ValueError("max_words_per_request must be at least 1")
@@ -109,7 +151,11 @@ async def read_dwords_chunked(
     count: int,
     max_dwords_per_request: int = 32,
 ) -> list[int]:
-    """Read contiguous dword values across multiple logical operations."""
+    """Read contiguous dword values across multiple logical operations.
+
+    Chunk boundaries are aligned to full dwords so a 32-bit value is never
+    torn across requests.
+    """
 
     if max_dwords_per_request <= 0:
         raise ValueError("max_dwords_per_request must be at least 1")
@@ -134,7 +180,11 @@ async def write_words_chunked(
     values: list[int],
     max_words_per_request: int = 64,
 ) -> None:
-    """Write contiguous word values across multiple logical operations."""
+    """Write contiguous word values across multiple logical operations.
+
+    Use this helper only when multiple write operations are acceptable to the
+    caller.
+    """
 
     if max_words_per_request <= 0:
         raise ValueError("max_words_per_request must be at least 1")
@@ -155,7 +205,11 @@ async def write_dwords_chunked(
     values: list[int],
     max_dwords_per_request: int = 32,
 ) -> None:
-    """Write contiguous dword values across multiple logical operations."""
+    """Write contiguous dword values across multiple logical operations.
+
+    Each chunk boundary is aligned to full dwords so one logical value remains
+    intact inside one request.
+    """
 
     if max_dwords_per_request <= 0:
         raise ValueError("max_dwords_per_request must be at least 1")
@@ -221,9 +275,11 @@ async def open_and_connect(
     """Create and connect an AsyncToyopucDeviceClient.
 
     Args:
-        host: PLC IP address or hostname.
+        host: PLC IP address, hostname, or a
+            :class:`ToyopucConnectionOptions` instance.
         port: TOYOPUC computer-link port. Defaults to 1025.
         timeout: Socket timeout in seconds.
+        retries: Retry count used by the async client.
 
     Returns:
         A connected AsyncToyopucDeviceClient.
@@ -252,15 +308,19 @@ async def read_typed(
 ) -> int | float:
     """Read one device value and convert it to the specified Python type.
 
+    Supported dtype codes are ``"U"``, ``"S"``, ``"D"``, ``"L"``, and
+    ``"F"``. The helper keeps the public surface aligned with the .NET and C++
+    helper layers.
+
     Args:
         client: Connected AsyncToyopucDeviceClient.
         device: Device address string (e.g. "D0100", "B0000").
-        dtype: Type code —
-            "U" unsigned 16-bit int,
-            "S" signed 16-bit int,
-            "D" unsigned 32-bit int,
-            "L" signed 32-bit int,
-            "F" float32.
+        dtype: Type code.
+            ``"U"`` for unsigned 16-bit int,
+            ``"S"`` for signed 16-bit int,
+            ``"D"`` for unsigned 32-bit int,
+            ``"L"`` for signed 32-bit int,
+            ``"F"`` for float32.
 
     Returns:
         Converted value as int or float.
@@ -289,10 +349,14 @@ async def write_typed(
 ) -> None:
     """Write one device value using the specified type format.
 
+    The dtype codes match :func:`read_typed`. Word-sized values are written as
+    one logical word, while ``"D"``, ``"L"``, and ``"F"`` use the dedicated
+    32-bit helper paths.
+
     Args:
         client: Connected AsyncToyopucDeviceClient.
         device: Device address string.
-        dtype: Type code — same as :func:`read_typed`.
+        dtype: Type code accepted by :func:`read_typed`.
         value: Value to write.
     """
     key = dtype.upper()
@@ -318,10 +382,14 @@ async def write_bit_in_word(
 ) -> None:
     """Set or clear a single bit within a word device (read-modify-write).
 
+    This helper is intended for expressions such as ``"D0100.3"``. Direct bit
+    devices should be written through :func:`write_typed` or the lower-level
+    client API.
+
     Args:
         client: Connected AsyncToyopucDeviceClient.
         device: Word device address.
-        bit_index: Bit position within the word (0–15).
+        bit_index: Bit position within the word, in the range ``0`` to ``15``.
         value: New bit state.
     """
     if not 0 <= bit_index <= 15:
@@ -342,10 +410,13 @@ async def write_bit_in_word(
 def _parse_address(address: str) -> tuple[str, str, int | None]:
     """Parse extended address notation into (base_device, dtype, bit_index).
 
+    This parser supports the address forms accepted by :func:`read_named` and
+    :func:`poll`.
+
     Supported formats:
-    - ``"D100"``      → device as unsigned 16-bit word (dtype "U")
-    - ``"D100:F"``    → device with explicit dtype code
-    - ``"D100.3"``    → bit 3 within word device (dtype "BIT_IN_WORD")
+    - ``"D100"``: device as unsigned 16-bit word (dtype ``"U"``)
+    - ``"D100:F"``: device with explicit dtype code
+    - ``"D100.3"``: bit 3 within one word device (dtype ``"BIT_IN_WORD"``)
     """
     if ":" in address:
         base, dtype = address.split(":", 1)
@@ -365,14 +436,18 @@ async def read_named(
 ) -> dict[str, int | float | bool]:
     """Read multiple devices by address string and return results as a dict.
 
+    The returned dictionary preserves the original address strings as keys so
+    application code can display or diff snapshots without rebuilding the
+    request list.
+
     Address format examples:
 
-    - ``"D0100"``    — unsigned 16-bit int
-    - ``"D0100:F"``  — float32
-    - ``"D0100:S"``  — signed 16-bit int
-    - ``"D0100:D"``  — unsigned 32-bit int
-    - ``"D0100:L"``  — signed 32-bit int
-    - ``"D0100.3"``  — bit 3 within word (bool)
+    - ``"D0100"``: unsigned 16-bit int
+    - ``"D0100:F"``: float32
+    - ``"D0100:S"``: signed 16-bit int
+    - ``"D0100:D"``: unsigned 32-bit int
+    - ``"D0100:L"``: signed 32-bit int
+    - ``"D0100.3"``: bit 3 within one word (bool)
 
     Args:
         client: Connected AsyncToyopucDeviceClient.
@@ -403,6 +478,9 @@ async def poll(
     interval: float,
 ) -> AsyncIterator[dict[str, int | float | bool]]:
     """Yield a snapshot of all devices every *interval* seconds.
+
+    This helper performs repeated :func:`read_named` calls and sleeps for the
+    requested interval between snapshots.
 
     Args:
         client: Connected AsyncToyopucDeviceClient.

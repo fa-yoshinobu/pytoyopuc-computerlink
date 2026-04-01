@@ -1,9 +1,17 @@
-"""Public package entry points for `toyopuc`.
+"""TOYOPUC communication package with high-level helpers as the recommended user surface.
 
-Use:
-- `ToyopucClient` for low-level protocol-oriented access
-- `ToyopucDeviceClient` for string-address based access
-- `resolve_device()` when you want address-family resolution without I/O
+The primary user-facing entry points are:
+
+- ``ToyopucConnectionOptions`` / ``open_and_connect``
+- ``read_typed`` / ``write_typed``
+- ``read_words_single_request`` / ``read_dwords_single_request``
+- ``read_words_chunked`` / ``read_dwords_chunked``
+- ``write_bit_in_word``
+- ``read_named`` / ``poll``
+
+Low-level clients and address helpers remain exported for advanced workflows,
+but the helpers above are the preferred surface for normal application code
+and generated user documentation.
 """
 
 __version__ = "0.1.2"
