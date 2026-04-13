@@ -25,3 +25,4 @@ local_folder/
 .vscode/
 .idea/
 uv.lock
+_site/

@@ -1,4 +1,4 @@
-site_dir: docs
+site_dir: _site
 docs_dir: docsrc
 site_name: Toyopuc Computer Link Python API
 site_url: https://fa-yoshinobu.github.io/plc-comm-computerlink-python/
