@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.1.6 - 2026-04-14
+
+### Changed
+- Reorganized the public docs around beginner-first getting-started and supported-register guides while keeping maintainer notes under `internal_docs`.
+- Separated local and publish docs builds so publication settings no longer affect local MkDocs verification.
+
 ## 0.1.5 - 2026-04-01
 
 ## 0.1.4 - 2026-03-29
