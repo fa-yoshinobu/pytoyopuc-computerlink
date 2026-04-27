@@ -100,6 +100,7 @@ ERROR_CODE_DESCRIPTIONS = {
 }
 
 
+_RETRYABLE_RESPONSE_ERROR_CODES = {0x73}
 _FR_BLOCK_WORDS = 0x8000
 _FR_MAX_INDEX = 0x1FFFFF
 _FR_IO_CHUNK_WORDS = 0x0200
@@ -188,6 +189,16 @@ def format_response_error(resp: ResponseFrame) -> str:
     return f"{msg}, data={resp.data.hex()}"
 
 
+def _response_error_code(resp: ResponseFrame) -> int | None:
+    if resp.rc != 0x10:
+        return None
+    return resp.data[-1] if resp.data else resp.cmd
+
+
+def _is_retryable_response_error(resp: ResponseFrame) -> bool:
+    return _response_error_code(resp) in _RETRYABLE_RESPONSE_ERROR_CODES
+
+
 def _extract_response_error_code(frame: bytes | None) -> int | None:
     if not frame:
         return None
@@ -195,9 +206,7 @@ def _extract_response_error_code(frame: bytes | None) -> int | None:
         resp = parse_response(frame)
     except Exception:
         return None
-    if resp.rc != 0x10:
-        return None
-    return resp.data[-1] if resp.data else resp.cmd
+    return _response_error_code(resp)
 
 
 def _extract_relay_nak_error_code(frame: bytes | None) -> int | None:
@@ -362,7 +371,6 @@ class ToyopucClient:
                         self.close()
                     except Exception:
                         pass
-                    import time
 
                     time.sleep(self.retry_delay)
                     continue
@@ -374,7 +382,6 @@ class ToyopucClient:
                         self.close()
                     except Exception:
                         pass
-                    import time
 
                     time.sleep(self.retry_delay)
                     continue
@@ -386,7 +393,11 @@ class ToyopucClient:
             if resp.ft != FT_RESPONSE:
                 raise ToyopucProtocolError(f"Unexpected frame type: 0x{resp.ft:02X}")
             if resp.rc != 0x00:
-                raise ToyopucError(format_response_error(resp))
+                last_err = ToyopucError(format_response_error(resp))
+                if _is_retryable_response_error(resp) and attempt <= self.retries:
+                    time.sleep(self.retry_delay)
+                    continue
+                raise last_err
             return resp
 
         if last_err:

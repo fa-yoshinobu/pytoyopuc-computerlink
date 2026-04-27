@@ -40,6 +40,7 @@ from .profiles import (
     ToyopucAddressingOptions,
     ToyopucAddressRange,
     ToyopucAreaDescriptor,
+    ToyopucDeviceCatalog,
     ToyopucDeviceProfile,
     ToyopucDeviceProfiles,
 )
@@ -119,6 +120,7 @@ __all__ = [
     "ToyopucAddressRange",
     "ToyopucAddressingOptions",
     "ToyopucAreaDescriptor",
+    "ToyopucDeviceCatalog",
     "ToyopucDeviceProfile",
     "ToyopucDeviceProfiles",
 ]

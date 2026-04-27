@@ -739,6 +739,163 @@ class ToyopucDeviceProfiles:
         )
 
 
+class ToyopucDeviceCatalog:
+    """Convenience API for profile area metadata used by UI/device lists."""
+
+    @classmethod
+    def get_area_descriptors(cls, profile: str | None = None) -> tuple[ToyopucAreaDescriptor, ...]:
+        return ToyopucDeviceProfiles.from_name(profile).areas
+
+    @classmethod
+    def get_areas(cls, prefixed: bool, profile: str | None = None) -> list[str]:
+        areas: list[str] = []
+        for descriptor in cls.get_area_descriptors(profile):
+            if (prefixed and descriptor.supports_prefixed) or (not prefixed and descriptor.supports_direct):
+                areas.append(descriptor.area)
+        return areas
+
+    @classmethod
+    def get_area_descriptor(cls, area: str, profile: str | None = None) -> ToyopucAreaDescriptor:
+        return ToyopucDeviceProfiles.get_area_descriptor(area, profile)
+
+    @classmethod
+    def get_supported_ranges(
+        cls,
+        area: str,
+        prefixed: bool,
+        profile: str | None = None,
+        *,
+        unit: str | None = None,
+        packed: bool = False,
+    ) -> tuple[ToyopucAddressRange, ...]:
+        descriptor = cls.get_area_descriptor(area, profile)
+        resolved_unit = cls._default_unit(descriptor, unit, packed)
+        return cls._get_supported_ranges(descriptor, prefixed, resolved_unit, packed)
+
+    @classmethod
+    def get_supported_range(
+        cls,
+        area: str,
+        prefixed: bool,
+        profile: str | None = None,
+        *,
+        unit: str | None = None,
+        packed: bool = False,
+    ) -> ToyopucAddressRange:
+        ranges = cls.get_supported_ranges(area, prefixed, profile, unit=unit, packed=packed)
+        if len(ranges) == 1:
+            return ranges[0]
+        raise ValueError(
+            f"Area {area} for profile {profile or 'Generic'!r} has multiple ranges; "
+            "use get_supported_ranges() instead."
+        )
+
+    @classmethod
+    def is_supported_index(
+        cls,
+        area: str,
+        index: int,
+        prefixed: bool,
+        profile: str | None = None,
+        *,
+        unit: str | None = None,
+        packed: bool = False,
+    ) -> bool:
+        try:
+            ranges = cls.get_supported_ranges(area, prefixed, profile, unit=unit, packed=packed)
+        except Exception:
+            return False
+        return any(r.contains(index) for r in ranges)
+
+    @classmethod
+    def get_suggested_start_addresses(
+        cls,
+        area: str,
+        prefix: str | None = None,
+        profile: str | None = None,
+        *,
+        unit: str | None = None,
+        packed: bool = False,
+        options: ToyopucAddressingOptions | None = None,
+    ) -> list[str]:
+        descriptor = cls.get_area_descriptor(area, profile)
+        normalized_prefix = cls._normalize_prefix(prefix)
+        prefixed = normalized_prefix is not None
+        resolved_unit = cls._default_unit(descriptor, unit, packed)
+        ranges = cls._get_supported_ranges(descriptor, prefixed, resolved_unit, packed)
+        resolved_options = options or ToyopucDeviceProfiles.from_name(profile).addressing_options
+
+        suffix = "W" if resolved_unit == "word" and packed else "L" if resolved_unit == "byte" else ""
+        device_prefix = f"{normalized_prefix}-" if normalized_prefix else ""
+        width = descriptor.get_address_width(resolved_unit, packed)
+        results: list[str] = []
+        seen: set[str] = set()
+
+        def add_candidate(value: int) -> None:
+            candidate = f"{value:0{width}X}"
+            device = f"{device_prefix}{descriptor.area}{candidate}{suffix}"
+            if candidate not in seen and cls._can_resolve(device, resolved_options):
+                seen.add(candidate)
+                results.append(candidate)
+
+        for address_range in ranges:
+            value = address_range.start
+            while value <= address_range.end:
+                add_candidate(value)
+                if cls._will_overflow_next(value, descriptor.suggested_start_step):
+                    break
+                value += descriptor.suggested_start_step
+            add_candidate(address_range.end)
+
+        return results
+
+    @staticmethod
+    def _default_unit(descriptor: ToyopucAreaDescriptor, unit: str | None, packed: bool) -> str:
+        if unit is not None:
+            return unit.strip().lower()
+        return "word" if packed or not descriptor.supports_packed_word else "bit"
+
+    @staticmethod
+    def _get_supported_ranges(
+        descriptor: ToyopucAreaDescriptor,
+        prefixed: bool,
+        unit: str,
+        packed: bool,
+    ) -> tuple[ToyopucAddressRange, ...]:
+        derived = descriptor.uses_derived_access(unit, packed)
+        ranges = descriptor.get_ranges_for_unit(prefixed, unit, packed)
+        if ranges:
+            return ranges
+
+        access_mode = "prefixed" if prefixed else "direct"
+        if derived and descriptor.supports_packed_word:
+            raise ValueError(f"Area {descriptor.area} does not support derived word/byte access for {access_mode} use")
+        raise ValueError(f"Area {descriptor.area} is not available for {access_mode} access")
+
+    @staticmethod
+    def _normalize_prefix(prefix: str | None) -> str | None:
+        if prefix is None or not prefix.strip():
+            return None
+        normalized = prefix.strip().upper()
+        if normalized not in {"P1", "P2", "P3"}:
+            raise ValueError(f"Unsupported prefix: {prefix}")
+        return normalized
+
+    @staticmethod
+    def _can_resolve(device: str, options: ToyopucAddressingOptions) -> bool:
+        from .high_level import resolve_device
+
+        try:
+            resolve_device(device, options=options)
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
+    def _will_overflow_next(value: int, step: int) -> bool:
+        return value > (2**31 - 1) - step
+
+
 # Populate class-level profile instances
 _OPT = ToyopucAddressingOptions
 ToyopucDeviceProfiles.Generic = ToyopucDeviceProfile(

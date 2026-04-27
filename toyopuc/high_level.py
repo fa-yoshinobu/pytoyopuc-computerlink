@@ -314,7 +314,7 @@ def resolve_device(
     """Resolve a string device address into a normalized access descriptor.
 
     Args:
-        device: Device address string (e.g. ``"D0100"``, ``"P1-M1000"``).
+        device: Device address string (e.g. ``"P1-D0100"``, ``"P1-M1000"``).
         options: Addressing option flags that control PC10 routing.  When
             *None* and *profile* is given the profile's options are used;
             otherwise the Generic (all-True) defaults apply.

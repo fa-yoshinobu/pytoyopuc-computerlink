@@ -39,7 +39,7 @@ python samples/clock_and_status.py --host 192.168.250.100 --port 1025
 
 Address note:
 
-- `P/K/V/T/C/L/X/Y/M/S/N/R/D` families require `P1-`, `P2-`, or `P3-` prefix when a profile is in use
+- `P/K/V/T/C/L/X/Y/M/S/N/R/D` families require `P1-`, `P2-`, or `P3-` prefix
 
 ## Choose a sample by task
 
