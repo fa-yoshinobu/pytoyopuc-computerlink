@@ -1,5 +1,6 @@
 import pytest
 
+from toyopuc.address import parse_address, parse_prefixed_address
 from toyopuc.high_level import resolve_device
 
 
@@ -57,6 +58,26 @@ def test_gx_gy_keep_explicit_names() -> None:
 def test_gxy_is_not_supported_area() -> None:
     with pytest.raises(ValueError):
         resolve_device("GXY000W")
+
+
+def test_single_letter_area_can_be_followed_by_hex_digit_f() -> None:
+    parsed = parse_prefixed_address("P1-DFFFF", "word")[1]
+    upper_u = resolve_device("U0FFFF", profile="Nano 10GX:Compatible mode")
+
+    with pytest.raises(ValueError, match="out of range") as error:
+        resolve_device("P1-DFFFF", profile="Nano 10GX:Compatible mode")
+
+    assert parsed.area == "D"
+    assert parsed.index == 0xFFFF
+    assert upper_u.area == "U"
+    assert upper_u.index == 0x0FFFF
+    assert upper_u.scheme == "pc10-word"
+    assert "Unknown" not in str(error.value)
+
+
+def test_unknown_area_is_rejected_without_fallback() -> None:
+    with pytest.raises(ValueError, match="Unknown device area"):
+        parse_address("QF00", "word")
 
 
 def test_gm_word_and_byte_address_spaces_are_consistent() -> None:

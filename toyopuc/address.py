@@ -138,6 +138,7 @@ _ALL_KNOWN_AREAS = (
     | {"ES", "EN", "H", "U", "EB", "FR"}
     | {"EP", "EK", "EV", "ET", "EC", "EL", "EX", "EY", "EM", "GX", "GY", "GM"}
 )
+_KNOWN_AREA_CANDIDATES = tuple(sorted(_ALL_KNOWN_AREAS, key=lambda area: (-len(area), area)))
 _VALID_AREAS_STR = ", ".join(sorted(_ALL_KNOWN_AREAS))
 _PREF_RE = re.compile(r"^(?P<prefix>P[123])-(?P<area>[A-Z]{1,2})(?P<num>[0-9A-Fa-f]+)(?P<suffix>[LHW])?$")
 
@@ -273,6 +274,23 @@ def _validate_packed_index(area: str, index: int, *, prefixed: bool, text: str) 
         raise ValueError(f"Packed W/H/L address out of range: {text!r}")
 
 
+def _split_known_area_body(body: str, original_text: str) -> tuple[str, str, str | None]:
+    for area in _KNOWN_AREA_CANDIDATES:
+        if body.startswith(area):
+            number_and_suffix = body[len(area) :]
+            if not number_and_suffix:
+                raise ValueError(f"Invalid address format: {original_text!r}")
+
+            suffix = number_and_suffix[-1] if number_and_suffix[-1] in "LHW" else None
+            num_text = number_and_suffix[:-1] if suffix else number_and_suffix
+            if not num_text:
+                raise ValueError(f"Invalid address format: {original_text!r}")
+
+            return area, num_text, suffix
+
+    raise ValueError(f"Unknown device area in {original_text!r}. Valid areas: {_VALID_AREAS_STR}")
+
+
 def parse_address(text: str, unit: str, *, radix: int = 16) -> ParsedAddress:
     """Parse address strings like 'D0100', 'D0100L', 'M0201'.
 
@@ -280,16 +298,13 @@ def parse_address(text: str, unit: str, *, radix: int = 16) -> ParsedAddress:
     - The manual examples use hexadecimal numeric fields (e.g. D0100 -> 0x0100).
     - Use radix=10 if your PLC uses decimal notation.
     """
-    m = _ADDR_RE.match(text.strip().upper())
+    body = text.strip().upper()
+    m = _ADDR_RE.match(body)
     if not m:
         raise ValueError(f"Invalid address format: {text!r}")
 
-    area = m.group("area")
-    if area not in _ALL_KNOWN_AREAS:
-        raise ValueError(f"Unknown device area {area!r} in {text!r}. Valid areas: {_VALID_AREAS_STR}")
-    num_text = m.group("num")
+    area, num_text, suffix = _split_known_area_body(body, text)
     num = int(num_text, radix)
-    suffix = m.group("suffix")
 
     if unit == "byte" and suffix is None:
         # Default to low byte when omitted for byte access.
@@ -331,15 +346,15 @@ def parse_prefixed_address(text: str, unit: str, *, radix: int = 16) -> tuple[in
     The returned `ex_no` is the prefix-side program exchange number used by
     prefixed access paths. The second value is a normal `ParsedAddress`.
     """
-    m = _PREF_RE.match(text.strip().upper())
+    normalized = text.strip().upper()
+    m = _PREF_RE.match(normalized)
     if not m:
         raise ValueError(f"Invalid prefixed address format: {text!r}")
 
     prefix = m.group("prefix")
-    area = m.group("area")
-    num_text = m.group("num")
+    body = normalized[len(prefix) + 1 :]
+    area, num_text, suffix = _split_known_area_body(body, text)
     num = int(num_text, radix)
-    suffix = m.group("suffix")
 
     if unit == "byte" and suffix is None:
         suffix = "L"
