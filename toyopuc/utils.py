@@ -233,7 +233,7 @@ async def read_words(
 
     Args:
         client: Connected AsyncToyopucDeviceClient.
-        device: Starting device address string, e.g. ``"D0100"``.
+        device: Starting device address string, e.g. ``"P1-D0100"``.
         count: Number of words to read.
 
     Returns:
@@ -314,7 +314,7 @@ async def read_typed(
 
     Args:
         client: Connected AsyncToyopucDeviceClient.
-        device: Device address string (e.g. "D0100", "B0000").
+        device: Device address string (e.g. "P1-D0100", "B0000").
         dtype: Type code.
             ``"U"`` for unsigned 16-bit int,
             ``"S"`` for signed 16-bit int,
@@ -382,7 +382,7 @@ async def write_bit_in_word(
 ) -> None:
     """Set or clear a single bit within a word device (read-modify-write).
 
-    This helper is intended for expressions such as ``"D0100.3"``. Direct bit
+    This helper is intended for expressions such as ``"P1-D0100.3"``. Direct bit
     devices should be written through :func:`write_typed` or the lower-level
     client API.
 
@@ -442,12 +442,12 @@ async def read_named(
 
     Address format examples:
 
-    - ``"D0100"``: unsigned 16-bit int
-    - ``"D0100:F"``: float32
-    - ``"D0100:S"``: signed 16-bit int
-    - ``"D0100:D"``: unsigned 32-bit int
-    - ``"D0100:L"``: signed 32-bit int
-    - ``"D0100.3"``: bit 3 within one word (bool)
+    - ``"P1-D0100"``: unsigned 16-bit int
+    - ``"P1-D0100:F"``: float32
+    - ``"P1-D0100:S"``: signed 16-bit int
+    - ``"P1-D0100:D"``: unsigned 32-bit int
+    - ``"P1-D0100:L"``: signed 32-bit int
+    - ``"P1-D0100.3"``: bit 3 within one word (bool)
 
     Args:
         client: Connected AsyncToyopucDeviceClient.
@@ -489,7 +489,7 @@ async def poll(
 
     Usage::
 
-        async for snapshot in poll(client, ["D0100", "D0200:F"], interval=1.0):
+        async for snapshot in poll(client, ["P1-D0100", "P1-D0200:F"], interval=1.0):
             print(snapshot)
     """
     while True:

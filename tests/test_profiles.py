@@ -4,6 +4,7 @@ import pytest
 
 from toyopuc import (
     ToyopucAddressingOptions,
+    ToyopucDeviceCatalog,
     ToyopucDeviceProfiles,
 )
 from toyopuc.high_level import resolve_device
@@ -76,6 +77,44 @@ def test_get_area_descriptor_area_absent_from_profile_raises() -> None:
     # FR is not in ToyopucPlus Standard
     with pytest.raises(ValueError):
         ToyopucDeviceProfiles.get_area_descriptor("FR", "TOYOPUC-Plus:Plus Standard mode")
+
+
+def test_device_catalog_returns_area_metadata() -> None:
+    direct_areas = ToyopucDeviceCatalog.get_areas(prefixed=False)
+    prefixed_areas = ToyopucDeviceCatalog.get_areas(prefixed=True)
+    fr = ToyopucDeviceCatalog.get_area_descriptor("FR")
+
+    assert "FR" in direct_areas
+    assert "FR" not in prefixed_areas
+    assert fr.address_width == 6
+    assert not fr.supports_packed_word
+    assert fr.suggested_start_step == 0x1000
+
+
+def test_device_catalog_supported_ranges_and_start_addresses() -> None:
+    generic_prefixed_p = ToyopucDeviceCatalog.get_supported_ranges("P", prefixed=True, profile="Generic")
+    generic_direct_areas = ToyopucDeviceCatalog.get_areas(prefixed=False, profile="Generic")
+    prefixed_m_starts = ToyopucDeviceCatalog.get_suggested_start_addresses(
+        "M",
+        prefix="P1",
+        profile="Generic",
+        unit="word",
+        packed=True,
+    )
+
+    assert "P" not in generic_direct_areas
+    assert [(r.start, r.end) for r in generic_prefixed_p] == [(0x0000, 0x01FF), (0x1000, 0x17FF)]
+    assert "000" in prefixed_m_starts
+    assert "100" in prefixed_m_starts
+    assert "0000" not in prefixed_m_starts
+
+
+def test_device_catalog_rejects_direct_basic_start_addresses() -> None:
+    with pytest.raises(ValueError, match="not available for direct access"):
+        ToyopucDeviceCatalog.get_suggested_start_addresses("D")
+
+    assert ToyopucDeviceCatalog.is_supported_index("D", 0, prefixed=False) is False
+    assert ToyopucDeviceCatalog.is_supported_index("D", 0, prefixed=True) is True
 
 
 def test_area_descriptor_get_ranges_packed() -> None:

@@ -70,7 +70,7 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-Basic area families `P/K/V/T/C/L/X/Y/M/S/N/R/D` require a `P1-`, `P2-`, or `P3-` prefix when a profile is in use.
+Basic area families `P/K/V/T/C/L/X/Y/M/S/N/R/D` require a `P1-`, `P2-`, or `P3-` prefix.
 
 ## Supported PLC Registers
 
